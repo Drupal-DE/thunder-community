@@ -1,0 +1,17 @@
+language: php
+
+sudo: false
+
+php:
+  - 7.1
+
+branches:
+  only:
+    - /^8\.([0-9]+|x)\-[0-9]+\.([0-9]+|x)$/
+    - feature/code-checks
+
+before_install:
+  - bash -x -e ./scripts/travis/before-install.sh
+
+script:
+  - bash -x -e ./scripts/travis/run-tests.sh
