@@ -1,0 +1,9 @@
+{
+  "name": "burdamagazinorg/thunder-community",
+  "type": "drupal-module",
+  "description": "Provides commmunity components for the Thunder distribution.",
+  "minimum-stability": "dev",
+  "require": {
+    "drupal/core": "^8.0"
+  }
+}
