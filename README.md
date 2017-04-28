@@ -1,1 +1,1 @@
-# module-thunder_community
+# Community components for the Thunder distribution
