@@ -1,0 +1,7 @@
+name: Thunder Forum
+description: Provides extension for the Drupal core forum.
+core: 8.x
+type: module
+dependencies:
+  - drupal:forum
+package: Thunder Community
