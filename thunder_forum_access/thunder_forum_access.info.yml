@@ -7,4 +7,4 @@ dependencies:
   - drupal:taxonomy
   - thunder:thunder_ach
   - thunder_forum:thunder_forum
-package: Thunder community
+package: Thunder Community

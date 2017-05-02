@@ -30,6 +30,21 @@ class ForumTermBase extends ThunderAccessControlHandlerBase {
   protected $vocabularyId = 'forums';
 
   /**
+   * The forum manager.
+   *
+   * @var \Drupal\thunder_forum\ThunderForumManagerInterface
+   */
+  protected $forumManager;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->forumManager = \Drupal::service('forum_manager');
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function applies(EntityInterface $entity, $operation, AccountInterface $account = NULL) {
@@ -41,28 +56,18 @@ class ForumTermBase extends ThunderAccessControlHandlerBase {
    * {@inheritdoc}
    */
   public function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
-    // @todo: Add service.
-    $is_moderator = FALSE;
+    $private = $this->forumManager->isPrivate($entity);
+    $is_member = $this->forumManager->isMember($entity, $account);
+    $is_moderator = $this->forumManager->isModerator($entity, $account);
     switch ($operation) {
       case 'view':
-        return AccessResult::allowedIf($is_moderator);
+        return AccessResult::forbiddenIf($private && !($is_moderator || $is_member));
 
       case 'update':
         return AccessResult::allowedIf($is_moderator);
-
-      case 'delete':
     }
     // Fallback.
     return parent::checkAccess($entity, $operation, $account);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
-    // @todo: Add service.
-    $is_moderator = FALSE;
-    return AccessResult::allowedIf($is_moderator);
   }
 
   /**
@@ -74,9 +79,8 @@ class ForumTermBase extends ThunderAccessControlHandlerBase {
     }
     // Forum moderators are allowed to edit title and description.
     $fields = ['name', 'description'];
-    // @todo: Add service.
-    $is_moderator = FALSE;
-    if ('edit' === $operation && in_array($field_definition->getName(), $fields)) {
+    if (!empty($items) && 'edit' === $operation && in_array($field_definition->getName(), $fields)) {
+      $is_moderator = $this->forumManager->isModerator($items->getEntity(), $account);
       return AccessResult::forbiddenIf(!$is_moderator);
     }
     return parent::checkFieldAccess($operation, $field_definition, $account, $items);

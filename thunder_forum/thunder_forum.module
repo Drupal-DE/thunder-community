@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * Main functions for "Thunder Forum" module.
+ */
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function thunder_forum_form_taxonomy_term_forums_form_alter(&$form, FormStateInterface &$form_state) {
+  _thunder_forum_term_form_alter($form, $form_state);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function thunder_forum_form_taxonomy_term_forums_container_form_alter(&$form, FormStateInterface &$form_state) {
+  _thunder_forum_term_form_alter($form, $form_state);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function thunder_forum_form_taxonomy_term_forums_forum_form_alter(&$form, FormStateInterface &$form_state) {
+  _thunder_forum_term_form_alter($form, $form_state);
+}
+
+/**
+ * Helper function to alter term/forum forms.
+ *
+ * @param array $form
+ *   The renderable form array.
+ * @param FormStateInterface $form_state
+ *   Current form state.
+ *
+ * @see hook_form_alter()
+ */
+function _thunder_forum_term_form_alter(&$form, FormStateInterface &$form_state) {
+  if (empty($form['field_forum_is_private']) || empty($form['field_forum_members'])) {
+    return;
+  }
+  $form['field_forum_members']['#states'] = [
+    'visible' => [
+      ':input[name="field_forum_is_private[value]"]' => ['checked' => TRUE],
+    ],
+  ];
+}
