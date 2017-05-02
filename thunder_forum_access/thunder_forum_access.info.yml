@@ -1,0 +1,10 @@
+name: 'Thunder forum access'
+description: 'Provide extended access control for forums.'
+type: module
+core: 8.x
+dependencies:
+  - drupal:forum
+  - drupal:taxonomy
+  - thunder:thunder_ach
+  - thunder_forum:thunder_forum
+package: Thunder community
