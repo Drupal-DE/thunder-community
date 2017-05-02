@@ -7,8 +7,8 @@ id: taxonomy_term.forums.field_forum_is_private
 field_name: field_forum_is_private
 entity_type: taxonomy_term
 bundle: forums
-label: Private
-description: 'Limit visibility/access to the list of forum members.'
+label: Forum is private
+description: 'Limit visibility/access to a list of selected users.'
 required: false
 translatable: false
 default_value:

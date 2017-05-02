@@ -2,8 +2,8 @@ status: true
 dependencies:
   module:
     - taxonomy
-id: taxonomy_term.field_forum_is_protected
-field_name: field_forum_is_protected
+id: taxonomy_term.field_forum_is_locked
+field_name: field_forum_is_locked
 entity_type: taxonomy_term
 type: boolean
 settings: {  }
