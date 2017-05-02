@@ -1,0 +1,20 @@
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_forum_is_protected
+    - taxonomy.vocabulary.forums
+id: taxonomy_term.forums.field_forum_is_protected
+field_name: field_forum_is_protected
+entity_type: taxonomy_term
+bundle: forums
+label: Protected
+description: 'Protect the forum from changes.'
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: protected
+  off_label: unprotected
+field_type: boolean

@@ -1,0 +1,21 @@
+status: true
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_forum_is_private
+    - taxonomy.vocabulary.forums
+id: taxonomy_term.forums.field_forum_is_private
+field_name: field_forum_is_private
+entity_type: taxonomy_term
+bundle: forums
+label: Private
+description: 'Limit visibility/access to the list of forum members.'
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: private
+  off_label: public
+field_type: boolean
