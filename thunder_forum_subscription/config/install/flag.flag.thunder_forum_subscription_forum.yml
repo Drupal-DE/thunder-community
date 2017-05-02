@@ -1,0 +1,30 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - thunder_forum_subscription
+id: thunder_forum_subscription_forum
+label: 'Forum subscription'
+bundles:
+  - forums
+entity_type: taxonomy_term
+global: false
+weight: 0
+flag_short: 'Subscribe to forum'
+flag_long: 'Subscribe to forum and get notifications about new content.'
+flag_message: 'Created forum subscription.'
+unflag_short: 'Remove forum subscription'
+unflag_long: 'Remove forum subscription to get no notifications about new content anymore.'
+unflag_message: 'Removed forum subscription.'
+unflag_denied_text: ''
+flag_type: 'entity:taxonomy_term'
+link_type: reload
+flagTypeConfig:
+  show_in_links:
+    full: full
+  show_as_field: true
+  show_on_form: false
+  show_contextual_link: false
+  extra_permissions: {  }
+linkTypeConfig: {  }
