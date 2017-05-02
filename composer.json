@@ -4,6 +4,7 @@
   "description": "Provides commmunity components for the Thunder distribution.",
   "minimum-stability": "dev",
   "require": {
+    "drupal/allowed_formats": "^1.0",
     "drupal/core": "^8.0",
     "drupal/flag": "^4.0"
   }
