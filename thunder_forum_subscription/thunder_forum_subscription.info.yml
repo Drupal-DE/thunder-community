@@ -3,7 +3,7 @@ description: Provides a subscription mechanism for forums and topics.
 core: 8.x
 type: module
 dependencies:
-  - thunder_forum
-  - flag
-  - views
+  - drupal:views
+  - flag:flag
+  - thunder_forum:thunder_forum
 package: Thunder Community

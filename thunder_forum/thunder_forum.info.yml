@@ -3,5 +3,5 @@ description: Provides extension for the Drupal core forum.
 core: 8.x
 type: module
 dependencies:
-  - forum
+  - drupal:forum
 package: Thunder Community
