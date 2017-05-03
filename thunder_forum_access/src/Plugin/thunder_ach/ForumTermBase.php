@@ -23,11 +23,16 @@ class ForumTermBase extends ThunderAccessControlHandlerBase {
   /**
    * The vocabulary ID of forum terms.
    *
-   * @todo Make configurable.
-   *
    * @var string
    */
   protected $vocabularyId = 'forums';
+
+  /**
+   * The term storage.
+   *
+   * @var \Drupal\taxonomy\TermStorageInterface
+   */
+  protected $storage;
 
   /**
    * The forum manager.
@@ -41,6 +46,8 @@ class ForumTermBase extends ThunderAccessControlHandlerBase {
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->vocabularyId = \Drupal::config('forum.settings')->get('vocabulary');
+    $this->storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
     $this->forumManager = \Drupal::service('forum_manager');
   }
 

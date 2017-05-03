@@ -3,6 +3,7 @@
 /**
  * Main functions for "Thunder Forum" module.
  */
+
 use Drupal\Core\Form\FormStateInterface;
 
 /**
