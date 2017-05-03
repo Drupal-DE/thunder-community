@@ -1,0 +1,64 @@
+<?php
+
+/**
+ * @file
+ * Provides a subscription mechanism for forums and topics.
+ */
+
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\flag\FlagInterface;
+use Drupal\node\NodeInterface;
+use Drupal\taxonomy\TermInterface;
+
+/**
+ * Implements hook_flag_action_access().
+ */
+function thunder_forum_subscription_flag_action_access($action, FlagInterface $flag, AccountInterface $account, EntityInterface $flaggable = NULL) {
+  $access_result = NULL;
+
+  switch ($flag->id()) {
+    // Forum subscription action.
+    case 'thunder_forum_subscription_forum':
+      $vid = \Drupal::config('forum.settings')->get('vocabulary');
+
+      // Is forum taxonomy term?
+      if ($flaggable instanceof TermInterface && $flaggable->bundle() === $vid) {
+        // Deny subscribing to forum containers.
+        if ($flaggable->hasField('forum_container') && $flaggable->forum_container->value) {
+          $access_result = AccessResult::forbidden();
+        }
+
+        // Deny subscribing to forums (if not allowed to view forum).
+        elseif (!$flaggable->access('view', $account)) {
+          $access_result = AccessResult::forbidden();
+        }
+      }
+      break;
+
+    // Forum topic subscription action.
+    case 'thunder_forum_subscription_topic':
+      // Is forum topic node?
+      if ($flaggable instanceof NodeInterface && $flaggable->bundle() === 'forum') {
+        // Deny subscribing to forum topics (if not allowed to view topic).
+        if (!$flaggable->access('view', $account)) {
+          $access_result = AccessResult::forbidden();
+        }
+      }
+      break;
+  }
+
+  // Return access result (if any).
+  if ($access_result) {
+    $access_result
+      // Add account to cache information.
+      ->addCacheableDependency($account)
+      // Add flaggable entity to cache information.
+      ->addCacheableDependency($flaggable);
+
+    return $access_result;
+  }
+
+  return AccessResult::neutral();
+}
