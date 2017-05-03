@@ -1,0 +1,31 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - thunder_forum_subscription
+id: thunder_forum_subscription_topic
+label: 'Forum topic subscription'
+bundles:
+  - forum
+entity_type: node
+global: false
+weight: 0
+flag_short: 'Subscribe to topic'
+flag_long: 'Subscribe to topic and get notifications about new content.'
+flag_message: 'Created topic subscription.'
+unflag_short: 'Remove topic subscription'
+unflag_long: 'Remove topic subscription to get no notifications about new content anymore.'
+unflag_message: 'Removed topic subscription.'
+unflag_denied_text: ''
+flag_type: 'entity:node'
+link_type: reload
+flagTypeConfig:
+  show_in_links:
+    full: full
+  show_as_field: true
+  show_on_form: true
+  show_contextual_link: false
+  extra_permissions:
+    owner: '0'
+linkTypeConfig: {  }
