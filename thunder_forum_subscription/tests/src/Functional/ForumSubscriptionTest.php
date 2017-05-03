@@ -53,36 +53,39 @@ class ForumSubscriptionTest extends BrowserTestBase {
       'forum_container' => 0,
       'name' => 'Forum',
       'parent' => $this->terms['container']->id(),
-      'vid' => 'forums'
+      'vid' => 'forums',
     ]);
 
     // @todo Create topic.
   }
 
   /**
-   * @todo Tests forum container subscription access.
+   * Tests forum container subscription access.
    */
   public function testForumContainerSubscriptionAccess() {
+    // Tests forum container subscription access.
     $this->drupalGet(Url::fromRoute('entity.taxonomy_term.canonical', [
       'taxonomy_term' => $this->terms['container']->id(),
     ]));
   }
 
   /**
-   * @todo Tests forum subscription access.
+   * Tests forum subscription access.
    */
   public function testForumForumSubscriptionAccess() {
+    // @todo Tests forum subscription access.
     $this->drupalGet(Url::fromRoute('entity.taxonomy_term.canonical', [
       'taxonomy_term' => $this->terms['forum']->id(),
     ]));
   }
 
   /**
-   * @todo Tests forum topic subscription access.
+   * Tests forum topic subscription access.
    */
   public function testForumTopicSubscriptionAccess() {
+    // @todo Tests forum topic subscription access.
     // $this->drupalGet(Url::fromRoute('entity.node.canonical', [
-    //   'node' => $this->nodes['topic']->id(),
+    // 'node' => $this->nodes['topic']->id(),
     // ]));
   }
 
