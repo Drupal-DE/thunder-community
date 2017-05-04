@@ -19,7 +19,7 @@ class ForumForumVisibilityTest extends BrowserTestBase {
   /**
    * List of user accounts.
    *
-   * @var \Drupal\Core\Session\AccountInterface[];
+   * @var \Drupal\Core\Session\AccountInterface[]
    */
   protected $accounts = [];
 

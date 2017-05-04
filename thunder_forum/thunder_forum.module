@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * @file
  * Main functions for "Thunder Forum" module.
  */
 
@@ -30,7 +31,7 @@ function thunder_forum_form_taxonomy_term_forums_forum_form_alter(&$form, FormSt
 /**
  * Helper function to alter term/forum forms.
  *
- * @param array $form
+ * @param $form
  *   The renderable form array.
  * @param FormStateInterface $form_state
  *   Current form state.

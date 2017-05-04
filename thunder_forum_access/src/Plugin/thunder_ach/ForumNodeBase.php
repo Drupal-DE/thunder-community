@@ -43,15 +43,6 @@ class ForumNodeBase extends ThunderAccessControlHandlerBase {
   /**
    * {@inheritdoc}
    */
-  public function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
-
-    // Fallback to default.
-    return parent::checkCreateAccess($account, $context, $entity_bundle);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     if ($entity->taxonomy_forums->isEmpty()) {
       return parent::checkAccess($entity, $operation, $account);

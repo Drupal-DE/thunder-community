@@ -3,4 +3,3 @@ services:
     class: Drupal\thunder_forum_access\Routing\RouteSubscriber
     tags:
       - { name: event_subscriber }
-
