@@ -1,0 +1,25 @@
+status: true
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_forum_moderators
+    - taxonomy.vocabulary.forums
+id: taxonomy_term.forums.field_forum_moderators
+field_name: field_forum_moderators
+entity_type: taxonomy_term
+bundle: forums
+label: Moderators
+description: 'List of moderator accounts for this forum.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:user'
+  handler_settings:
+    include_anonymous: false
+    target_bundles: null
+    sort:
+      field: name
+      direction: ASC
+    auto_create: false
+field_type: entity_reference

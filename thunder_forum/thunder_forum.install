@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * @file
+ * Install and update functions for "Thunder Forum" module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function thunder_forum_install() {
+  // Set the weight of the thunder_forum.module to 2 so it is loaded after the
+  // forum.module.
+  module_set_weight('thunder_forum', 2);
+}

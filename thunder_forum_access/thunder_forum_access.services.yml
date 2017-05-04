@@ -1,0 +1,5 @@
+services:
+  thunder_forum_access.route_subscriber:
+    class: Drupal\thunder_forum_access\Routing\RouteSubscriber
+    tags:
+      - { name: event_subscriber }
