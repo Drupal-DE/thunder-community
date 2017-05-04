@@ -28,7 +28,7 @@ class RouteSubscriber extends RouteSubscriberBase {
         '_entity_access' => 'taxonomy_term.view',
         'taxonomy_term' => '\d+',
       ];
-      $route->setRequirements($requirements);
+      $route->addRequirements($requirements);
     }
   }
 
