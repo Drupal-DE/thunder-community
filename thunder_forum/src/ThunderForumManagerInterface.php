@@ -12,6 +12,17 @@ use Drupal\taxonomy\TermInterface;
 interface ThunderForumManagerInterface extends ForumManagerInterface {
 
   /**
+   * Returns TRUE if the given taxonomy term is a forum term.
+   *
+   * @param \Drupal\taxonomy\TermInterface $term
+   *   A taxonomy term.
+   *
+   * @return bool
+   *   Boolean indicating whether the given taxonomy term is a forum term.
+   */
+  public function isForumTerm(TermInterface $term);
+
+  /**
    * Returns TRUE if the forum is private (and thus only accessible by members).
    *
    * @param \Drupal\taxonomy\TermInterface $term

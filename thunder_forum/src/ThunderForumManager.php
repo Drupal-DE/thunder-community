@@ -76,6 +76,13 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
   /**
    * {@inheritdoc}
    */
+  public function isForumTerm(TermInterface $term) {
+    return $term->bundle() === $this->configFactory->get('forum.settings')->get('vocabulary');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isPrivate(TermInterface $term) {
     return $term->__isset('field_forum_is_private') ? (bool) $term->field_forum_is_private->value : FALSE;
   }
