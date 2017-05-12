@@ -158,11 +158,11 @@ class ForumAccessMatrix extends Table {
           $element[$entity_type_id][$permission_name][$role_name] = [
             '#type' => 'checkbox',
             '#title' => $permission['label'],
+            '#title_display' => 'invisible',
             '#description' => !empty($permission['description']) ? $permission['description'] : NULL,
+            '#description_display' => 'invisible',
             '#default_value' => !empty($element['#value'][$role_name][$entity_type_id][$permission_name]),
             '#return_value' => $permission_name,
-            '#title_display' => 'invisible',
-            '#description_display' => 'invisible',
             '#parents' => array_merge($element['#parents'], [
               $role_name,
               $entity_type_id,
