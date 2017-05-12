@@ -55,12 +55,12 @@ class ForumAccessMatrix extends Table {
    *   The processed element.
    */
   public static function preRenderForumAccessMatrix($element) {
-    $forum_access_manager = static::getForumAccessMatrixService();
-    $roles = $forum_access_manager->getRoles();
+    $forum_access_matrix = static::getForumAccessMatrixService();
+    $roles = $forum_access_matrix->getRoles();
 
     // Build table rows.
     $rows = [];
-    foreach ($forum_access_manager->getPermissions() as $entity_type_id => $entity_type_info) {
+    foreach ($forum_access_matrix->getPermissions() as $entity_type_id => $entity_type_info) {
       // Entity type header row.
       $rows[$entity_type_id] = [
         'data' => [
@@ -115,8 +115,8 @@ class ForumAccessMatrix extends Table {
    *   The processed element.
    */
   public static function processForumAccessMatrix(array &$element, FormStateInterface $form_state, array &$complete_form) {
-    $forum_access_manager = static::getForumAccessMatrixService();
-    $roles = $forum_access_manager->getRoles();
+    $forum_access_matrix = static::getForumAccessMatrixService();
+    $roles = $forum_access_matrix->getRoles();
 
     $element['#tree'] = TRUE;
 
@@ -141,7 +141,7 @@ class ForumAccessMatrix extends Table {
     }
 
     // Permission labels/descriptions and checkboxes per role.
-    foreach ($forum_access_manager->getPermissions() as $entity_type_id => $entity_type_info) {
+    foreach ($forum_access_matrix->getPermissions() as $entity_type_id => $entity_type_info) {
       foreach ($entity_type_info['permissions'] as $permission_name => $permission) {
         // Permission label.
         $element[$entity_type_id][$permission_name]['_label'] = [
