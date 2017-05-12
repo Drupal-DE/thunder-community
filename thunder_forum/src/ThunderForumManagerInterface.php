@@ -12,6 +12,28 @@ use Drupal\taxonomy\TermInterface;
 interface ThunderForumManagerInterface extends ForumManagerInterface {
 
   /**
+   * Utility method to fetch the direct ancestor forum for a given forum.
+   *
+   * @param int $tid
+   *   The forum ID to fetch the parent for.
+   *
+   * @return \Drupal\taxonomy\TermInterface[]|null
+   *   The parent forum taxonomy term on success, otherwise NULL.
+   */
+  public function getParent($tid);
+
+  /**
+   * Utility method to fetch the direct ancestor forum ID for a given forum.
+   *
+   * @param int $tid
+   *   The forum ID to fetch the parent ID for.
+   *
+   * @return int
+   *   The parent forum taxonomy term ID on success, otherwise '0'.
+   */
+  public function getParentId($tid);
+
+  /**
    * Returns TRUE if the given taxonomy term is a forum term.
    *
    * @param \Drupal\taxonomy\TermInterface $term
