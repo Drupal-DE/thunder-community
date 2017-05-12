@@ -1,4 +1,4 @@
-name: 'Thunder forum access'
+name: 'Thunder Forum Access'
 description: 'Provide extended access control for forums.'
 type: module
 core: 8.x
