@@ -78,6 +78,8 @@ interface ForumAccessMatrixInterface {
    *       entity type. The key is the machine name, the value is a keyed array
    *       with the following items:
    *         - description: A brief description for the permission.
+   *         - disabled_for: (optional) An array of forum role machine names for
+   *           which the permission should be disabled.
    *         - label: The human-readable permission label.
    */
   public function getPermissions();
@@ -105,6 +107,22 @@ interface ForumAccessMatrixInterface {
    *   Boolean indicating whether the given forum permission exists.
    */
   public function permissionExists($target_entity_type_id, $permission);
+
+  /**
+   * Return whether forum permission is disabled for given role.
+   *
+   * @param string $target_entity_type_id
+   *   An ID for the entity type the permission is for.
+   * @param string $permission
+   *   A forum permission machine name.
+   * @param string $role
+   *   A forum role machine name.
+   *
+   * @return bool
+   *   Boolean indicating whether the given forum permission is disabled for the
+   *   given forum role.
+   */
+  public function permissionIsDisabledForRole($target_entity_type_id, $permission, $role);
 
   /**
    * Return whether forum role exists.

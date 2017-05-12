@@ -163,6 +163,7 @@ class ForumAccessMatrix extends Table {
             '#description_display' => 'invisible',
             '#default_value' => !empty($element['#value'][$role_name][$entity_type_id][$permission_name]),
             '#return_value' => $permission_name,
+            '#access' => !$forum_access_matrix->permissionIsDisabledForRole($entity_type_id, $permission_name, $role_name),
             '#parents' => array_merge($element['#parents'], [
               $role_name,
               $entity_type_id,

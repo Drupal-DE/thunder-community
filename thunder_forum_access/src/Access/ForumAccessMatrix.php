@@ -41,6 +41,7 @@ class ForumAccessMatrix implements ForumAccessMatrixInterface {
           static::PERMISSION_UPDATE_OWN => [
             'label' => $this->t('Edit own topics'),
             'description' => $this->t('Allow users to edit own topics in this forum and its subforums (if not configured differently on another level).'),
+            'disabled_for' => [static::ROLE_ANONYMOUS],
           ],
           static::PERMISSION_DELETE => [
             'label' => $this->t('Delete topics'),
@@ -49,6 +50,7 @@ class ForumAccessMatrix implements ForumAccessMatrixInterface {
           static::PERMISSION_DELETE_OWN => [
             'label' => $this->t('Delete own topics'),
             'description' => $this->t('Allow users to delete own topics in this forum and its subforums (if not configured differently on another level).'),
+            'disabled_for' => [static::ROLE_ANONYMOUS],
           ],
         ],
       ],
@@ -67,6 +69,7 @@ class ForumAccessMatrix implements ForumAccessMatrixInterface {
           static::PERMISSION_UPDATE_OWN => [
             'label' => $this->t('Edit own replies'),
             'description' => $this->t('Allow users to edit own replies to topics in this forum and its subforums (if not configured differently on another level).'),
+            'disabled_for' => [static::ROLE_ANONYMOUS],
           ],
           static::PERMISSION_DELETE => [
             'label' => $this->t('Delete replies'),
@@ -75,6 +78,7 @@ class ForumAccessMatrix implements ForumAccessMatrixInterface {
           static::PERMISSION_DELETE_OWN => [
             'label' => $this->t('Delete own replies'),
             'description' => $this->t('Allow users to delete own replies to topics in this forum and its subforums (if not configured differently on another level).'),
+            'disabled_for' => [static::ROLE_ANONYMOUS],
           ],
         ],
       ],
@@ -119,6 +123,19 @@ class ForumAccessMatrix implements ForumAccessMatrixInterface {
     $permissions = $this->getPermissions();
 
     return isset($permissions[$target_entity_type_id]['permissions'][$permission]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function permissionIsDisabledForRole($target_entity_type_id, $permission, $role) {
+    $permissions = $this->getPermissions();
+
+    if (isset($permissions[$target_entity_type_id]['permissions'][$permission]['disabled_for'])) {
+      return in_array($role, $permissions[$target_entity_type_id]['permissions'][$permission]['disabled_for'], TRUE);
+    }
+
+    return FALSE;
   }
 
   /**
