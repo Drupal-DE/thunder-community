@@ -4,3 +4,40 @@
  * @file
  * Main functions for "Thunder Forum" module.
  */
+
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function thunder_forum_form_taxonomy_term_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Is forum taxonomy term form?
+  if (in_array($form_id, ['taxonomy_term_forums_forum_form', 'taxonomy_term_forums_container_form'])) {
+    // 'Parent' field exists?
+    if (isset($form['parent'][0])) {
+      // Add element validation handler to disallows moving a forum into one of
+      // its children.
+      $form['parent'][0]['#element_validate'][] = '_thunder_forum_element_validate_forum_parent';
+    }
+  }
+}
+
+/**
+ * Form element validation handler for forum taxonomy term's 'parent' element.
+ *
+ * Disallows moving a forum into one of its children.
+ */
+function _thunder_forum_element_validate_forum_parent(array $element, FormStateInterface $form_state) {
+  $tid = $form_state->getValue('tid');
+  $vid = $form_state->getValue('vid');
+
+  if (isset($tid) && !empty($vid)) {
+    /** @var \Drupal\thunder_forum\ThunderForumManagerInterface $forum_manager */
+    $forum_manager = \Drupal::service('forum_manager');
+
+    // Value is one of the taxonomy term's children?
+    if (array_key_exists($element['#value'], $forum_manager->getChildren($vid, $tid))) {
+      $form_state->setError($element, t('A forum must not be moved into one of its children.'));
+    }
+  }
+}
