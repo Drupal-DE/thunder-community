@@ -46,30 +46,6 @@ interface ForumAccessManagerInterface {
   public function getForumModerators($tid);
 
   /**
-   * Forum is protected from changes?
-   *
-   * @param int $tid
-   *   A forum taxonomy term ID.
-   *
-   * @return bool
-   *   Whether the forum is locked / protected from changes  (or one of its
-   *   parents by inheritance).
-   */
-  public function forumIsLocked($tid);
-
-  /**
-   * Forum access is limited to associated members?
-   *
-   * @param int $tid
-   *   A forum taxonomy term ID.
-   *
-   * @return bool
-   *   Whether the forum is private / its access is limited to associated
-   *   members (or one of its parents by inheritance).
-   */
-  public function forumIsPrivate($tid);
-
-  /**
    * User is forum member?
    *
    * @param int $tid

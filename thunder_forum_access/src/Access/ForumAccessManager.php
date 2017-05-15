@@ -75,20 +75,6 @@ class ForumAccessManager implements ForumAccessManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function forumIsLocked($tid) {
-    // TODO: Implement forumIsLocked() method.
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function forumIsPrivate($tid) {
-    // TODO: Implement forumIsPrivate() method.
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function userIsForumMember($tid, AccountInterface $account) {
     $members = $this->getForumAccessRecord($tid)->getMemberUserIds();
 
