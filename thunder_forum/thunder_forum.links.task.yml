@@ -1,0 +1,11 @@
+forum.page.thunder_forum:
+  title: 'View'
+  route_name: forum.page
+  base_route: forum.page
+
+entity.taxonomy_term.forum_edit_form.thunder_forum:
+  title: 'Edit forum'
+  route_name: entity.taxonomy_term.forum_edit_container_form
+  class: '\Drupal\thunder_forum\Plugin\Menu\EditForumTermTab'
+  base_route: forum.page
+  weight: 100
