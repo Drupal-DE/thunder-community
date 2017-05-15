@@ -42,7 +42,7 @@ class EditForumTermTab extends LocalTaskDefault implements ContainerFactoryPlugi
    * @param array $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The comment storage service.
+   *   The route match.
    * @return \Drupal\Core\Routing\RedirectDestinationInterface
    *   The redirect destination helper.
    */
