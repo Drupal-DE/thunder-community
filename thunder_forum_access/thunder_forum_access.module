@@ -9,6 +9,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\taxonomy\TermInterface;
 
@@ -16,12 +17,46 @@ use Drupal\taxonomy\TermInterface;
  * Implements hook_form_FORM_ID_alter().
  */
 function thunder_forum_access_form_forum_overview_alter(&$form, FormStateInterface $form_state, $form_id) {
-  // Add 'configure access' operation link to all terms.
-  foreach (Element::children($form['terms']) as $key) {
-    if (isset($form['terms'][$key]['#term'])) {
-      $form['terms'][$key]['operations']['#links']['thunder_forum_access']['title'] = t('configure access');
-      $form['terms'][$key]['operations']['#links']['thunder_forum_access']['url'] = Url::fromRoute('entity.taxonomy_term.thunder_forum_access', ['taxonomy_term' => $form['terms'][$key]['#term']->id()]);
-      $form['terms'][$key]['operations']['#links']['thunder_forum_access']['query'] = \Drupal::destination()->getAsArray();
+  if (isset($form['terms'])) {
+    /** @var \Drupal\thunder_forum_access\Access\ForumAccessManagerInterface $forum_access_manager */
+    $forum_access_manager = \Drupal::service('thunder_forum_access.forum_access_manager');
+
+    // Add 'Access' header column.
+    $form['terms']['#header'][] = t('Access');
+
+    // Ensure 'Operations' header column is last.
+    $operations_header = NULL;
+    foreach ($form['terms']['#header'] as $key => $header) {
+      if ($header instanceof TranslatableMarkup && (string) $header === (string) t('Operations')) {
+        $operations_header = $header;
+        unset($form['terms']['#header'][$key]);
+      }
+    }
+
+    if (isset($operations_header)) {
+      $form['terms']['#header'][] = $operations_header;
+    }
+
+    foreach (Element::children($form['terms']) as $key) {
+      if (isset($form['terms'][$key]['#term'])) {
+        // Add 'configure access' operation link to all terms.
+        $form['terms'][$key]['operations']['#links']['thunder_forum_access']['title'] = t('configure access');
+        $form['terms'][$key]['operations']['#links']['thunder_forum_access']['url'] = Url::fromRoute('entity.taxonomy_term.thunder_forum_access', ['taxonomy_term' => $form['terms'][$key]['#term']->id()]);
+        $form['terms'][$key]['operations']['#links']['thunder_forum_access']['query'] = \Drupal::destination()->getAsArray();
+
+        // Load forum access record.
+        $record = $forum_access_manager->getForumAccessRecord($form['terms'][$key]['#term']);
+
+        // Add column containing forum access information.
+        $form['terms'][$key]['access'] = [
+          '#markup' => $record->inheritsMemberUserIds() && $record->inheritsModeratorUserIds() && $record->inheritsPermissions() ? t('Inherited') : t('Custom'),
+        ];
+      }
+
+      // Ensure 'Operations' column is last.
+      $operations = $form['terms'][$key]['operations'];
+      unset($form['terms'][$key]['operations']);
+      $form['terms'][$key]['operations'] = $operations;
     }
   }
 }
