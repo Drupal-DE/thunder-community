@@ -2,9 +2,10 @@
 
 namespace Drupal\thunder_forum_access\Plugin\thunder_ach;
 
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\thunder_ach\Plugin\ThunderAccessControlHandlerBase;
+use Drupal\thunder_forum_access\Access\ForumAccessMatrixInterface;
 
 /**
  * Provides a basic access control handler for forum terms.
@@ -15,47 +16,101 @@ use Drupal\thunder_ach\Plugin\ThunderAccessControlHandlerBase;
  *   weight = 1
  * )
  */
-class ForumNodeBase extends ThunderAccessControlHandlerBase {
-
-  /**
-   * The forum manager.
-   *
-   * @var \Drupal\thunder_forum\ThunderForumManagerInterface
-   */
-  protected $forumManager;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->forumManager = \Drupal::service('forum_manager');
-  }
+class ForumNodeBase extends ForumBase {
 
   /**
    * {@inheritdoc}
    */
   public function applies(EntityInterface $entity, $operation, AccountInterface $account = NULL) {
-    /* @var $entity \Drupal\node\NodeInterface */
-    return $entity->hasField('taxonomy_forums');
+    return $this->forumManager->checkNodeType($entity);
   }
 
   /**
    * {@inheritdoc}
    */
   public function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
-    if ($entity->taxonomy_forums->isEmpty()) {
-      return parent::checkAccess($entity, $operation, $account);
-    }
-    /* @var $forums \Drupal\Core\Entity\EntityInterface[] */
-    $forums = $entity->taxonomy_forums->referencedEntities();
-    switch ($operation) {
-      case 'view':
-        return $forums[0]->access($operation, $account, TRUE);
+    // No forum reference available?
+    if ($entity->get('taxonomy_forums')->isEmpty()) {
+      return parent::checkAccess($entity, $operation, $account)
+        // Cache access result per user.
+        ->cachePerUser()
+        // Add entity to cache dependencies.
+        ->addCacheableDependency($entity);
     }
 
-    // Fallback to default.
-    return parent::checkAccess($entity, $operation, $account);
+    /** @var \Drupal\taxonomy\TermInterface $term */
+    $term = $entity->get('taxonomy_forums')->first()->entity;
+
+    // Load forum access record.
+    $record = $this->forumAccessManager->getForumAccessRecord($term->id());
+
+    switch ($operation) {
+      case 'view':
+        $result = $term->access($operation, $account, TRUE);
+        break;
+
+      case 'update':
+      case 'delete':
+        if ($record->userHasPermission($account, $entity->getEntityTypeId(), $operation)) {
+          $result = AccessResult::allowed();
+        }
+        else {
+          $result = AccessResult::forbidden();
+        }
+        break;
+
+      default:
+        $result = parent::checkAccess($entity, $operation, $account);
+        break;
+    }
+
+    $result
+      // Cache access result per user.
+      ->cachePerUser()
+      // Add forum access record to cache dependencies.
+      ->addCacheableDependency($record)
+      // Add entity to cache dependencies.
+      ->addCacheableDependency($entity);
+
+    return $result;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
+    $tid = 0;
+    $cache_contexts = ['url'];
+
+    // Forum term page.
+    if (($term = $this->routeMatch->getParameter('taxonomy_term')) && $this->forumManager->isForumTerm($term)) {
+      $tid = $term->id();
+    }
+
+    // Node create form (with 'forum_id' URL parameter).
+    elseif ($this->requestStack->getCurrentRequest()->query->has('forum_id')) {
+      $tid = $this->requestStack->getCurrentRequest()->get('forum_id');
+      $cache_contexts[] = 'url.query_args:forum_id';
+    }
+
+    // Load forum access record.
+    $record = $this->forumAccessManager->getForumAccessRecord($tid);
+
+    // User is allowed to create forum nodes?
+    if ($record->userHasPermission($account, 'node', ForumAccessMatrixInterface::PERMISSION_CREATE)) {
+      $result = AccessResult::allowed();
+    }
+    else {
+      $result = AccessResult::forbidden();
+    }
+
+    return $result
+      // Cache access result per user.
+      ->cachePerUser()
+      // Cache access result per URL.
+      ->addCacheContexts($cache_contexts)
+      // Add forum access record to cache dependencies.
+      ->addCacheableDependency($record);
   }
 
 }
