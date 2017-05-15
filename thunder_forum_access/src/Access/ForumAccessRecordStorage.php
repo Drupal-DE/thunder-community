@@ -199,7 +199,7 @@ class ForumAccessRecordStorage implements ForumAccessRecordStorageInterface {
         ->orderBy('role', 'ASC')
         ->orderBy('target_entity_type_id', 'ASC')
         ->orderBy('permission', 'ASC')
-        ->condition('tid', $tids, 'IN')
+        ->condition('tid', $tids_to_load, 'IN')
         ->execute()
         ->fetchAll(\PDO::FETCH_OBJ);
 
@@ -520,7 +520,7 @@ class ForumAccessRecordStorage implements ForumAccessRecordStorageInterface {
       $cache += $this->database->select('thunder_forum_access', 'tfa')
         ->fields('tfa')
         ->orderBy('tid', 'ASC')
-        ->condition('tid', $tids, 'IN')
+        ->condition('tid', $tids_to_load, 'IN')
         ->execute()
         ->fetchAllAssoc('tid', \PDO::FETCH_ASSOC);
     }
@@ -607,7 +607,7 @@ class ForumAccessRecordStorage implements ForumAccessRecordStorageInterface {
         ->fields('tfau')
         ->orderBy('tid', 'ASC')
         ->orderBy('uid', 'ASC')
-        ->condition('tid', $tids, 'IN')
+        ->condition('tid', $tids_to_load, 'IN')
         ->execute()
         ->fetchAll(\PDO::FETCH_OBJ);
 
