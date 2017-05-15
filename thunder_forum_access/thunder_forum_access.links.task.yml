@@ -1,0 +1,5 @@
+forum.thunder_forum_access:
+  route_name: forum.thunder_forum_access
+  base_route: forum.overview
+  title: Access
+  weight: 200

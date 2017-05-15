@@ -1,0 +1,17 @@
+entity.taxonomy_term.thunder_forum_access:
+  path: '/admin/structure/forum/configure/access/{taxonomy_term}'
+  defaults:
+    _form: '\Drupal\thunder_forum_access\Form\ConfigureAccessForm'
+    _title: 'Configure access'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _permission: 'administer forums'
+
+forum.thunder_forum_access:
+  path: '/admin/structure/forum/configure/access'
+  defaults:
+    _form: '\Drupal\thunder_forum_access\Form\ConfigureAccessForm'
+    _title: 'Configure access'
+  requirements:
+    _permission: 'administer forums'

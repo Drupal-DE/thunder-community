@@ -1,6 +1,12 @@
 services:
+  thunder_forum_access.forum_access_manager:
+    class: Drupal\thunder_forum_access\Access\ForumAccessManager
+    arguments: ['@entity_type.manager', '@thunder_forum_access.forum_access_record_storage']
   thunder_forum_access.forum_access_matrix:
     class: Drupal\thunder_forum_access\Access\ForumAccessMatrix
+  thunder_forum_access.forum_access_record_storage:
+    class: Drupal\thunder_forum_access\Access\ForumAccessRecordStorage
+    arguments: ['@database', '@module_handler', '@forum_manager', '@thunder_forum_access.forum_access_matrix']
   thunder_forum_access.route_subscriber:
     class: Drupal\thunder_forum_access\Routing\RouteSubscriber
     tags:
