@@ -2,9 +2,7 @@
 
 namespace Drupal\thunder_forum;
 
-use Drupal\Core\Session\AccountInterface;
 use Drupal\forum\ForumManagerInterface;
-use Drupal\taxonomy\TermInterface;
 
 /**
  * Provides thunder forum manager interface.

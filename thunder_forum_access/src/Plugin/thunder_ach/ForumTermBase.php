@@ -48,7 +48,7 @@ class ForumTermBase extends ForumBase {
 
       case 'edit':
         // Only allow updates for admins or moderators.
-        if($account_is_admin || $this->forumAccessManager->userIsForumModerator($entity->id(), $account)) {
+        if ($account_is_admin || $this->forumAccessManager->userIsForumModerator($entity->id(), $account)) {
           $result = AccessResult::allowed();
         }
         else {
@@ -92,7 +92,7 @@ class ForumTermBase extends ForumBase {
     // Forum moderators are allowed to edit title and description.
     $fields = [
       'name',
-      'description'
+      'description',
     ];
 
     if (!empty($items) && $operation === 'edit') {
@@ -104,7 +104,6 @@ class ForumTermBase extends ForumBase {
     }
 
     // @todo Restrict access to custom fields like 'parent' and 'weight'.
-
     return parent::checkFieldAccess($operation, $field_definition, $account, $items);
   }
 

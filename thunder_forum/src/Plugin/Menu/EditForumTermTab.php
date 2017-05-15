@@ -43,7 +43,7 @@ class EditForumTermTab extends LocalTaskDefault implements ContainerFactoryPlugi
    *   The plugin implementation definition.
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The route match.
-   * @return \Drupal\Core\Routing\RedirectDestinationInterface
+   * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirect_destination
    *   The redirect destination helper.
    */
   public function __construct(array $configuration, $plugin_id, array $plugin_definition, RouteMatchInterface $route_match, RedirectDestinationInterface $redirect_destination) {
@@ -89,6 +89,9 @@ class EditForumTermTab extends LocalTaskDefault implements ContainerFactoryPlugi
     return Cache::mergeTags(parent::getCacheTags(), $this->getTerm()->getCacheTags());
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getOptions(RouteMatchInterface $route_match) {
     $options = parent::getOptions($route_match);
 
