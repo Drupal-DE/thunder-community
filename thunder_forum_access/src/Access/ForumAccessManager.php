@@ -5,7 +5,6 @@ namespace Drupal\thunder_forum_access\Access;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\taxonomy\TermInterface;
 
 /**
  * Provides forum access manager service.
@@ -44,9 +43,9 @@ class ForumAccessManager implements ForumAccessManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function getForumAccessRecord(TermInterface $term) {
+  public function getForumAccessRecord($tid) {
     $record = $this->forumAccessRecordStorage
-      ->accessRecordLoad($term->id());
+      ->accessRecordLoad($tid);
 
     if (!$record) {
       throw new \Exception('Forum access record not available.');
@@ -58,40 +57,40 @@ class ForumAccessManager implements ForumAccessManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function getForumMembers(TermInterface $term) {
+  public function getForumMembers($tid) {
     return $this->entityTypeManager
       ->getStorage('user')
-      ->loadMultiple($this->getForumAccessRecord($term)->getMemberUserIds());
+      ->loadMultiple($this->getForumAccessRecord($tid)->getMemberUserIds());
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getForumModerators(TermInterface $term) {
+  public function getForumModerators($tid) {
     return $this->entityTypeManager
       ->getStorage('user')
-      ->loadMultiple($this->getForumAccessRecord($term)->getModeratorUserIds());
+      ->loadMultiple($this->getForumAccessRecord($tid)->getModeratorUserIds());
   }
 
   /**
    * {@inheritdoc}
    */
-  public function forumIsLocked(TermInterface $term) {
+  public function forumIsLocked($tid) {
     // TODO: Implement forumIsLocked() method.
   }
 
   /**
    * {@inheritdoc}
    */
-  public function forumIsPrivate(TermInterface $term) {
+  public function forumIsPrivate($tid) {
     // TODO: Implement forumIsPrivate() method.
   }
 
   /**
    * {@inheritdoc}
    */
-  public function userIsForumMember(TermInterface $term, AccountInterface $account) {
-    $members = $this->getForumAccessRecord($term)->getMemberUserIds();
+  public function userIsForumMember($tid, AccountInterface $account) {
+    $members = $this->getForumAccessRecord($tid)->getMemberUserIds();
 
     return isset($members[$account->id()]);
   }
@@ -99,8 +98,8 @@ class ForumAccessManager implements ForumAccessManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function userIsForumModerator(TermInterface $term, AccountInterface $account) {
-    $moderators = $this->getForumAccessRecord($term)->getModeratorUserIds();
+  public function userIsForumModerator($tid, AccountInterface $account) {
+    $moderators = $this->getForumAccessRecord($tid)->getModeratorUserIds();
 
     return isset($moderators[$account->id()]);
   }

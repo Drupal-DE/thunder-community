@@ -3,7 +3,6 @@
 namespace Drupal\thunder_forum_access\Access;
 
 use Drupal\Core\Session\AccountInterface;
-use Drupal\taxonomy\TermInterface;
 
 /**
  * Provides forum access manager interface.
@@ -13,68 +12,68 @@ interface ForumAccessManagerInterface {
   /**
    * Return forum access record.
    *
-   * @param \Drupal\taxonomy\TermInterface $term
-   *   The taxonomy term.
+   * @param int $tid
+   *   A forum taxonomy term ID.
    *
    * @return \Drupal\thunder_forum_access\Access\ForumAccessRecordInterface
-   *   The forum access record.
+   *   The forum access record on success.
    *
    * @throws \Exception
    */
-  public function getForumAccessRecord(TermInterface $term);
+  public function getForumAccessRecord($tid);
 
   /**
    * Return list of forum members.
    *
-   * @param \Drupal\taxonomy\TermInterface $term
-   *   A forum term object.
+   * @param int $tid
+   *   A forum taxonomy term ID.
    *
    * @return \Drupal\user\UserInterface[]
    *   A list of members for the forum (or one of its parents by inheritance).
    */
-  public function getForumMembers(TermInterface $term);
+  public function getForumMembers($tid);
 
   /**
    * Return list of forum moderators.
    *
-   * @param \Drupal\taxonomy\TermInterface $term
-   *   A forum term object.
+   * @param int $tid
+   *   A forum taxonomy term ID.
    *
    * @return \Drupal\user\UserInterface[]
    *   A list of moderators for the forum (or one of its parents by
    *   inheritance).
    */
-  public function getForumModerators(TermInterface $term);
+  public function getForumModerators($tid);
 
   /**
    * Forum is protected from changes?
    *
-   * @param \Drupal\taxonomy\TermInterface $term
-   *   A forum term object.
+   * @param int $tid
+   *   A forum taxonomy term ID.
    *
    * @return bool
    *   Whether the forum is locked / protected from changes  (or one of its
    *   parents by inheritance).
    */
-  public function forumIsLocked(TermInterface $term);
+  public function forumIsLocked($tid);
 
   /**
    * Forum access is limited to associated members?
    *
-   * @param \Drupal\taxonomy\TermInterface $term
-   *   A forum term object.
+   * @param int $tid
+   *   A forum taxonomy term ID.
    *
    * @return bool
    *   Whether the forum is private / its access is limited to associated
    *   members (or one of its parents by inheritance).
    */
-  public function forumIsPrivate(TermInterface $term);
+  public function forumIsPrivate($tid);
 
   /**
    * User is forum member?
    *
-   * @param \Drupal\taxonomy\TermInterface $term
-   *   A forum term object.
+   * @param int $tid
+   *   A forum taxonomy term ID.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   A user account object.
    *
@@ -82,13 +81,13 @@ interface ForumAccessManagerInterface {
    *   Whether the given user is a member of the specified forum (or one of its
    *   parents by inheritance).
    */
-  public function userIsForumMember(TermInterface $term, AccountInterface $account);
+  public function userIsForumMember($tid, AccountInterface $account);
 
   /**
    * User is forum moderator?.
    *
-   * @param \Drupal\taxonomy\TermInterface $term
-   *   A forum term object.
+   * @param int $tid
+   *   A forum taxonomy term ID.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   A user account object.
    *
@@ -96,6 +95,6 @@ interface ForumAccessManagerInterface {
    *   Whether the given user is a moderator for the specified forum (or one of
    *   its parents by inheritance).
    */
-  public function userIsForumModerator(TermInterface $term, AccountInterface $account);
+  public function userIsForumModerator($tid, AccountInterface $account);
 
 }
