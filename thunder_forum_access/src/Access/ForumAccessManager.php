@@ -3,6 +3,7 @@
 namespace Drupal\thunder_forum_access\Access;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
@@ -12,6 +13,13 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 class ForumAccessManager implements ForumAccessManagerInterface {
 
   use StringTranslationTrait;
+
+  /**
+   * The current user.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
+  protected $currentUser;
 
   /**
    * The entity type manager.
@@ -34,10 +42,32 @@ class ForumAccessManager implements ForumAccessManagerInterface {
    *   The entity type manager.
    * @param \Drupal\thunder_forum_access\Access\ForumAccessRecordStorageInterface $forum_access_record_storage
    *   The forum access record storage.
+   * @param \Drupal\Core\Session\AccountInterface $current_user
+   *   The current user.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, ForumAccessRecordStorageInterface $forum_access_record_storage) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, ForumAccessRecordStorageInterface $forum_access_record_storage, AccountInterface $current_user) {
+    $this->currentUser = $current_user;
     $this->entityTypeManager = $entity_type_manager;
     $this->forumAccessRecordStorage = $forum_access_record_storage;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function alterForumNodeForm(array &$form, FormStateInterface $form_state, $form_id) {
+    /** @var \Drupal\node\NodeInterface $node */
+    $node = $form_state->getFormObject()->getEntity();
+
+    // Is a forum content form?
+    if ($this->forumAccessRecordStorage->getForumManagerService()->checkNodeType($node)) {
+      // Content is not new and forum field is not empty?
+      if (!$node->isNew() && !$node->get('taxonomy_forums')->isEmpty()) {
+        // Only show 'Leave shadow copy' field for moderator/admin users.
+        if (isset($form['shadow'])) {
+          $form['shadow']['#access'] = $this->userIsForumModerator($node->get('taxonomy_forums')->first()->entity->id(), $this->currentUser);
+        }
+      }
+    }
   }
 
   /**

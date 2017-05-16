@@ -2,12 +2,25 @@
 
 namespace Drupal\thunder_forum_access\Access;
 
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
  * Provides forum access manager interface.
  */
 interface ForumAccessManagerInterface {
+
+  /**
+   * Alter forum node form.
+   *
+   * @param array $form
+   *   An associative array containing the structure of the form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   * @param string $form_id
+   *   The form ID.
+   */
+  public function alterForumNodeForm(array &$form, FormStateInterface $form_state, $form_id);
 
   /**
    * Return forum access record.

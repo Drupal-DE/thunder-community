@@ -4,6 +4,8 @@ namespace Drupal\thunder_forum_access\Plugin\thunder_ach;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\thunder_forum_access\Access\ForumAccessMatrixInterface;
 
@@ -116,6 +118,34 @@ class ForumNodeBase extends ForumBase {
       ->addCacheContexts($cache_contexts)
       // Add forum access record to cache dependencies.
       ->addCacheableDependency($record);
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * Access for all other non-field API fields is checked via the corresponding
+   * node form alter method in the forum access manager service.
+   *
+   * @see \Drupal\thunder_forum_access\Access\ForumAccessManagerInterface::alterForumNodeForm()
+   */
+  public function checkFieldAccess($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, FieldItemListInterface $items = NULL) {
+    // Always grant access on all fields for forum administrators.
+    if ($this->forumAccessManager->userIsForumAdmin($account)) {
+      return AccessResult::allowed();
+    }
+
+    // Only forum moderators are allowed to move a forum content.
+    if ($field_definition->getName() === 'taxonomy_forums') {
+      if (!$items->getEntity()->isNew() && !$items->isEmpty() && $operation === 'edit') {
+        if ($this->forumAccessManager->userIsForumModerator($items->first()->entity->id(), $account)) {
+          return AccessResult::allowed();
+        }
+
+        return AccessResult::forbidden();
+      }
+    }
+
+    return parent::checkFieldAccess($operation, $field_definition, $account, $items);
   }
 
 }
