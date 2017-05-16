@@ -23,6 +23,18 @@ interface ForumAccessManagerInterface {
   public function alterForumNodeForm(array &$form, FormStateInterface $form_state, $form_id);
 
   /**
+   * Alter forum taxonomy term form.
+   *
+   * @param array $form
+   *   An associative array containing the structure of the form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   * @param string $form_id
+   *   The form ID.
+   */
+  public function alterForumTermForm(array &$form, FormStateInterface $form_state, $form_id);
+
+  /**
    * Return forum access record.
    *
    * @param int $tid

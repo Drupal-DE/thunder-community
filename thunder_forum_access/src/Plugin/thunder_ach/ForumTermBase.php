@@ -84,6 +84,11 @@ class ForumTermBase extends ForumBase {
 
   /**
    * {@inheritdoc}
+   *
+   * Access for all other non-field API fields is checked via the corresponding
+   * taxonomy term form alter method in the forum access manager service.
+   *
+   * @see \Drupal\thunder_forum_access\Access\ForumAccessManagerInterface::alterForumTermForm()
    */
   public function checkFieldAccess($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, FieldItemListInterface $items = NULL) {
     // Always hide status field, because this access plugin makes it useless.
@@ -110,7 +115,6 @@ class ForumTermBase extends ForumBase {
       return AccessResult::forbidden();
     }
 
-    // @todo Restrict access to custom fields like 'parent' and 'weight'.
     return parent::checkFieldAccess($operation, $field_definition, $account, $items);
   }
 

@@ -73,6 +73,33 @@ class ForumAccessManager implements ForumAccessManagerInterface {
   /**
    * {@inheritdoc}
    */
+  public function alterForumTermForm(array &$form, FormStateInterface $form_state, $form_id) {
+    // Is forum taxonomy term form?
+    if ($this->forumAccessRecordStorage->getForumManagerService()->isForumTermForm($form_id)) {
+      /** @var \Drupal\taxonomy\TermInterface $term */
+      $term = $form_state->getFormObject()->getEntity();
+
+      // Forum taxonomy term is not new?
+      if (!$term->isNew()) {
+        // Current user is forum administrator?
+        $is_admin = $this->userIsForumAdmin($this->currentUser);
+
+        // Only show 'Parent' field for admin users.
+        if (isset($form['parent'][0])) {
+          $form['parent'][0]['#access'] = $is_admin;
+        }
+
+        // Only show 'Weight' field for admin users.
+        if (isset($form['weight'])) {
+          $form['weight']['#access'] = $is_admin;
+        }
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getForumAccessRecord($tid) {
     $record = $this->forumAccessRecordStorage
       ->accessRecordLoad($tid);
