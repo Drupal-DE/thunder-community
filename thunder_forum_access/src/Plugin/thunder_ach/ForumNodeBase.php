@@ -51,7 +51,7 @@ class ForumNodeBase extends ForumBase {
 
       case 'update':
       case 'delete':
-        if ($record->userHasPermission($account, $entity->getEntityTypeId(), $operation)) {
+        if ($record->userHasPermission($account, $entity->getEntityTypeId(), $operation, $entity)) {
           $result = AccessResult::allowed()
             ->orIf($this->checkAccess($entity, 'view', $account));
         }
