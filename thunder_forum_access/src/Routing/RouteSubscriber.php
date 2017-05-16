@@ -36,7 +36,7 @@ class RouteSubscriber extends RouteSubscriberBase {
     // Edit forum.
     if ($route = $collection->get('entity.taxonomy_term.forum_edit_form')) {
       $requirements = [
-        '_entity_access' => 'taxonomy_term.edit',
+        '_entity_access' => 'taxonomy_term.update',
         'taxonomy_term' => '\d+',
       ];
 
@@ -46,7 +46,7 @@ class RouteSubscriber extends RouteSubscriberBase {
     // Edit forum container.
     if ($route = $collection->get('entity.taxonomy_term.forum_edit_container_form')) {
       $requirements = [
-        '_entity_access' => 'taxonomy_term.edit',
+        '_entity_access' => 'taxonomy_term.update',
         'taxonomy_term' => '\d+',
       ];
 

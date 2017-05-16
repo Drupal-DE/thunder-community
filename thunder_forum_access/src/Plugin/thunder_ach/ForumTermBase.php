@@ -43,7 +43,7 @@ class ForumTermBase extends ForumBase {
         }
         break;
 
-      case 'edit':
+      case 'update':
         // Only allow updates for admins or moderators.
         if ($this->forumAccessManager->userIsForumModerator($entity->id(), $account)) {
           $result = AccessResult::allowed();
