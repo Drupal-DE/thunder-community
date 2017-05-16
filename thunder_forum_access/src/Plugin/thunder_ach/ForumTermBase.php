@@ -102,7 +102,7 @@ class ForumTermBase extends ForumBase {
       'description',
     ];
 
-    if (!empty($items) && $operation === 'edit') {
+    if ($items->getEntity()->isNew() && !$items->isEmpty() && $operation === 'edit') {
       if (in_array($field_definition->getName(), $fields) && $this->forumAccessManager->userIsForumModerator($items->getEntity()->id(), $account)) {
         return AccessResult::allowed();
       }
