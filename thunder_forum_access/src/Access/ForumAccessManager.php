@@ -117,12 +117,12 @@ class ForumAccessManager implements ForumAccessManagerInterface {
   public function alterForumTermOverviewForm(array &$form, FormStateInterface $form_state, $form_id) {
     if (isset($form['terms'])) {
       // Add 'Access' header column.
-      $form['terms']['#header'][] = t('Access');
+      $form['terms']['#header'][] = $this->t('Access');
 
       // Ensure 'Operations' header column is last.
       $operations_header = NULL;
       foreach ($form['terms']['#header'] as $key => $header) {
-        if ($header instanceof TranslatableMarkup && (string) $header === (string) t('Operations')) {
+        if ($header instanceof TranslatableMarkup && (string) $header === (string) $this->t('Operations')) {
           $operations_header = $header;
           unset($form['terms']['#header'][$key]);
         }
@@ -135,7 +135,7 @@ class ForumAccessManager implements ForumAccessManagerInterface {
       foreach (Element::children($form['terms']) as $key) {
         if (isset($form['terms'][$key]['#term'])) {
           // Add 'configure access' operation link to all terms.
-          $form['terms'][$key]['operations']['#links']['thunder_forum_access']['title'] = t('configure access');
+          $form['terms'][$key]['operations']['#links']['thunder_forum_access']['title'] = $this->t('configure access');
           $form['terms'][$key]['operations']['#links']['thunder_forum_access']['url'] = Url::fromRoute('entity.taxonomy_term.thunder_forum_access', ['taxonomy_term' => $form['terms'][$key]['#term']->id()]);
           $form['terms'][$key]['operations']['#links']['thunder_forum_access']['query'] = $this->redirectDestination->getAsArray();
 
@@ -144,7 +144,7 @@ class ForumAccessManager implements ForumAccessManagerInterface {
 
           // Add column containing forum access information.
           $form['terms'][$key]['access'] = [
-            '#markup' => $record->inheritsMemberUserIds() && $record->inheritsModeratorUserIds() && $record->inheritsPermissions() ? t('Inherited') : t('Custom'),
+            '#markup' => $record->inheritsMemberUserIds() && $record->inheritsModeratorUserIds() && $record->inheritsPermissions() ? $this->t('Inherited') : $this->t('Custom'),
           ];
         }
 

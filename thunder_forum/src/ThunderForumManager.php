@@ -87,7 +87,7 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
   public function isForumTermForm($form_id) {
     return in_array($form_id, [
       'taxonomy_term_forums_forum_form',
-      'taxonomy_term_forums_container_form'
+      'taxonomy_term_forums_container_form',
     ]);
   }
 

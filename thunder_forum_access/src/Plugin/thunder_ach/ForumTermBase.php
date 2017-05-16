@@ -95,7 +95,7 @@ class ForumTermBase extends ForumBase {
     if ($field_definition->getName() === 'status') {
       return AccessResult::forbidden();
     }
-    
+
     // Always grant access on other fields for forum administrators.
     if ($this->forumAccessManager->userIsForumAdmin($account)) {
       return AccessResult::allowed();
