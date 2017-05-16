@@ -46,7 +46,8 @@ class ForumTermBase extends ForumBase {
       case 'update':
         // Only allow updates for admins or moderators.
         if ($this->forumAccessManager->userIsForumModerator($entity->id(), $account)) {
-          $result = AccessResult::allowed();
+          $result = AccessResult::allowed()
+            ->orIf($this->checkAccess($entity, 'view', $account));
         }
         else {
           $result = AccessResult::forbidden();
@@ -56,7 +57,8 @@ class ForumTermBase extends ForumBase {
       case 'delete':
         // Only allow deletion for admins.
         if ($this->forumAccessManager->userIsForumAdmin($account)) {
-          $result = AccessResult::allowed();
+          $result = AccessResult::allowed()
+            ->orIf($this->checkAccess($entity, 'view', $account));
         }
         else {
           $result = AccessResult::forbidden();
