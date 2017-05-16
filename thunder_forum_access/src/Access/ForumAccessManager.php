@@ -75,6 +75,13 @@ class ForumAccessManager implements ForumAccessManagerInterface {
   /**
    * {@inheritdoc}
    */
+  public function userIsForumAdmin(AccountInterface $account) {
+    return $this->getForumAccessRecord(0)->userIsForumAdmin($account);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function userIsForumMember($tid, AccountInterface $account) {
     $members = $this->getForumAccessRecord($tid)->getMemberUserIds();
 

@@ -258,6 +258,18 @@ interface ForumAccessRecordInterface {
   public function userHasPermission(AccountInterface $account, $target_entity_type_id, $permission, EntityInterface $target_entity = NULL);
 
   /**
+   * User is forum administrator?
+   *
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   A user account object.
+   *
+   * @return bool
+   *   Whether the given user is an administrator of the specified forum (based
+   *   on 'administer forums' permission).
+   */
+  public function userIsForumAdmin(AccountInterface $account);
+
+  /**
    * Return forum role for given user.
    *
    * @param \Drupal\Core\Session\AccountInterface $account

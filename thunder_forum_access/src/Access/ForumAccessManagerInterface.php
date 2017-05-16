@@ -46,6 +46,18 @@ interface ForumAccessManagerInterface {
   public function getForumModerators($tid);
 
   /**
+   * User is forum administrator?
+   *
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   A user account object.
+   *
+   * @return bool
+   *   Whether the given user is an administrator of the specified forum (based
+   *   on 'administer forums' permission).
+   */
+  public function userIsForumAdmin(AccountInterface $account);
+
+  /**
    * User is forum member?
    *
    * @param int $tid

@@ -463,8 +463,8 @@ class ForumAccessRecord implements ForumAccessRecordInterface, CacheableDependen
    * {@inheritdoc}
    */
   public function userHasPermission(AccountInterface $account, $target_entity_type_id, $permission, EntityInterface $target_entity = NULL) {
-    // Is administrator user?
-    if ($account->hasPermission('administer forums')) {
+    // Always grant access for forum administrators.
+    if ($this->userIsForumAdmin($account)) {
       return TRUE;
     }
 
@@ -489,6 +489,13 @@ class ForumAccessRecord implements ForumAccessRecordInterface, CacheableDependen
     }
 
     return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function userIsForumAdmin(AccountInterface $account) {
+    return $account->hasPermission('administer forums');
   }
 
   /**
