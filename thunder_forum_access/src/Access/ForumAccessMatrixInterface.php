@@ -39,29 +39,21 @@ interface ForumAccessMatrixInterface {
 
   /**
    * Forum role machine name: Anonymous user.
-   *
-   * @var string
    */
   const ROLE_ANONYMOUS = 'anonymous';
 
   /**
    * Forum role: Authenticated user.
-   *
-   * @var string
    */
   const ROLE_AUTHENTICATED = 'authenticated';
 
   /**
    * Forum role: Member.
-   *
-   * @var string
    */
   const ROLE_MEMBER = 'member';
 
   /**
    * Forum role: Moderator.
-   *
-   * @var string
    */
   const ROLE_MODERATOR = 'moderator';
 
