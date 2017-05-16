@@ -3,6 +3,7 @@
 namespace Drupal\thunder_forum;
 
 use Drupal\forum\ForumManagerInterface;
+use Drupal\taxonomy\TermInterface;
 
 /**
  * Provides thunder forum manager interface.
@@ -30,5 +31,16 @@ interface ThunderForumManagerInterface extends ForumManagerInterface {
    *   The parent forum taxonomy term ID on success, otherwise '0'.
    */
   public function getParentId($tid);
+
+  /**
+   * Returns TRUE if the given taxonomy term is a forum term.
+   *
+   * @param \Drupal\taxonomy\TermInterface $term
+   *   A taxonomy term.
+   *
+   * @return bool
+   *   Boolean indicating whether the given taxonomy term is a forum term.
+   */
+  public function isForumTerm(TermInterface $term);
 
 }
