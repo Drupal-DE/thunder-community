@@ -86,7 +86,12 @@ class ForumTermBase extends ForumBase {
    * {@inheritdoc}
    */
   public function checkFieldAccess($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, FieldItemListInterface $items = NULL) {
-    // Always grant access for forum administrators.
+    // Always hide status field, because this access plugin makes it useless.
+    if ($field_definition->getName() === 'status') {
+      return AccessResult::forbidden();
+    }
+    
+    // Always grant access on other fields for forum administrators.
     if ($this->forumAccessManager->userIsForumAdmin($account)) {
       return AccessResult::allowed();
     }
