@@ -8,6 +8,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Routing\RedirectDestinationInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\thunder_forum\ThunderForumManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -17,6 +18,13 @@ use Symfony\Component\HttpFoundation\Request;
 class EditForumTermTab extends LocalTaskDefault implements ContainerFactoryPluginInterface {
 
   use StringTranslationTrait;
+
+  /**
+   * The forum manager.
+   *
+   * @var \Drupal\thunder_forum\ThunderForumManagerInterface
+   */
+  protected $forumManager;
 
   /**
    * The redirect destination helper.
@@ -41,14 +49,17 @@ class EditForumTermTab extends LocalTaskDefault implements ContainerFactoryPlugi
    *   The plugin_id for the plugin instance.
    * @param array $plugin_definition
    *   The plugin implementation definition.
+   * @param \Drupal\thunder_forum\ThunderForumManagerInterface $forum_manager
+   *   The forum manager.
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The route match.
    * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirect_destination
    *   The redirect destination helper.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, RouteMatchInterface $route_match, RedirectDestinationInterface $redirect_destination) {
+  public function __construct(array $configuration, $plugin_id, array $plugin_definition, ThunderForumManagerInterface $forum_manager, RouteMatchInterface $route_match, RedirectDestinationInterface $redirect_destination) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
+    $this->forumManager = $forum_manager;
     $this->routeMatch = $route_match;
     $this->redirectDestination = $redirect_destination;
   }
@@ -61,6 +72,7 @@ class EditForumTermTab extends LocalTaskDefault implements ContainerFactoryPlugi
       $configuration,
       $plugin_id,
       $plugin_definition,
+      $container->get('forum_manager'),
       $container->get('current_route_match'),
       $container->get('redirect.destination')
     );
@@ -105,11 +117,13 @@ class EditForumTermTab extends LocalTaskDefault implements ContainerFactoryPlugi
    * {@inheritdoc}
    */
   public function getRouteName() {
-    if ($this->isForumContainer()) {
-      return 'entity.taxonomy_term.forum_edit_container_form';
+    $route_name = parent::getRouteName();
+
+    if ($this->forumManager->isForumContainer($this->getTerm())) {
+      $route_name = 'entity.taxonomy_term.forum_edit_container_form';
     }
 
-    return parent::getRouteName();
+    return $route_name;
   }
 
   /**
@@ -133,18 +147,7 @@ class EditForumTermTab extends LocalTaskDefault implements ContainerFactoryPlugi
    * {@inheritdoc}
    */
   public function getTitle(Request $request = NULL) {
-    return $this->isForumContainer() ? $this->t('Edit container') : parent::getTitle($request);
-  }
-
-  /**
-   * Is forum container.
-   *
-   * @return bool
-   *   Whether the current forum taxonomy term route parameter reflects a forum
-   *   container.
-   */
-  protected function isForumContainer() {
-    return !empty($this->getTerm()->forum_container->value);
+    return $this->forumManager->isForumContainer($this->getTerm()) ? $this->t('Edit container') : parent::getTitle($request);
   }
 
 }

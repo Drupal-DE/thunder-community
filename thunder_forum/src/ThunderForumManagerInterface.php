@@ -33,6 +33,17 @@ interface ThunderForumManagerInterface extends ForumManagerInterface {
   public function getParentId($tid);
 
   /**
+   * Returns TRUE if the given taxonomy term is a forum container.
+   *
+   * @param \Drupal\taxonomy\TermInterface $term
+   *   A taxonomy term.
+   *
+   * @return bool
+   *   Boolean indicating whether the given taxonomy term is a forum container.
+   */
+  public function isForumContainer(TermInterface $term);
+
+  /**
    * Returns TRUE if the given taxonomy term is a forum term.
    *
    * @param \Drupal\taxonomy\TermInterface $term

@@ -37,6 +37,13 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
   /**
    * {@inheritdoc}
    */
+  public function isForumContainer(TermInterface $term) {
+    return $this->isForumTerm($term) && $term->hasField('forum_container') && !empty($term->forum_container->value);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isForumTerm(TermInterface $term) {
     return $term->bundle() === $this->configFactory->get('forum.settings')->get('vocabulary');
   }
