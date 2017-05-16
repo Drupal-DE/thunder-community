@@ -4,8 +4,12 @@ namespace Drupal\thunder_forum_access\Access;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
+use Drupal\Core\Routing\RedirectDestinationInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Url;
 
 /**
  * Provides forum access manager service.
@@ -36,6 +40,13 @@ class ForumAccessManager implements ForumAccessManagerInterface {
   protected $forumAccessRecordStorage;
 
   /**
+   * The redirect destination service.
+   *
+   * @var \Drupal\Core\Routing\RedirectDestinationInterface
+   */
+  protected $redirectDestination;
+
+  /**
    * Constructs a new ForumAccessManager.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -44,11 +55,14 @@ class ForumAccessManager implements ForumAccessManagerInterface {
    *   The forum access record storage.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
+   * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirect_destination
+   *   The redirect destination service.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, ForumAccessRecordStorageInterface $forum_access_record_storage, AccountInterface $current_user) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, ForumAccessRecordStorageInterface $forum_access_record_storage, AccountInterface $current_user, RedirectDestinationInterface $redirect_destination) {
     $this->currentUser = $current_user;
     $this->entityTypeManager = $entity_type_manager;
     $this->forumAccessRecordStorage = $forum_access_record_storage;
+    $this->redirectDestination = $redirect_destination;
   }
 
   /**
@@ -93,6 +107,51 @@ class ForumAccessManager implements ForumAccessManagerInterface {
         if (isset($form['weight'])) {
           $form['weight']['#access'] = $is_admin;
         }
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function alterForumTermOverviewForm(array &$form, FormStateInterface $form_state, $form_id) {
+    if (isset($form['terms'])) {
+      // Add 'Access' header column.
+      $form['terms']['#header'][] = t('Access');
+
+      // Ensure 'Operations' header column is last.
+      $operations_header = NULL;
+      foreach ($form['terms']['#header'] as $key => $header) {
+        if ($header instanceof TranslatableMarkup && (string) $header === (string) t('Operations')) {
+          $operations_header = $header;
+          unset($form['terms']['#header'][$key]);
+        }
+      }
+
+      if (isset($operations_header)) {
+        $form['terms']['#header'][] = $operations_header;
+      }
+
+      foreach (Element::children($form['terms']) as $key) {
+        if (isset($form['terms'][$key]['#term'])) {
+          // Add 'configure access' operation link to all terms.
+          $form['terms'][$key]['operations']['#links']['thunder_forum_access']['title'] = t('configure access');
+          $form['terms'][$key]['operations']['#links']['thunder_forum_access']['url'] = Url::fromRoute('entity.taxonomy_term.thunder_forum_access', ['taxonomy_term' => $form['terms'][$key]['#term']->id()]);
+          $form['terms'][$key]['operations']['#links']['thunder_forum_access']['query'] = $this->redirectDestination->getAsArray();
+
+          // Load forum access record.
+          $record = $this->getForumAccessRecord($form['terms'][$key]['#term']->id());
+
+          // Add column containing forum access information.
+          $form['terms'][$key]['access'] = [
+            '#markup' => $record->inheritsMemberUserIds() && $record->inheritsModeratorUserIds() && $record->inheritsPermissions() ? t('Inherited') : t('Custom'),
+          ];
+        }
+
+        // Ensure 'Operations' column is last.
+        $operations = $form['terms'][$key]['operations'];
+        unset($form['terms'][$key]['operations']);
+        $form['terms'][$key]['operations'] = $operations;
       }
     }
   }
