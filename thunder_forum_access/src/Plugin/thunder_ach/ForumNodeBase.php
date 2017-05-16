@@ -69,6 +69,8 @@ class ForumNodeBase extends ForumBase {
       ->orIf(parent::checkAccess($entity, $operation, $account))
       // Cache access result per user.
       ->cachePerUser()
+      // Cache per permissions.
+      ->cachePerPermissions()
       // Add forum access record to cache dependencies.
       ->addCacheableDependency($record)
       // Add entity to cache dependencies.

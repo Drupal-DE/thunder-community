@@ -64,8 +64,6 @@ class ForumTermBase extends ForumBase {
         else {
           $result = AccessResult::forbidden();
         }
-
-        $result->cachePerPermissions();
         break;
 
       default:
@@ -77,6 +75,8 @@ class ForumTermBase extends ForumBase {
       ->orIf(parent::checkAccess($entity, $operation, $account))
       // Cache access result per user.
       ->cachePerUser()
+      // Cache per permissions.
+      ->cachePerPermissions()
       // Add forum access record to cache dependencies.
       ->addCacheableDependency($record);
 
