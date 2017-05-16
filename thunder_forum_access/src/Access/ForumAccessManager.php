@@ -83,6 +83,10 @@ class ForumAccessManager implements ForumAccessManagerInterface {
    * {@inheritdoc}
    */
   public function userIsForumMember($tid, AccountInterface $account) {
+    if ($this->userIsForumAdmin($account)) {
+      return TRUE;
+    }
+
     $members = $this->getForumAccessRecord($tid)->getMemberUserIds();
 
     return isset($members[$account->id()]);
@@ -92,6 +96,10 @@ class ForumAccessManager implements ForumAccessManagerInterface {
    * {@inheritdoc}
    */
   public function userIsForumModerator($tid, AccountInterface $account) {
+    if ($this->userIsForumAdmin($account)) {
+      return TRUE;
+    }
+
     $moderators = $this->getForumAccessRecord($tid)->getModeratorUserIds();
 
     return isset($moderators[$account->id()]);

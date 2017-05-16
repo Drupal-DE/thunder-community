@@ -33,9 +33,6 @@ class ForumTermBase extends ForumBase {
     // Load forum access record.
     $record = $this->forumAccessManager->getForumAccessRecord($entity->id());
 
-    // Account is admin?
-    $account_is_admin = $account->hasPermission('administer taxonomy') || $account->hasPermission('administer forums');
-
     switch ($operation) {
       case 'view':
         if ($record->userHasPermission($account, $entity->getEntityTypeId(), $operation)) {
@@ -48,7 +45,7 @@ class ForumTermBase extends ForumBase {
 
       case 'edit':
         // Only allow updates for admins or moderators.
-        if ($account_is_admin || $this->forumAccessManager->userIsForumModerator($entity->id(), $account)) {
+        if ($this->forumAccessManager->userIsForumModerator($entity->id(), $account)) {
           $result = AccessResult::allowed();
         }
         else {
@@ -58,7 +55,7 @@ class ForumTermBase extends ForumBase {
 
       case 'delete':
         // Only allow deletion for admins.
-        if ($account_is_admin) {
+        if ($this->forumAccessManager->userIsForumAdmin($account)) {
           $result = AccessResult::allowed();
         }
         else {
@@ -87,7 +84,8 @@ class ForumTermBase extends ForumBase {
    * {@inheritdoc}
    */
   public function checkFieldAccess($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, FieldItemListInterface $items = NULL) {
-    if ($account->hasPermission('administer taxonomy') || $account->hasPermission('administer forums')) {
+    // Always grant access for forum administrators.
+    if ($this->forumAccessManager->userIsForumAdmin($account)) {
       return AccessResult::allowed();
     }
 
