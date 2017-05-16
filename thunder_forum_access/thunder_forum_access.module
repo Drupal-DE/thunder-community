@@ -6,9 +6,20 @@
  */
 
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\taxonomy\TermInterface;
+
+/**
+ * Implements hook_entity_bundle_field_info_alter().
+ */
+function thunder_forum_access_entity_bundle_field_info_alter(&$fields, EntityTypeInterface $entity_type, $bundle) {
+  // Add constraint to ensure posting to selected forum is allowed.
+  if ($entity_type->id() == 'node'  && !empty($fields['taxonomy_forums'])) {
+    $fields['taxonomy_forums']->addConstraint('ThunderForumAccessAllowedToPostInForum', []);
+  }
+}
 
 /**
  * Implements hook_form_FORM_ID_alter().
