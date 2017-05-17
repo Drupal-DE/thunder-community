@@ -1,0 +1,50 @@
+<?php
+
+/**
+ * @file
+ * Install and update functions for "Thunder Message Private" module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function thunder_private_message_install() {
+  /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager */
+  $entity_field_manager = \Drupal::service('entity_field.manager');
+
+  /** @var \Drupal\Core\Field\FieldStorageDefinitionListenerInterface $field_storage_definition_listener */
+  $field_storage_definition_listener = \Drupal::service('field_storage_definition.listener');
+
+  // Load field storage definitions.
+  $definitions = $entity_field_manager->getFieldStorageDefinitions('message');
+
+  // Create field storages.
+  foreach (['tpm_recipient', 'tpm_title', 'tpm_message'] as $field_name) {
+    if (empty($definitions[$field_name])) {
+      continue;
+    }
+    $field_storage_definition_listener->onFieldStorageDefinitionCreate($definitions[$field_name]);
+  }
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function thunder_private_message_uninstall() {
+  /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager */
+  $entity_field_manager = \Drupal::service('entity_field.manager');
+
+  /** @var \Drupal\Core\Field\FieldStorageDefinitionListenerInterface $field_storage_definition_listener */
+  $field_storage_definition_listener = \Drupal::service('field_storage_definition.listener');
+
+  // Load field storage definitions.
+  $definitions = $entity_field_manager->getFieldStorageDefinitions('message');
+
+  // Remove field storages.
+  foreach (['tpm_recipient', 'tpm_title', 'tpm_message'] as $field_name) {
+    if (empty($definitions[$field_name])) {
+      continue;
+    }
+    $field_storage_definition_listener->onFieldStorageDefinitionDelete($definitions[$field_name]);
+  }
+}

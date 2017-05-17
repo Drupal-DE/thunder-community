@@ -1,0 +1,192 @@
+<?php
+
+/**
+ * @file
+ * Main functions for "Thunder Message Private" module.
+ */
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\thunder_private_message\FieldDefinition;
+
+/**
+ * Implements hook_entity_bundle_field_info().
+ */
+function thunder_private_message_entity_bundle_field_info(EntityTypeInterface $entity_type, $bundle, array $base_field_definitions) {
+  if ($entity_type->id() !== 'message' || 'thunder_private_message' !== $bundle) {
+    return;
+  }
+  $fields['tpm_recipient'] = FieldDefinition::create('entity_reference')
+    ->setLabel(t('Recipient'))
+    ->setProvider('thunder_private_message')
+    ->setDescription(t('The user ID of the message recipient.'))
+    ->setSetting('target_type', 'user')
+    ->setRevisionable(FALSE)
+    ->setSetting('target_type', 'user')
+    ->setCardinality(1)
+    ->setDisplayOptions('form', [
+      'type' => 'entity_reference_autocomplete',
+      'weight' => -10,
+      'settings' => [
+        'match_operator' => 'CONTAINS',
+        'size' => '60',
+        'placeholder' => '',
+        'handler' => 'default:user',
+        'handler_settings' => [
+          'include_anonymous' => FALSE,
+          'auto_create' => FALSE,
+          'sort' => [
+            'field' => 'name',
+            'direction' => 'ASC',
+          ],
+        ],
+      ],
+    ])
+    ->setDisplayConfigurable('view', TRUE)
+    ->setDisplayConfigurable('form', TRUE);
+
+  $fields['tpm_title'] = FieldDefinition::create('string')
+    ->setLabel(t('Message title'))
+    ->setProvider('thunder_private_message')
+    ->setDescription(t('The message subject.'))
+    ->setRevisionable(FALSE)
+    ->setDefaultValue('')
+    ->setDisplayOptions('form', [
+      'type' => 'string_textfield',
+      'weight' => 0,
+    ])
+    ->setDisplayOptions('view', [
+      'label' => 'hidden',
+      'type' => 'string',
+      'weight' => 1,
+    ])
+    ->setDisplayConfigurable('view', TRUE)
+    ->setDisplayConfigurable('form', TRUE);
+  $fields['tpm_message'] = FieldDefinition::create('text_long')
+    ->setLabel(t('Message'))
+    ->setProvider('thunder_private_message')
+    ->setDescription(t('The message body.'))
+    ->setRevisionable(FALSE)
+    ->setDefaultValue('')
+    ->setDisplayOptions('form', [
+      'type' => 'text_textarea',
+      'weight' => 10,
+      'settings' => [
+        'rows' => 4,
+      ],
+    ])
+    ->setDisplayOptions('view', [
+      'label' => 'hidden',
+      'type' => 'string',
+      'weight' => 2,
+    ])
+    ->setDisplayConfigurable('view', TRUE)
+    ->setDisplayConfigurable('form', TRUE);
+
+  return $fields;
+}
+
+/**
+ * Implements hook_entity_field_storage_info().
+ */
+function thunder_private_message_entity_field_storage_info(EntityTypeInterface $entity_type) {
+  if ('message' !== $entity_type->id()) {
+    return [];
+  }
+  $result = [];
+
+  $result['tpm_recipient'] = FieldStorageConfig::create([
+      'field_name' => 'tpm_recipient',
+      'type' => 'entity_reference',
+      'entity_type' => $entity_type->id(),
+      'settings' => [
+        'target_type' => 'user',
+      ],
+    ])->setTranslatable(FALSE)->setCardinality(1);
+
+  $result['tpm_title'] = FieldStorageConfig::create([
+      'field_name' => 'tpm_title',
+      'entity_type' => $entity_type->id(),
+      'type' => 'string',
+      'settings' => [],
+    ])->setTranslatable(FALSE);
+
+  $result['tpm_message'] = FieldStorageConfig::create([
+      'field_name' => 'tpm_message',
+      'entity_type' => $entity_type->id(),
+      'type' => 'text_long',
+      'settings' => [],
+    ])->setTranslatable(FALSE);
+
+  return $result;
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_access().
+ */
+function thunder_private_message_message_access(EntityInterface $message, $operation, AccountInterface $account) {
+  if ('thunder_private_message' !== $message->bundle()) {
+    return AccessResult::neutral();
+  }
+
+  $is_admin = $account->hasPermission('adminster messages');
+  if ($message->uid->first()->isEmpty() || $message->tpm_recipient->first()->isEmpty()) {
+    // Something went wrong here.
+    return AccessResult::neutral();
+  }
+  $is_author = $account->id() == $message->uid->first()->entity->id();
+  $is_recipient = $account->id() == $message->tpm_recipient->first()->entity->id();
+  switch ($operation) {
+    case 'view':
+      return AccessResult::forbiddenIf(!$is_admin && !$is_author && !$is_recipient);
+
+    case 'edit':
+      return AccessResult::forbiddenIf(!$is_admin && !($is_author || $account->hasPermission('edit thunder_private_message messages')));
+
+    case 'delete':
+      return AccessResult::forbiddenIf(!$is_admin && !($is_author || $account->hasPermission('delete thunder_private_message messages')));
+  }
+
+  // Fallback.
+  return AccessResult::neutral();
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function thunder_private_message_form_message_thunder_private_message_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $account = \Drupal::currentUser();
+  // Hide "text" element.
+  if (!empty($form['text'])) {
+    $form['text']['#access'] = FALSE;
+  }
+  if (!$account->hasPermission('adminster thunder_private_message')) {
+    // Hide details.
+    $form['advanced']['#access'] = FALSE;
+  }
+}
+
+/**
+ * Check inbox and outbox access.
+ *
+ * @param \Drupal\Core\Session\AccountInterface $account
+ *   The user who wants to access this view.
+ *
+ * @return bool
+ *   Returns whether the user has access to the inbox.
+ */
+function thunder_private_message_list_access(AccountInterface $account) {
+  // Load the request user object.
+  $uid = \Drupal::routeMatch()->getParameter('user');
+
+  // Check if the current user owns the inbox.
+  if (!empty($uid) && $account->id() == $uid) {
+    return AccessResult::allowedIfHasPermission($account, 'view thunder_private_message message');
+  }
+
+  // Allow if the user has the bypass permission
+  return AccessResult::allowedIfHasPermission($account, 'bypass thunder_private_message access');
+}

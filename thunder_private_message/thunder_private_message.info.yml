@@ -1,0 +1,8 @@
+name: Thunder Private Message
+description: Enable a private message system for users.
+core: 8.x
+type: module
+dependencies:
+  - drupal:views
+  - message_ui:message_ui
+package: Thunder Community

@@ -1,0 +1,8 @@
+status: true
+dependencies: {  }
+template: thunder_private_message
+label: 'Private message'
+description: 'Template for private messages.'
+text:
+  - "<p>Private Message -</p>\r\n"
+settings: {  }
