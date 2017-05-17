@@ -76,9 +76,17 @@ class ForumAccessManager implements ForumAccessManagerInterface {
     if ($this->forumAccessRecordStorage->getForumManagerService()->checkNodeType($node)) {
       // Content is not new and forum field is not empty?
       if (!$node->isNew() && !$node->get('taxonomy_forums')->isEmpty()) {
+        /** @var \Drupal\taxonomy\TermInterface $term */
+        $term = $node->get('taxonomy_forums')->first()->entity;
+
         // Only show 'Leave shadow copy' field for moderator/admin users.
         if (isset($form['shadow'])) {
-          $form['shadow']['#access'] = $this->userIsForumModerator($node->get('taxonomy_forums')->first()->entity->id(), $this->currentUser);
+          $form['shadow']['#access'] = $this->userIsForumModerator($term->id(), $this->currentUser);
+        }
+
+        // Display comment settings for moderator/admin users.
+        if (isset($form['comment_forum'])) {
+          $form['comment_forum']['#access'] = $this->userIsForumModerator($term->id(), $this->currentUser);
         }
       }
     }
