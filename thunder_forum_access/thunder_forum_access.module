@@ -33,6 +33,17 @@ function thunder_forum_access_form_forum_overview_alter(&$form, FormStateInterfa
 }
 
 /**
+ * Implements hook_form_BASE_FORM_ID_alter() for \Drupal\comment\CommentForm.
+ */
+function thunder_forum_access_form_comment_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  /** @var \Drupal\thunder_forum_access\Access\ForumAccessManagerInterface $forum_access_manager */
+  $forum_access_manager = \Drupal::service('thunder_forum_access.forum_access_manager');
+
+  // Alter forum comment form.
+  $forum_access_manager->alterForumCommentForm($form, $form_state, $form_id);
+}
+
+/**
  * Implements hook_form_BASE_FORM_ID_alter() for \Drupal\node\NodeForm.
  */
 function thunder_forum_access_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {

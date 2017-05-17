@@ -11,6 +11,18 @@ use Drupal\Core\Session\AccountInterface;
 interface ForumAccessManagerInterface {
 
   /**
+   * Alter forum comment form.
+   *
+   * @param array $form
+   *   An associative array containing the structure of the form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   * @param string $form_id
+   *   The form ID.
+   */
+  public function alterForumCommentForm(array &$form, FormStateInterface $form_state, $form_id);
+
+  /**
    * Alter forum node form.
    *
    * @param array $form
