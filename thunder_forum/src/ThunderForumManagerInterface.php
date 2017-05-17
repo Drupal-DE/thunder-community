@@ -4,6 +4,7 @@ namespace Drupal\thunder_forum;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\forum\ForumManagerInterface;
+use Drupal\node\NodeInterface;
 use Drupal\taxonomy\TermInterface;
 
 /**
@@ -22,6 +23,16 @@ interface ThunderForumManagerInterface extends ForumManagerInterface {
    *   The form ID.
    */
   public function alterForumTermForm(array &$form, FormStateInterface $form_state, $form_id);
+
+  /**
+   * Return forum taxonomy term for forum node.
+   *
+   * @param \Drupal\node\NodeInterface $node
+   *   A forum node.
+   * @return \Drupal\taxonomy\TermInterface|null
+   *   The forum taxonomy term on success, otherwise NULL.
+   */
+  public function getForumTermByNode(NodeInterface $node);
 
   /**
    * Utility method to fetch the direct ancestor forum for a given forum.

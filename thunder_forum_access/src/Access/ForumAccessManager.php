@@ -75,10 +75,7 @@ class ForumAccessManager implements ForumAccessManagerInterface {
     // Is a forum content form?
     if ($this->forumAccessRecordStorage->getForumManagerService()->checkNodeType($node)) {
       // Content is not new and forum field is not empty?
-      if (!$node->isNew() && !$node->get('taxonomy_forums')->isEmpty()) {
-        /** @var \Drupal\taxonomy\TermInterface $term */
-        $term = $node->get('taxonomy_forums')->first()->entity;
-
+      if (!$node->isNew() && ($term = $this->forumAccessRecordStorage->getForumManagerService()->getForumTermByNode($node))) {
         // Only show 'Leave shadow copy' field for moderator/admin users.
         if (isset($form['shadow'])) {
           $form['shadow']['#access'] = $this->userIsForumModerator($term->id(), $this->currentUser);

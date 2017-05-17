@@ -4,6 +4,7 @@ namespace Drupal\thunder_forum;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\forum\ForumManager;
+use Drupal\node\NodeInterface;
 use Drupal\taxonomy\TermInterface;
 
 /**
@@ -41,6 +42,20 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
         $form_state->setError($element, t('A forum must not be moved into one of its children.'));
       }
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getForumTermByNode(NodeInterface $node) {
+    $field_name = 'taxonomy_forums';
+
+    // Is forum node type and has forum taxonomy term?
+    if ($this->checkNodeType($node) && !$node->get($field_name)->isEmpty()) {
+      return $node->get($field_name)->first()->entity;
+    }
+
+    return NULL;
   }
 
   /**

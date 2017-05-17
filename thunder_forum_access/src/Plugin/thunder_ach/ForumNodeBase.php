@@ -32,16 +32,13 @@ class ForumNodeBase extends ForumBase {
    */
   public function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     // No forum reference available?
-    if ($entity->get('taxonomy_forums')->isEmpty()) {
+    if (!($term = $this->forumManager->getForumTermByNode($entity))) {
       return parent::checkAccess($entity, $operation, $account)
         // Cache access result per user.
         ->cachePerUser()
         // Add entity to cache dependencies.
         ->addCacheableDependency($entity);
     }
-
-    /** @var \Drupal\taxonomy\TermInterface $term */
-    $term = $entity->get('taxonomy_forums')->first()->entity;
 
     // Load forum access record.
     $record = $this->forumAccessManager->getForumAccessRecord($term->id());
@@ -137,7 +134,7 @@ class ForumNodeBase extends ForumBase {
     // Only forum moderators are allowed to move a forum content.
     if ($field_definition->getName() === 'taxonomy_forums') {
       if (!$items->getEntity()->isNew() && !$items->isEmpty() && $operation === 'edit') {
-        if ($this->forumAccessManager->userIsForumModerator($items->first()->entity->id(), $account)) {
+        if ($this->forumAccessManager->userIsForumModerator($this->forumManager->getForumTermByNode($items->getEntity())->id(), $account)) {
           return AccessResult::allowed();
         }
 
