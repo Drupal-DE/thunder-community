@@ -1,0 +1,5 @@
+services:
+  thunder_private_message.message:
+    class: Drupal\thunder_private_message\Breadcrumb\PrivateMessageBreadcrumbBuilder
+    tags:
+      - {name: breadcrumb_builder, priority: 10}
