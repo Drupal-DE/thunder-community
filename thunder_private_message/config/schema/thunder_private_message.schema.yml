@@ -1,0 +1,15 @@
+# Schema for the configuration files of the thunder_private_message module.
+
+thunder_private_message.settings:
+  type: config_object
+  label: 'Private message settings'
+  mapping:
+    recipients:
+      type: mapping
+      label: 'Recipients'
+      mapping:
+        roles:
+          type: sequence
+          label: 'allowed roles'
+          sequence:
+            type: string

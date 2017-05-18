@@ -9,7 +9,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
- * Breadcrumb builder for content type article
+ * Breadcrumb builder for private messages.
  */
 class PrivateMessageBreadcrumbBuilder implements BreadcrumbBuilderInterface {
 

@@ -6,7 +6,6 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\views\Plugin\views\access\AccessPluginBase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -23,27 +22,6 @@ use Symfony\Component\Routing\Route;
 class MessagelistOwnerOrAdmin extends AccessPluginBase implements CacheableDependencyInterface {
 
   /**
-   * Constructs a InboxPermission object.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static($configuration, $plugin_id, $plugin_definition);
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function access(AccountInterface $account) {
@@ -57,6 +35,9 @@ class MessagelistOwnerOrAdmin extends AccessPluginBase implements CacheableDepen
     $route->setRequirement('_custom_access', 'thunder_private_message_list_access');
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function summaryTitle() {
     return $this->t('Messagelist owner or admin');
   }

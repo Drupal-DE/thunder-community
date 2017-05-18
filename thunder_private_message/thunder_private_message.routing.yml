@@ -1,0 +1,8 @@
+thunder_private_message.message.settings:
+  path: '/admin/config/message/pm'
+  defaults:
+    _title: 'Thunder Private Message'
+    _description: 'Settings for private messages'
+    _form: 'Drupal\thunder_private_message\Form\MessageSettingsForm'
+  requirements:
+    _permission: 'administer thunder_private_message'

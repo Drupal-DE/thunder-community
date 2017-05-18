@@ -46,7 +46,7 @@ function thunder_private_message_views_data() {
       'id' => 'markup',
       'format' => [
         'field' => 'tpm_message_format',
-      ]
+      ],
     ],
   ];
 

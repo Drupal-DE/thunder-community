@@ -1,0 +1,6 @@
+thunder_private_message.message.settings:
+  title: 'Thunder Private Message'
+  route_name: thunder_private_message.message.settings
+  parent: message.main_settings
+  description: 'Settings for private messages'
+  weight: 0
