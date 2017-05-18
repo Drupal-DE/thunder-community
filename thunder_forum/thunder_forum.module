@@ -11,9 +11,9 @@ use Drupal\Core\Form\FormStateInterface;
  * Implements hook_form_BASE_FORM_ID_alter().
  */
 function thunder_forum_form_taxonomy_term_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  /** @var \Drupal\thunder_forum\ThunderForumManagerInterface $forum_manager */
-  $forum_manager = \Drupal::service('forum_manager');
+  /** @var \Drupal\thunder_forum\ThunderForumHelperInterface $forum_helper */
+  $forum_helper = \Drupal::service('thunder_forum.forum_helper');
 
   // Alter forum taxonomy term form.
-  $forum_manager->alterForumTermForm($form, $form_state, $form_id);
+  $forum_helper->alterForumTermForm($form, $form_state, $form_id);
 }

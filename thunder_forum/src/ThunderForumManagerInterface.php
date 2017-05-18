@@ -2,7 +2,6 @@
 
 namespace Drupal\thunder_forum;
 
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\forum\ForumManagerInterface;
 use Drupal\node\NodeInterface;
 use Drupal\taxonomy\TermInterface;
@@ -11,18 +10,6 @@ use Drupal\taxonomy\TermInterface;
  * Provides thunder forum manager interface.
  */
 interface ThunderForumManagerInterface extends ForumManagerInterface {
-
-  /**
-   * Alter forum taxonomy term form.
-   *
-   * @param array $form
-   *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   * @param string $form_id
-   *   The form ID.
-   */
-  public function alterForumTermForm(array &$form, FormStateInterface $form_state, $form_id);
 
   /**
    * Return forum taxonomy term for forum node.
