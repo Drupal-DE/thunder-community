@@ -3,11 +3,14 @@
 namespace Drupal\thunder_forum;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Provides thunder forum helper service.
  */
 class ThunderForumHelper implements ThunderForumHelperInterface {
+
+  use StringTranslationTrait;
 
   /**
    * The forum manager.
@@ -53,7 +56,7 @@ class ThunderForumHelper implements ThunderForumHelperInterface {
     if (isset($tid) && !empty($vid)) {
       // Value is one of the forum taxonomy term's children?
       if (array_key_exists($element['#value'], $this->forumManager->getChildren($vid, $tid))) {
-        $form_state->setError($element, t('A forum must not be moved into one of its children.'));
+        $form_state->setError($element, $this->t('A forum must not be moved into one of its children.'));
       }
     }
   }

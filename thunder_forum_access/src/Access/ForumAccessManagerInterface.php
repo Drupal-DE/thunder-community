@@ -2,7 +2,6 @@
 
 namespace Drupal\thunder_forum_access\Access;
 
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**

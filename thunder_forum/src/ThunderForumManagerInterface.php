@@ -16,6 +16,7 @@ interface ThunderForumManagerInterface extends ForumManagerInterface {
    *
    * @param \Drupal\node\NodeInterface $node
    *   A forum node.
+   *
    * @return \Drupal\taxonomy\TermInterface|null
    *   The forum taxonomy term on success, otherwise NULL.
    */
