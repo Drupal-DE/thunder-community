@@ -86,9 +86,9 @@ class ForumTermBase extends ForumBase {
    * {@inheritdoc}
    *
    * Access for all other non-field API fields is checked via the corresponding
-   * taxonomy term form alter method in the forum access manager service.
+   * taxonomy term form alter method in the forum access helper service.
    *
-   * @see \Drupal\thunder_forum_access\Access\ForumAccessManagerInterface::alterForumTermForm()
+   * @see \Drupal\thunder_forum_access\Access\ForumAccessHelperInterface::alterForumTermForm()
    */
   public function checkFieldAccess($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, FieldItemListInterface $items = NULL) {
     // Always hide status field, because this access plugin makes it useless.

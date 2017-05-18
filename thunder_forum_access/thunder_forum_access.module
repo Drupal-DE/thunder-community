@@ -25,44 +25,44 @@ function thunder_forum_access_entity_bundle_field_info_alter(&$fields, EntityTyp
  * Implements hook_form_FORM_ID_alter().
  */
 function thunder_forum_access_form_forum_overview_alter(&$form, FormStateInterface $form_state, $form_id) {
-  /** @var \Drupal\thunder_forum_access\Access\ForumAccessManagerInterface $forum_access_manager */
-  $forum_access_manager = \Drupal::service('thunder_forum_access.forum_access_manager');
+  /** @var \Drupal\thunder_forum_access\Access\ForumAccessHelperInterface $forum_access_helper */
+  $forum_access_helper = \Drupal::service('thunder_forum_access.forum_access_helper');
 
   // Alter forum taxonomy term overview form.
-  $forum_access_manager->alterForumTermOverviewForm($form, $form_state, $form_id);
+  $forum_access_helper->alterForumTermOverviewForm($form, $form_state, $form_id);
 }
 
 /**
  * Implements hook_form_BASE_FORM_ID_alter() for \Drupal\comment\CommentForm.
  */
 function thunder_forum_access_form_comment_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  /** @var \Drupal\thunder_forum_access\Access\ForumAccessManagerInterface $forum_access_manager */
-  $forum_access_manager = \Drupal::service('thunder_forum_access.forum_access_manager');
+  /** @var \Drupal\thunder_forum_access\Access\ForumAccessHelperInterface $forum_access_helper */
+  $forum_access_helper = \Drupal::service('thunder_forum_access.forum_access_helper');
 
   // Alter forum comment form.
-  $forum_access_manager->alterForumCommentForm($form, $form_state, $form_id);
+  $forum_access_helper->alterForumCommentForm($form, $form_state, $form_id);
 }
 
 /**
  * Implements hook_form_BASE_FORM_ID_alter() for \Drupal\node\NodeForm.
  */
 function thunder_forum_access_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  /** @var \Drupal\thunder_forum_access\Access\ForumAccessManagerInterface $forum_access_manager */
-  $forum_access_manager = \Drupal::service('thunder_forum_access.forum_access_manager');
+  /** @var \Drupal\thunder_forum_access\Access\ForumAccessHelperInterface $forum_access_helper */
+  $forum_access_helper = \Drupal::service('thunder_forum_access.forum_access_helper');
 
   // Alter forum node form.
-  $forum_access_manager->alterForumNodeForm($form, $form_state, $form_id);
+  $forum_access_helper->alterForumNodeForm($form, $form_state, $form_id);
 }
 
 /**
  * Implements hook_form_BASE_FORM_ID_alter().
  */
 function thunder_forum_access_form_taxonomy_term_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  /** @var \Drupal\thunder_forum_access\Access\ForumAccessManagerInterface $forum_access_manager */
-  $forum_access_manager = \Drupal::service('thunder_forum_access.forum_access_manager');
+  /** @var \Drupal\thunder_forum_access\Access\ForumAccessHelperInterface $forum_access_helper */
+  $forum_access_helper = \Drupal::service('thunder_forum_access.forum_access_helper');
 
-  // Alter forum node form.
-  $forum_access_manager->alterForumTermForm($form, $form_state, $form_id);
+  // Alter forum taxonomy term form.
+  $forum_access_helper->alterForumTermForm($form, $form_state, $form_id);
 }
 
 /**

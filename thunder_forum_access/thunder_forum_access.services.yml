@@ -1,7 +1,10 @@
 services:
+  thunder_forum_access.forum_access_helper:
+    class: Drupal\thunder_forum_access\Access\ForumAccessHelper
+    arguments: ['@thunder_forum_access.forum_access_manager', '@thunder_forum_access.forum_access_record_storage', '@current_user', '@redirect.destination']
   thunder_forum_access.forum_access_manager:
     class: Drupal\thunder_forum_access\Access\ForumAccessManager
-    arguments: ['@entity_type.manager', '@thunder_forum_access.forum_access_record_storage', '@current_user', '@redirect.destination']
+    arguments: ['@entity_type.manager', '@thunder_forum_access.forum_access_record_storage', '@current_user']
   thunder_forum_access.forum_access_matrix:
     class: Drupal\thunder_forum_access\Access\ForumAccessMatrix
   thunder_forum_access.forum_access_record_storage:

@@ -121,9 +121,9 @@ class ForumNodeBase extends ForumBase {
    * {@inheritdoc}
    *
    * Access for all other non-field API fields is checked via the corresponding
-   * node form alter method in the forum access manager service.
+   * node form alter method in the forum access helper service.
    *
-   * @see \Drupal\thunder_forum_access\Access\ForumAccessManagerInterface::alterForumNodeForm()
+   * @see \Drupal\thunder_forum_access\Access\ForumAccessHelperInterface::alterForumNodeForm()
    */
   public function checkFieldAccess($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, FieldItemListInterface $items = NULL) {
     // Always grant access on all fields for forum administrators.
