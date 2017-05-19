@@ -8,10 +8,33 @@
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\thunder_private_message\FieldDefinition;
+
+/**
+ * Implements hook_entity_bundle_field_info().
+ */
+function thunder_private_message_entity_base_field_info(EntityTypeInterface $entity_type) {
+  if ('user' !== $entity_type->id()) {
+    return [];
+  }
+
+  $definitions['tpr_allow_messages'] = BaseFieldDefinition::create('boolean')
+    ->setLabel(t('Receive private messages'))
+    ->setDefaultValue(TRUE)
+    ->setRequired(TRUE)
+    ->setDisplayOptions('form', [
+      'type' => 'checkbox',
+      'weight' => 0,
+    ])
+    ->setDisplayConfigurable('form', TRUE)
+    ->setDisplayConfigurable('view', TRUE);
+
+  return $definitions;
+}
 
 /**
  * Implements hook_entity_bundle_field_info().
@@ -100,27 +123,27 @@ function thunder_private_message_entity_field_storage_info(EntityTypeInterface $
   $result = [];
 
   $result['tpm_recipient'] = FieldStorageConfig::create([
-    'field_name' => 'tpm_recipient',
-    'type' => 'entity_reference',
-    'entity_type' => $entity_type->id(),
-    'settings' => [
-      'target_type' => 'user',
-    ],
-  ])->setTranslatable(FALSE)->setCardinality(1);
+      'field_name' => 'tpm_recipient',
+      'type' => 'entity_reference',
+      'entity_type' => $entity_type->id(),
+      'settings' => [
+        'target_type' => 'user',
+      ],
+    ])->setTranslatable(FALSE)->setCardinality(1);
 
   $result['tpm_title'] = FieldStorageConfig::create([
-    'field_name' => 'tpm_title',
-    'entity_type' => $entity_type->id(),
-    'type' => 'string',
-    'settings' => [],
-  ])->setTranslatable(FALSE);
+      'field_name' => 'tpm_title',
+      'entity_type' => $entity_type->id(),
+      'type' => 'string',
+      'settings' => [],
+    ])->setTranslatable(FALSE);
 
   $result['tpm_message'] = FieldStorageConfig::create([
-    'field_name' => 'tpm_message',
-    'entity_type' => $entity_type->id(),
-    'type' => 'text_long',
-    'settings' => [],
-  ])->setTranslatable(FALSE);
+      'field_name' => 'tpm_message',
+      'entity_type' => $entity_type->id(),
+      'type' => 'text_long',
+      'settings' => [],
+    ])->setTranslatable(FALSE);
 
   return $result;
 }
