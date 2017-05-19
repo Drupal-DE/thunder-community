@@ -34,7 +34,16 @@ class PrivateMessageUserSelection extends UserSelection {
       $handler_settings['filter']['role'] = array_keys(array_filter($roles));
     }
 
-    return parent::buildEntityQuery($match, $match_operator);
+    $query = parent::buildEntityQuery($match, $match_operator);
+
+    $account = \Drupal::currentUser();
+    if ($account->hasPermission('bypass thunder_private_message access') || $account->hasPermission('administer thunder_private_message')) {
+      return $query;
+    }
+    // Exclude users not wanting private messages.
+    $query->condition('tpr_allow_messages', 1, '=');
+
+    return $query;
   }
 
   /**
