@@ -163,15 +163,22 @@ function thunder_private_message_message_access(EntityInterface $message, $opera
   }
   $is_author = $account->id() == $message->uid->first()->entity->id();
   $is_recipient = $account->id() == $message->tpm_recipient->first()->entity->id();
+
+  /* @var $flag_service \Drupal\flag\FlagServiceInterface */
+  $flag_service = \Drupal::service('flag');
+  /* @var $flag \Drupal\flag\FlagInterface */
+  $flag = $flag_service->getFlagById('message_deleted');
+  $deleted = $flag->isFlagged($message, $account);
+
   switch ($operation) {
     case 'view':
-      return AccessResult::forbiddenIf(!$is_admin && !$is_author && !$is_recipient);
+      return AccessResult::forbiddenIf(!$is_admin && ((!$is_author && !$is_recipient) || $deleted));
 
     case 'edit':
-      return AccessResult::forbiddenIf(!$is_admin && !($is_author || $account->hasPermission('edit thunder_private_message messages')));
+      return AccessResult::forbiddenIf(!$is_admin && ((!$is_author && !$account->hasPermission('edit thunder_private_message messages')) || $deleted));
 
     case 'delete':
-      return AccessResult::forbiddenIf(!$is_admin && !($is_author || $account->hasPermission('delete thunder_private_message messages')));
+      return AccessResult::forbiddenIf(!$is_admin && (!$is_author && $account->hasPermission('delete thunder_private_message messages')));
   }
 
   // Fallback.

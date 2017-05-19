@@ -1,0 +1,26 @@
+status: true
+dependencies: {  }
+id: message_deleted
+label: 'Message: deleted'
+bundles:
+  - thunder_private_message
+entity_type: message
+global: false
+weight: 0
+flag_short: 'delete message'
+flag_long: ''
+flag_message: 'The message has been deleted.'
+unflag_short: 'undelete message'
+unflag_long: ''
+unflag_message: ''
+unflag_denied_text: ''
+flag_type: 'entity:message'
+link_type: reload
+flagTypeConfig:
+  show_in_links: {  }
+  show_as_field: true
+  show_on_form: false
+  show_contextual_link: true
+  extra_permissions:
+    owner: '0'
+linkTypeConfig: {  }
