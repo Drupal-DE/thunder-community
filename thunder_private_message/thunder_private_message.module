@@ -230,7 +230,7 @@ function thunder_private_message_preprocess_flag__message_deleted(&$vars) {
   if (empty($vars['attributes']['href'])) {
     return;
   }
-  // @todo Find a better way to alter the destination.
+  // Is there a better (more robust) way to alter the destination?
   $url = new Url('view.private_messages.inbox', ['user' => $vars['user']->id()]);
   $destination = $url->toString();
   $vars['attributes']['href'] = preg_replace('#destination=message\/\d+#', 'destination=' . trim($destination, '/'), $vars['attributes']['href']);
