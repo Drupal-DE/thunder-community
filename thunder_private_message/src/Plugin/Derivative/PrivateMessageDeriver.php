@@ -62,11 +62,13 @@ class PrivateMessageDeriver extends DeriverBase implements ContainerDeriverInter
       'route_name' => 'view.private_messages.inbox',
       'title' => 'Inbox',
       'parent_id' => 'entity.message.private_messages:entity.user.private_message',
+      'cache_contexts' => ['user'],
     ];
     $this->derivatives['entity.user.private_message.outbox'] = [
       'route_name' => 'view.private_messages.outbox',
       'title' => 'Sent',
       'parent_id' => 'entity.message.private_messages:entity.user.private_message',
+      'cache_contexts' => ['user'],
     ];
 
     foreach ($this->derivatives as &$entry) {
