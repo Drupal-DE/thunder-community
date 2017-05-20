@@ -1,0 +1,8 @@
+thunder_private_message.reply:
+  route_name: message_ui.add
+  route_parameters:
+    message_template: 'thunder_private_message'
+  title: 'Reply'
+  appears_on:
+    - entity.message.canonical
+  class: '\Drupal\thunder_private_message\Plugin\Menu\LocalAction\MessageReplyAction'
