@@ -33,10 +33,12 @@ class ForumAccessMatrix implements ForumAccessMatrixInterface {
           static::PERMISSION_CREATE => [
             'label' => $this->t('Create topics'),
             'description' => $this->t('Allow users to create topics in this forum and its subforums (if not configured differently on another level).'),
+            'disabled_for' => [static::ROLE_ANONYMOUS],
           ],
           static::PERMISSION_UPDATE => [
             'label' => $this->t('Edit topics'),
             'description' => $this->t('Allow users to edit topics in this forum and its subforums (if not configured differently on another level).'),
+            'disabled_for' => [static::ROLE_ANONYMOUS],
           ],
           static::PERMISSION_UPDATE_OWN => [
             'label' => $this->t('Edit own topics'),
@@ -46,6 +48,7 @@ class ForumAccessMatrix implements ForumAccessMatrixInterface {
           static::PERMISSION_DELETE => [
             'label' => $this->t('Delete topics'),
             'description' => $this->t('Allow users to delete topics in this forum and its subforums (if not configured differently on another level).'),
+            'disabled_for' => [static::ROLE_ANONYMOUS],
           ],
           static::PERMISSION_DELETE_OWN => [
             'label' => $this->t('Delete own topics'),
@@ -61,10 +64,12 @@ class ForumAccessMatrix implements ForumAccessMatrixInterface {
           static::PERMISSION_CREATE => [
             'label' => $this->t('Create replies'),
             'description' => $this->t('Allow users to create replies to topics in this forum and its subforums (if not configured differently on another level).'),
+            'disabled_for' => [static::ROLE_ANONYMOUS],
           ],
           static::PERMISSION_UPDATE => [
             'label' => $this->t('Edit replies'),
             'description' => $this->t('Allow users to edit replies to topics in this forum and its subforums (if not configured differently on another level).'),
+            'disabled_for' => [static::ROLE_ANONYMOUS],
           ],
           static::PERMISSION_UPDATE_OWN => [
             'label' => $this->t('Edit own replies'),
@@ -74,6 +79,7 @@ class ForumAccessMatrix implements ForumAccessMatrixInterface {
           static::PERMISSION_DELETE => [
             'label' => $this->t('Delete replies'),
             'description' => $this->t('Allow users to delete replies to topics in this forum and its subforums (if not configured differently on another level).'),
+            'disabled_for' => [static::ROLE_ANONYMOUS],
           ],
           static::PERMISSION_DELETE_OWN => [
             'label' => $this->t('Delete own replies'),
