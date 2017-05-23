@@ -26,10 +26,16 @@ class MessageReplyForm extends MessageForm {
     $defaults = [
       'template' => 'thunder_private_message',
       'tpm_recipient' => $message->getOwner(),
+      'tpm_title' => $this->t('Re: @title', ['@title' => $message->tpm_title->first()->value]),
+      'tpm_message' => '[quote]' . $message->tpm_message->first()->value . '[/quote]',
     ];
     $this->entity = Message::create($defaults);
 
     $form = parent::buildForm($form, $form_state);
+
+    // Use different text for save-button.
+    $form['actions']['save']['#value'] = $this->t('Reply');
+
     return $form;
   }
 
