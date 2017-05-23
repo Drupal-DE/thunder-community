@@ -4,3 +4,8 @@ services:
     arguments: ['@config.factory', '@current_user']
     tags:
       - {name: breadcrumb_builder, priority: 10}
+#  thunder_private_message.flag_subscriber:
+#    class: Drupal\thunder_private_message\FlagSubscriber
+#    arguments: ['@flag.link_builder', '@current_user']
+#    tags:
+#      - { name: event_subscriber }

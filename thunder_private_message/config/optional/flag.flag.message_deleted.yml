@@ -10,9 +10,9 @@ weight: 0
 flag_short: 'delete message'
 flag_long: ''
 flag_message: 'The message has been deleted.'
-unflag_short: 'undelete message'
+unflag_short: 'Undo message deletion.'
 unflag_long: ''
-unflag_message: ''
+unflag_message: 'The message has been restored.'
 unflag_denied_text: ''
 flag_type: 'entity:message'
 link_type: reload
@@ -20,7 +20,7 @@ flagTypeConfig:
   show_in_links: {  }
   show_as_field: true
   show_on_form: false
-  show_contextual_link: true
+  show_contextual_link: false
   extra_permissions:
     owner: '0'
 linkTypeConfig: {  }
