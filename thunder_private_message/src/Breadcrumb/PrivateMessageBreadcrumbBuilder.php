@@ -4,8 +4,10 @@ namespace Drupal\thunder_private_message\Breadcrumb;
 
 use Drupal\Core\Breadcrumb\Breadcrumb;
 use Drupal\Core\Breadcrumb\BreadcrumbBuilderInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
@@ -14,6 +16,33 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 class PrivateMessageBreadcrumbBuilder implements BreadcrumbBuilderInterface {
 
   use StringTranslationTrait;
+
+  /**
+   * Configuration factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
+   * The current user account.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
+  protected $account;
+
+  /**
+   * Constructs the PrivateMessageBreadcrumbBuilder.
+   *
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The configuration factory.
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   The current user account.
+   */
+  public function __construct(ConfigFactoryInterface $config_factory, AccountInterface $account) {
+    $this->configFactory = $config_factory;
+    $this->account = $account;
+  }
 
   /**
    * {@inheritdoc}
@@ -39,28 +68,27 @@ class PrivateMessageBreadcrumbBuilder implements BreadcrumbBuilderInterface {
 
     $show_outbox = FALSE;
 
-    $account = \Drupal::currentUser();
     $message_author = $message->getOwner();
     /* @var $message_recipient \Drupal\user\UserInterface */
     $message_recipient = $message->get('tpm_recipient')->first()->entity;
-    if ($account->id() === $message_author->id()) {
+    if ($this->account->id() === $message_author->id()) {
       // Author displays message. Set trail to author.
-      $account = $message_author;
+      $this->account = $message_author;
       $show_outbox = TRUE;
     }
-    elseif ($account->id() === $message_recipient->id()) {
+    elseif ($this->account->id() === $message_recipient->id()) {
       // Recipient displays message. Set trail to recipient.
-      $account = $message_recipient;
+      $this->account = $message_recipient;
     }
 
     // Add link hierarchy.
     $breadcrumb->addLink(Link::createFromRoute($this->t('Front page'), '<front>'));
-    $breadcrumb->addLink(Link::createFromRoute($account->getDisplayName(), 'entity.user.canonical', ['user' => $account->id()]));
+    $breadcrumb->addLink(Link::createFromRoute($this->account->getDisplayName(), 'entity.user.canonical', ['user' => $this->account->id()]));
 
     // Add link to message inbox/outbox.
-    $breadcrumb->addLink(Link::createFromRoute(\Drupal::config('views.view.private_messages')->get('display.inbox.display_options.title'), 'view.private_messages.inbox', ['user' => $account->id()]));
+    $breadcrumb->addLink(Link::createFromRoute($this->configFactory->get('views.view.private_messages')->get('display.inbox.display_options.title'), 'view.private_messages.inbox', ['user' => $this->account->id()]));
     if ($show_outbox) {
-      $breadcrumb->addLink(Link::createFromRoute(\Drupal::config('views.view.private_messages')->get('display.outbox.display_options.title'), 'view.private_messages.outbox', ['user' => $account->id()]));
+      $breadcrumb->addLink(Link::createFromRoute($this->configFactory->get('views.view.private_messages')->get('display.outbox.display_options.title'), 'view.private_messages.outbox', ['user' => $this->account->id()]));
     }
 
     $breadcrumb->addCacheContexts(['url']);
