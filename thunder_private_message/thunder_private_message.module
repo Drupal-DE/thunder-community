@@ -240,3 +240,16 @@ function thunder_private_message_preprocess_flag__message_deleted(&$vars) {
   $destination = $url->toString();
   $vars['attributes']['href'] = preg_replace('#destination=message\/\d+#', 'destination=' . trim($destination, '/'), $vars['attributes']['href']);
 }
+
+/**
+ * Implements hook_entity_type_alter().
+ */
+function thunder_private_message_entity_type_alter(array &$entity_types) {
+  if (empty($entity_types['message'])) {
+    return;
+  }
+
+  $entity_types['message']
+    ->setFormClass('pm-reply', 'Drupal\thunder_private_message\Form\MessageReplyForm')
+    ->setLinkTemplate('pm-reply', '/message/{message}/reply');
+}

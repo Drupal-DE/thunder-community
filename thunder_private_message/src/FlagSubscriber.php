@@ -38,6 +38,8 @@ class FlagSubscriber implements EventSubscriberInterface {
    *
    * @param \Drupal\flag\FlagLinkBuilder $link_builder
    *   Flag link builder to use.
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   The current user account.
    */
   public function __construct(FlagLinkBuilder $link_builder, AccountInterface $account) {
     $this->linkBuilder = $link_builder;
@@ -73,7 +75,11 @@ class FlagSubscriber implements EventSubscriberInterface {
     $url->setOption('query', ['destination' => $destination->getInternalPath()]);
     $title = $action === 'unflag' ? $flag->getUnflagShortText() : $flag->getFlagShortText();
 
-    drupal_set_message($this->t('@message @undo', ['@message' => $flag->getFlagMessage(), '@undo' => Link::fromTextAndUrl($title, $url)->toString()]));
+    $message_params = [
+      '@message' => $flag->getFlagMessage(),
+      '@undo' => Link::fromTextAndUrl($title, $url)->toString(),
+    ];
+    drupal_set_message($this->t('@message @undo', $message_params));
   }
 
 }

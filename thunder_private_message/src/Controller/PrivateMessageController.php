@@ -2,7 +2,9 @@
 
 namespace Drupal\thunder_private_message\Controller;
 
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\message\MessageInterface;
 use Drupal\message\MessageTemplateInterface;
 use Drupal\message_ui\Controller\MessageController;
 
@@ -34,6 +36,32 @@ class PrivateMessageController extends MessageController {
       $form['tpm_recipient']['widget'][0]['target_id']['#default_value'] = $recipient;
     }
     return $form;
+  }
+
+  /**
+   * Generates form output for replying to a private message.
+   *
+   * @param \Drupal\message\MessageInterface $message
+   *   The message object.
+   *
+   * @return array
+   *   An array as expected by drupal_render().
+   */
+  public function reply(MessageInterface $message) {
+    return $this->entityFormBuilder()->getForm($message, 'pm-reply');
+  }
+
+  /**
+   * Checks access for reply links.
+   *
+   * @param \Drupal\message\MessageInterface $message
+   *   The message object.
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   Run access checks for this account.
+   */
+  public function replyAccess(MessageInterface $message, AccountInterface $account) {
+    // Only message recipients are allowed to reply to a private message.
+    return AccessResult::allowedIf($message->get('tpm_recipient')->first()->entity->id() === $account->id());
   }
 
 }
