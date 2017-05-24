@@ -218,6 +218,9 @@ function thunder_private_message_form_message_thunder_private_message_form_alter
 function thunder_private_message_list_access(AccountInterface $account) {
   // Load the request user object.
   $uid = \Drupal::routeMatch()->getParameter('user');
+  if ($uid instanceof AccountInterface) {
+    $uid = $uid->id();
+  }
 
   // Check if the current user owns the inbox.
   if (!empty($uid) && $account->id() == $uid) {
