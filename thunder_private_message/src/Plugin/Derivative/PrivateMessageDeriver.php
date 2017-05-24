@@ -46,7 +46,7 @@ class PrivateMessageDeriver extends DeriverBase implements ContainerDeriverInter
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($base_plugin_definition) {
-    if (!isset($this->account->tpr_allow_messages) || !$this->account->tpr_allow_messages || $this->account->tpr_allow_messages->isEmpty() || !$this->account->tpr_allow_messages->first()->value) {
+    if (!isset($this->account->tpm_allow_messages) || !$this->account->tpm_allow_messages || $this->account->tpm_allow_messages->isEmpty() || !$this->account->tpm_allow_messages->first()->value) {
       return parent::getDerivativeDefinitions($base_plugin_definition);
     }
 

@@ -41,7 +41,7 @@ class PrivateMessageUserSelection extends UserSelection {
       return $query;
     }
     // Exclude users not wanting private messages.
-    $query->condition('tpr_allow_messages', 1, '=');
+    $query->condition('tpm_allow_messages', 1, '=');
 
     return $query;
   }
