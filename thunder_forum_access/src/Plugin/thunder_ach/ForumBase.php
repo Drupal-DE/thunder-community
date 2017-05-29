@@ -10,6 +10,8 @@ use Drupal\thunder_forum_access\Access\ForumAccessManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+// @todo Rewrite to use new pACH module.
+
 /**
  * Provides a base class for forum access control handlers.
  */

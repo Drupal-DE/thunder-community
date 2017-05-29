@@ -11,6 +11,8 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\taxonomy\TermInterface;
 
+// @todo Rewrite to not use comment entities but forum reply entities instead.
+
 /**
  * Implements hook_entity_bundle_field_info_alter().
  */

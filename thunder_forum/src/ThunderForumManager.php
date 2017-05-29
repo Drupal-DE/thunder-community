@@ -2,6 +2,7 @@
 
 namespace Drupal\thunder_forum;
 
+use Drupal\Core\Session\AccountInterface;
 use Drupal\forum\ForumManager;
 use Drupal\node\NodeInterface;
 use Drupal\taxonomy\TermInterface;
@@ -10,6 +11,14 @@ use Drupal\taxonomy\TermInterface;
  * Provides thunder forum manager service.
  */
 class ThunderForumManager extends ForumManager implements ThunderForumManagerInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getForumStatistics($tid) {
+    // @todo override ThunderForumManager::getForumStatistics().
+    return parent::getForumStatistics($tid);
+  }
 
   /**
    * {@inheritdoc}
@@ -23,6 +32,14 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
     }
 
     return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getLastPost($tid) {
+    // @todo override ThunderForumManager::getLastPost().
+    return parent::getLastPost($tid);
   }
 
   /**
@@ -47,6 +64,22 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
     $parent = $this->getParent($tid);
 
     return $parent ? $parent->id() : 0;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTopics($tid, AccountInterface $account) {
+    // @todo override ThunderForumManager::getTopics().
+    return parent::getTopics($tid, $account);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTopicOrder($sortby) {
+    // @todo override ThunderForumManager::getTopicOrder().
+    return parent::getTopicOrder($sortby);
   }
 
   /**

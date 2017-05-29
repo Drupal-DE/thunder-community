@@ -8,6 +8,8 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Session\AccountInterface;
 
+// @todo Rewrite to use new pACH module.
+
 /**
  * Provides a basic access control handler for forum terms.
  *

@@ -14,6 +14,8 @@ use Drupal\thunder_forum_reply\ForumReplyStorageInterface;
 use Drupal\thunder_forum_reply\Plugin\Field\FieldType\ForumReplyItemInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+// @todo Rewrite to use new pACH module.
+
 /**
  * Default access control handler plugin for forum replies.
  *

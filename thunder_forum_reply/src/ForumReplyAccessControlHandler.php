@@ -10,6 +10,8 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Access\AccessResult;
 
+// @todo Rewrite to use new pACH module.
+
 /**
  *  Defines an extensible access control handler for the Forum reply entity.
  *

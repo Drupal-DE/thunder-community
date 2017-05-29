@@ -9,6 +9,8 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\thunder_forum_access\Access\ForumAccessMatrixInterface;
 
+// @todo Rewrite to use new pACH module.
+
 /**
  * Provides a basic access control handler for forum terms.
  *
