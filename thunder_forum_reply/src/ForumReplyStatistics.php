@@ -10,6 +10,9 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\node\NodeInterface;
 use Drupal\user\EntityOwnerInterface;
 
+/**
+ * Defines a service for storing and retrieving forum reply statistics.
+ */
 class ForumReplyStatistics implements ForumReplyStatisticsInterface {
 
   /**
@@ -62,7 +65,7 @@ class ForumReplyStatistics implements ForumReplyStatisticsInterface {
   /**
    * {@inheritdoc}
    */
-  public function read($nodes, $accurate = TRUE) {
+  public function read(array $nodes, $accurate = TRUE) {
     $options = $accurate ? [] : ['target' => 'replica'];
 
     $stats = $this->database->select('thunder_forum_reply_node_statistics', 'frs', $options)
@@ -91,7 +94,7 @@ class ForumReplyStatistics implements ForumReplyStatisticsInterface {
   /**
    * {@inheritdoc}
    */
-  public function create(NodeInterface $node, $fields) {
+  public function create(NodeInterface $node, array $fields) {
     $query = $this->database->insert('thunder_forum_reply_node_statistics')
       ->fields([
         'nid',
@@ -130,14 +133,14 @@ class ForumReplyStatistics implements ForumReplyStatisticsInterface {
         $last_reply_timestamp = $node->getChangedTimeAcrossTranslations();
       }
 
-      $query->values(array(
+      $query->values([
         'nid' => $node->id(),
         'field_name' => $field_name,
         'frid' => 0,
         'last_reply_timestamp' => $last_reply_timestamp,
         'last_reply_uid' => $last_reply_uid,
         'reply_count' => 0,
-      ));
+      ]);
     }
 
     $query->execute();
@@ -175,7 +178,7 @@ class ForumReplyStatistics implements ForumReplyStatisticsInterface {
         ->fields('fr', [
           'frid',
           'changed',
-          'uid'
+          'uid',
         ])
         ->condition('fr.nid', $reply->getRepliedNodeId())
         ->condition('fr.field_name', $reply->getFieldName())
@@ -189,16 +192,16 @@ class ForumReplyStatistics implements ForumReplyStatisticsInterface {
       // Use merge here because forum node could be created before forum reply
       // field.
       $this->database->merge('thunder_forum_reply_node_statistics')
-        ->fields(array(
+        ->fields([
           'frid' => $last_reply->frid,
           'reply_count' => $count,
           'last_reply_timestamp' => $last_reply->changed,
           'last_reply_uid' => $last_reply->uid,
-        ))
-        ->keys(array(
+        ])
+        ->keys([
           'nid' => $reply->getRepliedNodeId(),
           'field_name' => $reply->getFieldName(),
-        ))
+        ])
         ->execute();
     }
 
@@ -219,14 +222,14 @@ class ForumReplyStatistics implements ForumReplyStatisticsInterface {
       }
 
       $this->database->update('thunder_forum_reply_node_statistics')
-        ->fields(array(
+        ->fields([
           'frid' => 0,
           'reply_count' => 0,
           // Use the changed date of the entity if it's set, or default to
           // REQUEST_TIME.
           'last_reply_timestamp' => ($node instanceof EntityChangedInterface) ? $node->getChangedTimeAcrossTranslations() : REQUEST_TIME,
           'last_reply_uid' => $last_reply_uid,
-        ))
+        ])
         ->condition('nid', $reply->getRepliedNodeId())
         ->condition('field_name', $reply->getFieldName())
         ->execute();
@@ -235,7 +238,7 @@ class ForumReplyStatistics implements ForumReplyStatisticsInterface {
     // Reset the cache of the replied forum node, so that when the entity is
     // loaded the next time, the statistics will be loaded again.
     $this->entityTypeManager->getStorage('node')
-      ->resetCache(array($reply->getRepliedNodeId()));
+      ->resetCache([$reply->getRepliedNodeId()]);
   }
 
 }

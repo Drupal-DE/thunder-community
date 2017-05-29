@@ -7,7 +7,6 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
 use Drupal\thunder_forum_reply\Plugin\Field\FieldType\ForumReplyItemInterface;
@@ -167,13 +166,13 @@ class ForumReplyLinkBuilder implements ForumReplyLinkBuilderInterface {
           // Show the "post forum reply" link if the form is on another page, or
           // if there are existing forum replies that the link will skip past.
           if ($form_location == ForumReplyItemInterface::FORM_SEPARATE_PAGE || (!empty($node->get($field_name)->reply_count) && $reply->access('view', $this->currentUser))) {
-            $links['thunder-forum-reply-add'] = array(
+            $links['thunder-forum-reply-add'] = [
               'title' => $this->t('Add new reply'),
               'attributes' => [
                 'title' => $this->t('Share your thoughts and opinions.'),
               ],
               'fragment' => 'forum-reply-form',
-            );
+            ];
 
             if ($form_location == ForumReplyItemInterface::FORM_SEPARATE_PAGE) {
               $links['thunder-forum-reply-add']['url'] = Url::fromRoute('thunder_forum_reply.add', [
@@ -192,7 +191,7 @@ class ForumReplyLinkBuilder implements ForumReplyLinkBuilderInterface {
         $entity_links['thunder_forum_reply__' . $field_name] = [
           '#theme' => 'links__entity__thunder_forum_reply__' . $field_name,
           '#links' => $links,
-          '#attributes' => array('class' => array('links', 'inline')),
+          '#attributes' => ['class' => ['links', 'inline']],
         ];
 
         if ($view_mode === 'teaser' && $this->moduleHandler->moduleExists('history') && $this->currentUser->isAuthenticated()) {
@@ -218,7 +217,14 @@ class ForumReplyLinkBuilder implements ForumReplyLinkBuilderInterface {
                 'fragment' => 'new',
               ]),
             ];
-            $parents = ['thunder_forum_reply', 'newRepliesLinks', 'node', $field_name, $node->id()];
+
+            $parents = [
+              'thunder_forum_reply',
+              'newRepliesLinks',
+              'node',
+              $field_name, $node->id(),
+            ];
+
             NestedArray::setValue($entity_links['thunder_forum_reply__' . $field_name]['#attached']['drupalSettings'], $parents, $value);
           }
         }

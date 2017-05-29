@@ -63,7 +63,7 @@ class ForumReplyViewBuilder extends EntityViewBuilder {
     }
 
     // Pre-load associated users into cache to leverage multiple loading.
-    $uids = array();
+    $uids = [];
     foreach ($entities as $entity) {
       $uids[] = $entity->getOwnerId();
     }
@@ -83,15 +83,18 @@ class ForumReplyViewBuilder extends EntityViewBuilder {
 
       // Links.
       if ($display->getComponent('links')) {
-        $build[$id]['links'] = array(
-          '#lazy_builder' => ['thunder_forum_reply.lazy_builders:renderLinks', [
-            $entity->id(),
-            $view_mode,
-            $entity->language()->getId(),
-            !empty($entity->in_preview),
-          ]],
+        $build[$id]['links'] = [
+          '#lazy_builder' => [
+            'thunder_forum_reply.lazy_builders:renderLinks',
+            [
+              $entity->id(),
+              $view_mode,
+              $entity->language()->getId(),
+              !empty($entity->in_preview),
+            ],
+          ],
           '#create_placeholder' => TRUE,
-        );
+        ];
       }
 
       if (!isset($build[$id]['#attached'])) {

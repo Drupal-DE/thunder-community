@@ -67,7 +67,9 @@ class ForumReplyDefaultFormatter extends FormatterBase implements ContainerFacto
   protected $entityTypeManager;
 
   /**
-   * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
+   * The route match.
+   *
+   * @var \Drupal\Core\Routing\RouteMatchInterface
    */
   protected $routeMatch;
 
@@ -94,6 +96,8 @@ class ForumReplyDefaultFormatter extends FormatterBase implements ContainerFacto
    *   The entity type manager.
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The route match object.
+   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
+   *   The entity display repository.
    */
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, AccountInterface $current_user, EntityTypeManagerInterface $entity_type_manager, RouteMatchInterface $route_match, EntityDisplayRepositoryInterface $entity_display_repository) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
@@ -148,7 +152,6 @@ class ForumReplyDefaultFormatter extends FormatterBase implements ContainerFacto
     /** @var \Drupal\node\NodeInterface $entity */
     $entity = $items->getEntity();
 
-
     // Replies thread.
     $replies_per_page = $settings['per_page'];
     $replies = $this->storage->loadThread($entity, $field_name, $replies_per_page, $this->getSetting('pager_id'));
@@ -185,7 +188,10 @@ class ForumReplyDefaultFormatter extends FormatterBase implements ContainerFacto
       $elements['#cache']['contexts'][] = 'user';
 
       $output['reply_form'] = [
-        '#lazy_builder' => ['thunder_forum_reply.lazy_builders:renderForm', [$entity->id(), $field_name]],
+        '#lazy_builder' => [
+          'thunder_forum_reply.lazy_builders:renderForm',
+          [$entity->id(), $field_name],
+        ],
         '#create_placeholder' => TRUE,
       ];
     }
@@ -220,13 +226,13 @@ class ForumReplyDefaultFormatter extends FormatterBase implements ContainerFacto
     ];
 
     // Pager ID.
-    $element['pager_id'] = array(
+    $element['pager_id'] = [
       '#type' => 'select',
       '#title' => $this->t('Pager ID'),
       '#options' => range(0, 10),
       '#default_value' => $this->getSetting('pager_id'),
       '#description' => $this->t("Unless you're experiencing problems with pagers related to this field, you should leave this at 0. If using multiple pagers on one page you may need to set this number to a higher value so as not to conflict within the ?page= array. Large values will add a lot of commas to your URLs, so avoid if possible."),
-    );
+    ];
 
     return $element;
   }

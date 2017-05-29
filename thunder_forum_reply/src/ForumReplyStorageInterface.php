@@ -2,7 +2,6 @@
 
 namespace Drupal\thunder_forum_reply;
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\ContentEntityStorageInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -37,6 +36,7 @@ interface ForumReplyStorageInterface extends ContentEntityStorageInterface {
    *
    * @param \Drupal\thunder_forum_reply\ForumReplyInterface[] $replies
    *   An array of forum reply entities keyed by their IDs.
+   *
    * @return array
    *   The entity IDs of the passed forum reply entities' children as an array.
    */

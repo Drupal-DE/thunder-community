@@ -39,8 +39,7 @@ interface ForumReplyInterface extends ContentEntityInterface, EntityOwnerInterfa
   public function getHostname();
 
   /**
-   * Returns the parent forum reply entity if this is a response to a forum
-   * reply.
+   * Returns parent forum reply if a response to another forum reply.
    *
    * @return \Drupal\thunder_forum_reply\ForumReplyInterface|null
    *   A forum reply entity of the parent forum reply or NULL if there is no
@@ -49,8 +48,7 @@ interface ForumReplyInterface extends ContentEntityInterface, EntityOwnerInterfa
   public function getParentReply();
 
   /**
-   * Returns the ID of the parent forum reply entity if this is a response
-   * to a forum reply.
+   * Returns ID of the parent forum reply if a response to another forum reply.
    *
    * @return int|null
    *   A forum reply entity ID of the parent forum reply or NULL if there is no
@@ -67,7 +65,7 @@ interface ForumReplyInterface extends ContentEntityInterface, EntityOwnerInterfa
   public function getRepliedNode();
 
   /**
-   * Returns the ID of the forum topic node to which the forum reply is attached.
+   * Returns ID of the forum topic node to which the forum reply is attached.
    *
    * @return int
    *   The ID of the forum topic node to which the forum reply is attached.
@@ -94,6 +92,7 @@ interface ForumReplyInterface extends ContentEntityInterface, EntityOwnerInterfa
    * Returns the permalink URL for this forum reply.
    *
    * @return \Drupal\Core\Url
+   *   The permalink URL object.
    */
   public function permalink();
 

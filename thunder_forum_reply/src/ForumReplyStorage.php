@@ -6,7 +6,6 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -164,7 +163,7 @@ class ForumReplyStorage extends SqlContentEntityStorage implements ForumReplySto
    */
   public function getChildReplyIds(array $replies) {
     return $this->database->select('thunder_forum_reply_field_data', 'fr')
-      ->fields('fr', array('frid'))
+      ->fields('fr', ['frid'])
       ->condition('pfrid', array_keys($replies), 'IN')
       ->condition('default_langcode', 1)
       ->execute()

@@ -2,7 +2,6 @@
 
 namespace Drupal\thunder_forum_reply;
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\node\NodeInterface;
 
 /**

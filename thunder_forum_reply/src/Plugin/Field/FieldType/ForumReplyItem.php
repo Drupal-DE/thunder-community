@@ -62,29 +62,29 @@ class ForumReplyItem extends FieldItemBase implements ForumReplyItemInterface {
    * {@inheritdoc}
    */
   public static function schema(FieldStorageDefinitionInterface $field_definition) {
-    return array(
-      'columns' => array(
-        'status' => array(
+    return [
+      'columns' => [
+        'status' => [
           'description' => 'Whether forum replies are allowed on this entity: 0 = no, 1 = closed (read only), 2 = open (read/write).',
           'type' => 'int',
           'default' => 0,
-        ),
-      ),
-      'indexes' => array(),
-      'foreign keys' => array(),
-    );
+        ],
+      ],
+      'indexes' => [],
+      'foreign keys' => [],
+    ];
   }
 
   /**
    * {@inheritdoc}
    */
   public function fieldSettingsForm(array $form, FormStateInterface $form_state) {
-    $element = array();
+    $element = [];
 
     $settings = $this->getSettings();
 
     // Replies per page.
-    $element['per_page'] = array(
+    $element['per_page'] = [
       '#type' => 'number',
       '#title' => t('Forum replies per page'),
       '#default_value' => $settings['per_page'],
@@ -92,26 +92,26 @@ class ForumReplyItem extends FieldItemBase implements ForumReplyItemInterface {
       '#min' => 1,
       '#max' => 100,
       '#step' => 1,
-    );
+    ];
 
     // Form location.
-    $element['form_location'] = array(
+    $element['form_location'] = [
       '#type' => 'checkbox',
       '#title' => t('Show forum reply form on the same page as other forum replies'),
       '#default_value' => $settings['form_location'],
-    );
+    ];
 
     // Preview behavior.
-    $element['preview'] = array(
+    $element['preview'] = [
       '#type' => 'radios',
       '#title' => t('Preview forum reply'),
       '#default_value' => $settings['preview'],
-      '#options' => array(
+      '#options' => [
         DRUPAL_DISABLED => t('Disabled'),
         DRUPAL_OPTIONAL => t('Optional'),
         DRUPAL_REQUIRED => t('Required'),
-      ),
-    );
+      ],
+    ];
 
     return $element;
   }

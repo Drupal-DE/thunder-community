@@ -50,6 +50,8 @@ class ForumReplyRevisionDeleteForm extends ConfirmFormBase {
    *   The forum reply storage.
    * @param \Drupal\Core\Database\Connection $connection
    *   The database connection.
+   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
+   *   The date formatter.
    */
   public function __construct(ForumReplyStorageInterface $storage, Connection $connection, DateFormatterInterface $date_formatter) {
     $this->storage = $storage;

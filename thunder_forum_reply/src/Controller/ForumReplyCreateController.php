@@ -34,8 +34,10 @@ class ForumReplyCreateController extends ControllerBase {
   /**
    * Constructs a ForumReplyCreateController object.
    *
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
-   *   The entity field manager.
+   * @param \Drupal\thunder_forum\ThunderForumManagerInterface $forum_manager
+   *   The forum manager.
+   * @param \Drupal\thunder_forum_reply\ForumReplyManagerInterface $forum_reply_manager
+   *   The forum reply manager.
    */
   public function __construct(ThunderForumManagerInterface $forum_manager, ForumReplyManagerInterface $forum_reply_manager) {
     $this->forumManager = $forum_manager;
@@ -112,8 +114,8 @@ class ForumReplyCreateController extends ControllerBase {
   /**
    * Access check for the forum reply form.
    *
-   * @param NodeInterface $node
-   *   The node entity this forum reply belongs to.
+   * @param \Drupal\node\NodeInterface $node
+   *   The forum node this forum reply belongs to.
    * @param string $field_name
    *   The field_name to which the forum reply belongs.
    * @param int|null $pfrid

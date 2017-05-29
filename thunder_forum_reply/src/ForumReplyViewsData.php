@@ -28,128 +28,128 @@ class ForumReplyViewsData extends EntityViewsData {
     $data['thunder_forum_reply_field_data']['created']['help'] = $this->t('Date and time of when the forum reply was created.');
 
     // Created date (CCYYMMDD).
-    $data['thunder_forum_reply_field_data']['created_fulldata'] = array(
+    $data['thunder_forum_reply_field_data']['created_fulldata'] = [
       'title' => $this->t('Created date'),
       'help' => $this->t('Date in the form of CCYYMMDD.'),
-      'argument' => array(
+      'argument' => [
         'field' => 'created',
         'id' => 'date_fulldate',
-      ),
-    );
+      ],
+    ];
 
     // Created date (YYYYMM).
-    $data['thunder_forum_reply_field_data']['created_year_month'] = array(
+    $data['thunder_forum_reply_field_data']['created_year_month'] = [
       'title' => $this->t('Created year + month'),
       'help' => $this->t('Date in the form of YYYYMM.'),
-      'argument' => array(
+      'argument' => [
         'field' => 'created',
         'id' => 'date_year_month',
-      ),
-    );
+      ],
+    ];
 
     // Created date (YYYY).
-    $data['thunder_forum_reply_field_data']['created_year'] = array(
+    $data['thunder_forum_reply_field_data']['created_year'] = [
       'title' => $this->t('Created year'),
       'help' => $this->t('Date in the form of YYYY.'),
-      'argument' => array(
+      'argument' => [
         'field' => 'created',
         'id' => 'date_year',
-      ),
-    );
+      ],
+    ];
 
     // Created date (MM).
-    $data['thunder_forum_reply_field_data']['created_month'] = array(
+    $data['thunder_forum_reply_field_data']['created_month'] = [
       'title' => $this->t('Created month'),
       'help' => $this->t('Date in the form of MM (01 - 12).'),
-      'argument' => array(
+      'argument' => [
         'field' => 'created',
         'id' => 'date_month',
-      ),
-    );
+      ],
+    ];
 
     // Created date (DD).
-    $data['thunder_forum_reply_field_data']['created_day'] = array(
+    $data['thunder_forum_reply_field_data']['created_day'] = [
       'title' => $this->t('Created day'),
       'help' => $this->t('Date in the form of DD (01 - 31).'),
-      'argument' => array(
+      'argument' => [
         'field' => 'created',
         'id' => 'date_day',
-      ),
-    );
+      ],
+    ];
 
     // Created date (WW).
-    $data['thunder_forum_reply_field_data']['created_week'] = array(
+    $data['thunder_forum_reply_field_data']['created_week'] = [
       'title' => $this->t('Created week'),
       'help' => $this->t('Date in the form of WW (01 - 53).'),
-      'argument' => array(
+      'argument' => [
         'field' => 'created',
         'id' => 'date_week',
-      ),
-    );
+      ],
+    ];
 
     // Changed date.
     $data['thunder_forum_reply_field_data']['changed']['title'] = $this->t('Updated date');
     $data['thunder_forum_reply_field_data']['changed']['help'] = $this->t('Date and time of when the forum reply was last updated.');
 
     // Changed date (CCYYMMDD).
-    $data['thunder_forum_reply_field_data']['changed_fulldata'] = array(
+    $data['thunder_forum_reply_field_data']['changed_fulldata'] = [
       'title' => $this->t('Changed date'),
       'help' => $this->t('Date in the form of CCYYMMDD.'),
-      'argument' => array(
+      'argument' => [
         'field' => 'changed',
         'id' => 'date_fulldate',
-      ),
-    );
+      ],
+    ];
 
     // Changed date (YYYYMM).
-    $data['thunder_forum_reply_field_data']['changed_year_month'] = array(
+    $data['thunder_forum_reply_field_data']['changed_year_month'] = [
       'title' => $this->t('Changed year + month'),
       'help' => $this->t('Date in the form of YYYYMM.'),
-      'argument' => array(
+      'argument' => [
         'field' => 'changed',
         'id' => 'date_year_month',
-      ),
-    );
+      ],
+    ];
 
     // Changed date (YYYY).
-    $data['thunder_forum_reply_field_data']['changed_year'] = array(
+    $data['thunder_forum_reply_field_data']['changed_year'] = [
       'title' => $this->t('Changed year'),
       'help' => $this->t('Date in the form of YYYY.'),
-      'argument' => array(
+      'argument' => [
         'field' => 'changed',
         'id' => 'date_year',
-      ),
-    );
+      ],
+    ];
 
     // Changed date (MM).
-    $data['thunder_forum_reply_field_data']['changed_month'] = array(
+    $data['thunder_forum_reply_field_data']['changed_month'] = [
       'title' => $this->t('Changed month'),
       'help' => $this->t('Date in the form of MM (01 - 12).'),
-      'argument' => array(
+      'argument' => [
         'field' => 'changed',
         'id' => 'date_month',
-      ),
-    );
+      ],
+    ];
 
     // Changed date (DD).
-    $data['thunder_forum_reply_field_data']['changed_day'] = array(
+    $data['thunder_forum_reply_field_data']['changed_day'] = [
       'title' => $this->t('Changed day'),
       'help' => $this->t('Date in the form of DD (01 - 31).'),
-      'argument' => array(
+      'argument' => [
         'field' => 'changed',
         'id' => 'date_day',
-      ),
-    );
+      ],
+    ];
 
     // Changed date (WW).
-    $data['thunder_forum_reply_field_data']['changed_week'] = array(
+    $data['thunder_forum_reply_field_data']['changed_week'] = [
       'title' => $this->t('Changed week'),
       'help' => $this->t('Date in the form of WW (01 - 53).'),
-      'argument' => array(
+      'argument' => [
         'field' => 'changed',
         'id' => 'date_week',
-      ),
-    );
+      ],
+    ];
 
     // Status.
     $data['thunder_forum_reply_field_data']['status']['title'] = $this->t('Publishing status');
@@ -172,63 +172,63 @@ class ForumReplyViewsData extends EntityViewsData {
 
     // Define the base group of this table. Fields that don't have a group
     // defined will go into this field by default.
-    $data['thunder_forum_reply_node_statistics']['table']['group']  = $this->t('Forum reply statistics');
+    $data['thunder_forum_reply_node_statistics']['table']['group'] = $this->t('Forum reply statistics');
 
     // Last forum reply timestamp.
-    $data['thunder_forum_reply_node_statistics']['last_reply_timestamp'] = array(
+    $data['thunder_forum_reply_node_statistics']['last_reply_timestamp'] = [
       'title' => $this->t('Last forum reply time'),
       'help' => $this->t('Date and time of when the last forum reply was posted.'),
-      'field' => array(
+      'field' => [
         'id' => 'thunder_forum_reply_last_timestamp',
-      ),
-      'sort' => array(
+      ],
+      'sort' => [
         'id' => 'date',
-      ),
-      'filter' => array(
+      ],
+      'filter' => [
         'id' => 'date',
-      ),
-    );
+      ],
+    ];
 
     // Forum reply count.
-    $data['thunder_forum_reply_node_statistics']['reply_count'] = array(
+    $data['thunder_forum_reply_node_statistics']['reply_count'] = [
       'title' => $this->t('Forum reply count'),
       'help' => $this->t('The number of forum replies an entity has.'),
-      'field' => array(
+      'field' => [
         'id' => 'numeric',
-      ),
-      'filter' => array(
+      ],
+      'filter' => [
         'id' => 'numeric',
-      ),
-      'sort' => array(
+      ],
+      'sort' => [
         'id' => 'standard',
-      ),
-      'argument' => array(
+      ],
+      'argument' => [
         'id' => 'standard',
-      ),
-    );
+      ],
+    ];
 
     // Last updated date.
-    $data['thunder_forum_reply_node_statistics']['last_updated'] = array(
+    $data['thunder_forum_reply_node_statistics']['last_updated'] = [
       'title' => $this->t('Updated/replied date'),
       'help' => $this->t('The most recent of last forum reply posted or entity updated time.'),
-      'field' => array(
+      'field' => [
         'id' => 'thunder_forum_reply_statistics_last_updated',
         'no group by' => TRUE,
-      ),
-      'sort' => array(
+      ],
+      'sort' => [
         'id' => 'thunder_forum_reply_statistics_last_updated',
         'no group by' => TRUE,
-      ),
-      'filter' => array(
+      ],
+      'filter' => [
         'id' => 'thunder_forum_reply_statistics_last_updated',
-      ),
-    );
+      ],
+    ];
 
     // Last forum reply ID.
-    $data['thunder_forum_reply_node_statistics']['frid'] = array(
+    $data['thunder_forum_reply_node_statistics']['frid'] = [
       'title' => $this->t('Last forum reply ID'),
       'help' => $this->t('Display the last forum reply of an entity'),
-      'relationship' => array(
+      'relationship' => [
         'title' => $this->t('Last forum reply'),
         'help' => $this->t('The last forum reply of an entity.'),
         'group' => $this->t('Forum reply'),
@@ -236,48 +236,48 @@ class ForumReplyViewsData extends EntityViewsData {
         'base field' => 'frid',
         'id' => 'standard',
         'label' => $this->t('Last forum reply'),
-      ),
-    );
+      ],
+    ];
 
     // Last forum reply user ID.
-    $data['thunder_forum_reply_node_statistics']['last_reply_uid'] = array(
+    $data['thunder_forum_reply_node_statistics']['last_reply_uid'] = [
       'title' => $this->t('Last forum reply uid'),
       'help' => $this->t('The User ID of the author of the last forum reply of an entity.'),
-      'relationship' => array(
+      'relationship' => [
         'title' => $this->t('Last forum reply author'),
         'base' => 'users',
         'base field' => 'uid',
         'id' => 'standard',
         'label' => $this->t('Last forum reply author'),
-      ),
-      'filter' => array(
+      ],
+      'filter' => [
         'id' => 'numeric',
-      ),
-      'argument' => array(
+      ],
+      'argument' => [
         'id' => 'numeric',
-      ),
-      'field' => array(
+      ],
+      'field' => [
         'id' => 'numeric',
-      ),
-    );
+      ],
+    ];
 
     // Forum reply field name.
-    $data['thunder_forum_reply_node_statistics']['field_name'] = array(
+    $data['thunder_forum_reply_node_statistics']['field_name'] = [
       'title' => $this->t('Forum reply field name'),
       'help' => $this->t('The field name from which the forum reply originated.'),
-      'field' => array(
+      'field' => [
         'id' => 'standard',
-      ),
-      'filter' => array(
+      ],
+      'filter' => [
         'id' => 'string',
-      ),
-      'argument' => array(
+      ],
+      'argument' => [
         'id' => 'string',
-      ),
-      'sort' => array(
+      ],
+      'sort' => [
         'id' => 'standard',
-      ),
-    );
+      ],
+    ];
 
     // Provide a relationship(s) for node entity type.
     if ($fields = \Drupal::service('thunder_forum_reply.manager')->getFields()) {
@@ -285,8 +285,8 @@ class ForumReplyViewsData extends EntityViewsData {
         ->getStorage('node')
         ->getEntityType();
 
-      $data['thunder_forum_reply_field_data']['node'] = array(
-        'relationship' => array(
+      $data['thunder_forum_reply_field_data']['node'] = [
+        'relationship' => [
           'title' => $node_entity_type->getLabel(),
           'help' => $this->t('The @entity_type to which the forum reply is a response to.', ['@entity_type' => $node_entity_type->getLabel()]),
           'base' => $node_entity_type->getDataTable() ?: $node_entity_type->getBaseTable(),
@@ -295,8 +295,8 @@ class ForumReplyViewsData extends EntityViewsData {
           'id' => 'standard',
           'label' => $node_entity_type->getLabel(),
           'extra' => [],
-        ),
-      );
+        ],
+      ];
 
       // This relationship does not use the 'field id' column, if the entity has
       // multiple forum reply fields, then this might introduce duplicates, in
@@ -304,12 +304,12 @@ class ForumReplyViewsData extends EntityViewsData {
       // reply_count field. We cannot create a relationship from the base table
       // to {thunder_forum_reply_node_statistics} for each field as multiple
       // joins between the same two tables is not supported.
-      $data['thunder_forum_reply_node_statistics']['table']['join'][$node_entity_type->getDataTable() ?: $node_entity_type->getBaseTable()] = array(
+      $data['thunder_forum_reply_node_statistics']['table']['join'][$node_entity_type->getDataTable() ?: $node_entity_type->getBaseTable()] = [
         'type' => 'INNER',
         'left_field' => $node_entity_type->getKey('id'),
         'field' => 'nid',
         'extra' => [],
-      );
+      ];
     }
 
     return $data;

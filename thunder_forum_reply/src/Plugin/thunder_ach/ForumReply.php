@@ -74,11 +74,11 @@ class ForumReply extends ThunderAccessControlHandlerBase implements ContainerFac
     return TRUE;
   }
 
-  // TODO ForumReply::checkAccess()
   /**
    * {@inheritdoc}
    */
   public function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
+    // TODO ForumReply::checkAccess()
     return AccessResult::allowed();
 
     switch ($operation) {
@@ -158,11 +158,11 @@ class ForumReply extends ThunderAccessControlHandlerBase implements ContainerFac
     return $access;
   }
 
-  // TODO ForumReply::checkFieldAccess()
   /**
    * {@inheritdoc}
    */
   public function checkFieldAccess($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, FieldItemListInterface $items = NULL) {
+    // TODO ForumReply::checkFieldAccess()
     if ($operation === 'edit') {
       // Status field is only visible for forum administrators.
       if ($field_definition->getName() === 'status') {

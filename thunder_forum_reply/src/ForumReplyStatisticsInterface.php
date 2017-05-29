@@ -21,7 +21,7 @@ interface ForumReplyStatisticsInterface {
    * @return object[]
    *   Array of statistics records.
    */
-  public function read($nodes, $accurate = TRUE);
+  public function read(array $nodes, $accurate = TRUE);
 
   /**
    * Delete forum reply statistics records for a forum node.
@@ -54,12 +54,12 @@ interface ForumReplyStatisticsInterface {
   /**
    * Insert an empty record for the given forum node.
    *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param \Drupal\node\NodeInterface $node
    *   The created forum node for which a statistics record is to be
    *   initialized.
    * @param array $fields
    *   Array of forum reply field definitions for the given forum node.
    */
-  public function create(NodeInterface $node, $fields);
+  public function create(NodeInterface $node, array $fields);
 
 }

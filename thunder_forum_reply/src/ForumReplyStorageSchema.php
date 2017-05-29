@@ -49,7 +49,7 @@ class ForumReplyStorageSchema extends SqlContentEntityStorageSchema {
         case 'langcode':
           $this->addSharedTableFieldIndex($storage_definition, $schema, TRUE);
           break;
-          
+
         case 'revision_uid':
           $this->addSharedTableFieldForeignKey($storage_definition, $schema, 'users', 'uid');
           break;

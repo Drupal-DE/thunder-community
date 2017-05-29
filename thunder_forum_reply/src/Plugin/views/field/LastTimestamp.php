@@ -8,7 +8,7 @@ use Drupal\views\ResultRow;
 use Drupal\views\ViewExecutable;
 
 /**
- * Field handler to display timestamp of forum reply with count of forum replies.
+ * Field handler to display timestamp of forum reply with forum replies count.
  *
  * @ingroup views_field_handlers
  *

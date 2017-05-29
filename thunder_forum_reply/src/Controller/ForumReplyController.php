@@ -60,6 +60,8 @@ class ForumReplyController extends ControllerBase {
    *   The forum reply manager.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   *   The entity repository.
    */
   public function __construct(HttpKernelInterface $http_kernel, ForumReplyManagerInterface $forum_reply_manager, EntityFieldManagerInterface $entity_field_manager, EntityRepositoryInterface $entity_repository) {
     $this->entityFieldManager = $entity_field_manager;
@@ -114,7 +116,7 @@ class ForumReplyController extends ControllerBase {
 
       // @todo: Cleaner sub request handling.
       $subrequest_url = $node->toUrl()->setOption('query', ['page' => $page])->toString(TRUE);
-      $redirect_request = Request::create($subrequest_url->getGeneratedUrl(), 'GET', $request->query->all(), $request->cookies->all(), array(), $request->server->all());
+      $redirect_request = Request::create($subrequest_url->getGeneratedUrl(), 'GET', $request->query->all(), $request->cookies->all(), [], $request->server->all());
 
       // Carry over the session to the subrequest.
       if ($session = $request->getSession()) {
@@ -180,7 +182,7 @@ class ForumReplyController extends ControllerBase {
     // Only handle up to 100 nodes.
     $nids = array_slice($nids, 0, 100);
 
-    $links = array();
+    $links = [];
 
     foreach ($nids as $nid) {
       $node = $this->entityTypeManager()

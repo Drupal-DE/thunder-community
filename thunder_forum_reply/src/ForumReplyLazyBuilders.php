@@ -84,7 +84,7 @@ class ForumReplyLazyBuilders {
   }
 
   /**
-   * #lazy_builder callback; builds the forum reply form.
+   * Lazy builder callback; builds the forum reply form.
    *
    * @param int $nid
    *   The replied forum node ID.
@@ -95,11 +95,11 @@ class ForumReplyLazyBuilders {
    *   A renderable array containing the forum reply form.
    */
   public function renderForm($nid, $field_name) {
-    $values = array(
+    $values = [
       'nid' => $nid,
       'field_name' => $field_name,
       'pfrid' => NULL,
-    );
+    ];
 
     // Create basic forum reply object.
     $reply = $this->entityTypeManager->getStorage('thunder_forum_reply')->create($values);
@@ -108,7 +108,7 @@ class ForumReplyLazyBuilders {
   }
 
   /**
-   * #lazy_builder callback; builds a forum reply's links.
+   * Lazy builder callback; builds a forum reply's links.
    *
    * @param string $reply_entity_id
    *   The forum reply entity ID.
@@ -139,11 +139,11 @@ class ForumReplyLazyBuilders {
       $links['thunder_forum_reply'] = $this->buildLinks($reply, $node);
 
       // Allow other modules to alter the forum reply links.
-      $hook_context = array(
+      $hook_context = [
         'view_mode' => $view_mode,
         'langcode' => $langcode,
         'replied_node' => $node,
-      );
+      ];
 
       $this->moduleHandler->alter('thunder_forum_reply_links', $links, $reply, $hook_context);
     }
@@ -165,38 +165,39 @@ class ForumReplyLazyBuilders {
     $links = [];
 
     if ($reply->access('delete')) {
-      $links['thunder_forum_reply-delete'] = array(
+      $links['thunder_forum_reply-delete'] = [
         'title' => t('Delete'),
         'url' => $reply->toUrl('delete-form')
           ->setOption('query', $this->redirectDestination->getAsArray()),
-      );
+      ];
     }
 
     if ($reply->access('update')) {
-      $links['thunder_forum_reply-edit'] = array(
+      $links['thunder_forum_reply-edit'] = [
         'title' => t('Edit'),
         'url' => $reply->toUrl('edit-form'),
-      );
+      ];
     }
 
     if ($reply->access('create')) {
-      $links['thunder_forum_reply-create'] = array(
+      $links['thunder_forum_reply-create'] = [
         'title' => t('Reply'),
         'url' => Url::fromRoute('thunder_forum_reply.add', [
           'node' => $reply->getRepliedNodeId(),
           'field_name' => $reply->getFieldName(),
           'pfrid' => $reply->id(),
         ]),
-      );
+      ];
     }
 
     // @todo Add translations link for translation-enabled forum reply bundles.
-    // if ($this->moduleHandler->moduleExists('content_translation') && $this->access($reply)->isAllowed()) {
-    //  $links['thunder_forum_reply-translations'] = array(
-    //    'title' => t('Translate'),
-    //    'url' => $reply->toUrl('drupal:content-translation-overview'),
-    //  );
-    // }
+    if ($this->moduleHandler->moduleExists('content_translation')) {
+      // && $this->access($reply)->isAllowed()) {
+      // $links['thunder_forum_reply-translations'] = [
+      // 'title' => t('Translate'),
+      // 'url' => $reply->toUrl('drupal:content-translation-overview'),
+      // ];
+    }
 
     return [
       '#theme' => 'links__thunder_forum_reply__thunder_forum_reply',

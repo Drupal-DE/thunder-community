@@ -13,6 +13,9 @@ use Drupal\views\Plugin\views\filter\Date;
  */
 class StatisticsLastUpdated extends Date {
 
+  /**
+   * {@inheritdoc}
+   */
   public function query() {
     $this->ensureMyTable();
 

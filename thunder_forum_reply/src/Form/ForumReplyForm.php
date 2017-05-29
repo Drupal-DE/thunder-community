@@ -27,6 +27,8 @@ class ForumReplyForm extends ContentEntityForm {
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer service.
    */
   public function __construct(EntityManagerInterface $entity_manager, RendererInterface $renderer) {
     parent::__construct($entity_manager);
@@ -158,9 +160,9 @@ class ForumReplyForm extends ContentEntityForm {
   /**
    * Form submission handler for the 'preview' action.
    *
-   * @param $form
+   * @param array $form
    *   An associative array containing the structure of the form.
-   * @param $form_state
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
   public function preview(array $form, FormStateInterface $form_state) {
@@ -279,4 +281,5 @@ class ForumReplyForm extends ContentEntityForm {
     $reply->setRevisionCreationTime(REQUEST_TIME);
     $reply->setRevisionUserId(\Drupal::currentUser()->id());
   }
+
 }

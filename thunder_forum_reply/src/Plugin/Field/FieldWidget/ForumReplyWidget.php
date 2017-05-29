@@ -27,26 +27,26 @@ class ForumReplyWidget extends WidgetBase {
     $entity = $items->getEntity();
 
     // Status.
-    $element['status'] = array(
+    $element['status'] = [
       '#type' => 'radios',
       '#title' => t('Forum replies'),
       '#title_display' => 'invisible',
       '#default_value' => $items->status,
-      '#options' => array(
+      '#options' => [
         ForumReplyItemInterface::OPEN => t('Open'),
         ForumReplyItemInterface::CLOSED => t('Closed'),
         ForumReplyItemInterface::HIDDEN => t('Hidden'),
-      ),
-      ForumReplyItemInterface::OPEN => array(
+      ],
+      ForumReplyItemInterface::OPEN => [
         '#description' => t('Users with the "Create forum replies" permission can post forum replies.'),
-      ),
-      ForumReplyItemInterface::CLOSED => array(
+      ],
+      ForumReplyItemInterface::CLOSED => [
         '#description' => t('Users cannot post forum replies, but existing forum replies will be displayed.'),
-      ),
-      ForumReplyItemInterface::HIDDEN => array(
+      ],
+      ForumReplyItemInterface::HIDDEN => [
         '#description' => t('Forum replies are hidden from view.'),
-      ),
-    );
+      ],
+    ];
 
     // If the entity doesn't have any forum replies, the "hidden" option makes
     // no sense, so don't even bother presenting it to the user unless this is
@@ -67,13 +67,13 @@ class ForumReplyWidget extends WidgetBase {
       // Override widget title to be helpful for end users.
       $element['#title'] = $this->t('Forum reply settings');
 
-      $element += array(
+      $element += [
         '#type' => 'details',
         // Open the details when the selected value is different to the stored
         // default values for the field.
         '#open' => ($items->status != $field_default_values[0]['status']),
         '#group' => 'advanced',
-      );
+      ];
     }
 
     return $element;
@@ -86,13 +86,14 @@ class ForumReplyWidget extends WidgetBase {
     // Add default values for statistics properties because we don't want to
     // have them in form.
     foreach ($values as &$value) {
-      $value += array(
+      $value += [
         'frid' => 0,
         'last_reply_timestamp' => 0,
         'last_reply_uid' => 0,
         'reply_count' => 0,
-      );
+      ];
     }
+
     return $values;
   }
 

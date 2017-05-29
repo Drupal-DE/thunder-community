@@ -121,7 +121,7 @@ class ForumReply extends ContentEntityBase implements ForumReplyInterface {
       ->setSetting('target_bundles', ['forum'])
       ->setRequired(TRUE);
 
-    // Parent forum reply ID
+    // Parent forum reply ID.
     $fields['pfrid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Parent forum reply ID'))
       ->setDescription(t('The ID of the forum reply this item is a direct reply to.'))
@@ -256,12 +256,14 @@ class ForumReply extends ContentEntityBase implements ForumReplyInterface {
   /**
    * {@inheritdoc}
    */
-  public function getChangedTimeAcrossTranslations()  {
+  public function getChangedTimeAcrossTranslations() {
     $changed = $this->getUntranslated()->getChangedTime();
-    foreach ($this->getTranslationLanguages(FALSE) as $language)    {
+
+    foreach ($this->getTranslationLanguages(FALSE) as $language) {
       $translation_changed = $this->getTranslation($language->getId())->getChangedTime();
       $changed = max($translation_changed, $changed);
     }
+
     return $changed;
   }
 

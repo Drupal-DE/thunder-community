@@ -33,8 +33,8 @@ class ForumReplyRevisionController extends ControllerBase {
   /**
    * Constructs a new ForumReplyRevisionController.
    *
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection.
+   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
+   *   The date formatter.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer service.
    */
@@ -170,15 +170,25 @@ class ForumReplyRevisionController extends ControllerBase {
             $links['revert'] = [
               'title' => $this->t('Revert'),
               'url' => $has_translations ?
-              Url::fromRoute('entity.thunder_forum_reply.translation_revision_revert', ['thunder_forum_reply' => $thunder_forum_reply->id(), 'thunder_forum_reply_revision' => $vid, 'langcode' => $langcode]) :
-              Url::fromRoute('entity.thunder_forum_reply.revision_revert', ['thunder_forum_reply' => $thunder_forum_reply->id(), 'thunder_forum_reply_revision' => $vid]),
+              Url::fromRoute('entity.thunder_forum_reply.translation_revision_revert', [
+                'thunder_forum_reply' => $thunder_forum_reply->id(),
+                'thunder_forum_reply_revision' => $vid,
+                'langcode' => $langcode,
+              ]) :
+              Url::fromRoute('entity.thunder_forum_reply.revision_revert', [
+                'thunder_forum_reply' => $thunder_forum_reply->id(),
+                'thunder_forum_reply_revision' => $vid,
+              ]),
             ];
           }
 
           if ($delete_permission) {
             $links['delete'] = [
               'title' => $this->t('Delete'),
-              'url' => Url::fromRoute('entity.thunder_forum_reply.revision_delete', ['thunder_forum_reply' => $thunder_forum_reply->id(), 'thunder_forum_reply_revision' => $vid]),
+              'url' => Url::fromRoute('entity.thunder_forum_reply.revision_delete', [
+                'thunder_forum_reply' => $thunder_forum_reply->id(),
+                'thunder_forum_reply_revision' => $vid,
+              ]),
             ];
           }
 

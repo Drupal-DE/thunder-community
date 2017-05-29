@@ -13,6 +13,8 @@ use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ * Provides a forum reply entity migrate destination.
+ *
  * @MigrateDestination(
  *   id = "entity:thunder_forum_reply"
  * )
@@ -49,9 +51,9 @@ class EntityForumReply extends EntityContentBase {
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param MigrationInterface $migration
+   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
    *   The migration.
-   * @param EntityStorageInterface $storage
+   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
    *   The storage for this entity type.
    * @param array $bundles
    *   The list of bundles this entity type has.
@@ -94,7 +96,7 @@ class EntityForumReply extends EntityContentBase {
   /**
    * {@inheritdoc}
    */
-  public function import(Row $row, array $old_destination_id_values = array()) {
+  public function import(Row $row, array $old_destination_id_values = []) {
     if ($row->isStub() && ($state = $this->state->get('thunder_forum_reply.maintain_node_statistics', 0))) {
       $this->state->set('thunder_forum_reply.maintain_node_statistics', 0);
     }

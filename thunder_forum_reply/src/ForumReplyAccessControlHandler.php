@@ -13,7 +13,7 @@ use Drupal\Core\Access\AccessResult;
 // @todo Rewrite to use new pACH module.
 
 /**
- *  Defines an extensible access control handler for the Forum reply entity.
+ * Defines an extensible access control handler for the Forum reply entity.
  *
  * @see \Drupal\thunder_forum_reply\Entity\ForumReply.
  */
