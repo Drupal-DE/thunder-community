@@ -1,0 +1,15 @@
+services:
+  thunder_forum_reply.lazy_builders:
+    class: Drupal\thunder_forum_reply\ForumReplyLazyBuilders
+    arguments: ['@entity.manager', '@entity.form_builder', '@current_user', '@module_handler', '@renderer', '@redirect.destination']
+  thunder_forum_reply.link_builder:
+    class: Drupal\thunder_forum_reply\ForumReplyLinkBuilder
+    arguments: ['@current_user', '@thunder_forum_reply.manager', '@module_handler', '@entity.manager']
+  thunder_forum_reply.manager:
+    class: Drupal\thunder_forum_reply\ForumReplyManager
+    arguments: ['@entity.manager', '@entity.query', '@module_handler', '@current_user']
+  thunder_forum_reply.statistics:
+    class: Drupal\thunder_forum_reply\ForumReplyStatistics
+    arguments: ['@database', '@current_user', '@entity_type.manager', '@state']
+    tags:
+      - { name: backend_overridable }

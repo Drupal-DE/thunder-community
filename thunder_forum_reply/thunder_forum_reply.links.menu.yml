@@ -1,0 +1,5 @@
+entity.thunder_forum_reply.collection:
+  title: 'Forum replies'
+  route_name: entity.thunder_forum_reply.collection
+  description: 'List forum replies'
+  parent: system.admin_content

@@ -1,0 +1,622 @@
+<?php
+
+/**
+ * @file
+ * Main functions for "Thunder Forum Reply" module.
+ */
+
+// TODO Alter forum index service to use forum reply entity instead of comments
+// FIXME Revision field data is not deleted upon revision delete
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\Entity\EntityViewMode;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
+use Drupal\Core\Render\Element;
+use Drupal\Core\Url;
+use Drupal\field\FieldConfigInterface;
+use Drupal\field\FieldStorageConfigInterface;
+use Drupal\language\ConfigurableLanguageInterface;
+use Drupal\node\NodeInterface;
+use Drupal\thunder_forum_reply\ForumReplyInterface;
+use Drupal\thunder_forum_reply\Plugin\Field\FieldType\ForumReplyItemInterface;
+
+/**
+ * Implements hook_preprocess_HOOK() for forum reply templates.
+ */
+function template_preprocess_thunder_forum_reply(array &$variables) {
+  /** @var \Drupal\Core\Datetime\DateFormatterInterface $date_formatter */
+  $date_formatter = \Drupal::service('date.formatter');
+
+  /** @var \Drupal\thunder_forum_reply\ForumReplyInterface $reply */
+  $reply = $variables['elements']['#thunder_forum_reply'];
+  $node = $reply->getRepliedNode();
+
+  $variables['reply'] = $reply;
+  $variables['node'] = $node;
+
+  $account = $reply->getOwner();
+  $username = [
+    '#theme' => 'username',
+    '#account' => $account,
+  ];
+  $variables['author'] = \Drupal::service('renderer')
+    ->render($username);
+  $variables['author_id'] = $reply->getOwnerId();
+
+  $variables['new_indicator_timestamp'] = $reply->getChangedTime();
+  $variables['created'] = $date_formatter->format($reply->getCreatedTime());
+  if ($reply->getChangedTime() == $reply->getCreatedTime()) {
+    $variables['changed'] = $variables['created'];
+  }
+  else {
+    $variables['changed'] = $date_formatter->format($reply->getChangedTime());
+  }
+
+  // User pictures.
+  if (theme_get_setting('features.comment_user_picture')) {
+    // To change user picture settings (for instance, image style), edit the
+    // 'compact' view mode on the User entity.
+    $variables['user_picture'] = user_view($account, 'compact');
+  }
+  else {
+    $variables['user_picture'] = [];
+  }
+
+  // Forum reply is previewed?
+  if (isset($reply->in_preview)) {
+    $variables['title'] = Link::createFromRoute($reply->label(), '<front>');
+    $variables['permalink'] = Link::createFromRoute(t('Permalink'), '<front>');
+  }
+
+  // Forum reply is rendered normally.
+  else {
+    $uri = $reply->permalink();
+    $attributes = $uri->getOption('attributes') ?: [];
+    $attributes += array('class' => array('permalink'), 'rel' => 'bookmark');
+    $uri->setOption('attributes', $attributes);
+    $variables['title'] = Link::fromTextAndUrl($reply->label(), $uri);
+    $variables['permalink'] = Link::fromTextAndUrl(t('Permalink'), $reply->permalink());
+  }
+
+  $variables['submitted'] = t('Submitted by @username on @datetime', [
+    '@username' => $variables['author'],
+    '@datetime' => $variables['created'],
+  ]);
+
+  // Parent information.
+  if ($reply->hasParentReply()) {
+    // Fetch and store the parent forum reply information for use in templates.
+    $reply_parent = $reply->getParentReply();
+    $account_parent = $reply_parent->getOwner();
+
+    $variables['parent_reply'] = $reply_parent;
+
+    $username_parent = [
+      '#theme' => 'username',
+      '#account' => $account_parent,
+    ];
+    $variables['parent_author'] = \Drupal::service('renderer')
+      ->render($username_parent);
+
+    $variables['parent_created'] = $date_formatter->format($reply_parent->getCreatedTime());
+    if ($reply_parent->getChangedTime() == $reply_parent->getCreatedTime()) {
+      $variables['parent_changed'] = $variables['parent_created'];
+    }
+    else {
+      $variables['parent_changed'] = $date_formatter->format($reply_parent->getChangedTime());
+    }
+
+    $permalink_uri_parent = $reply_parent->permalink();
+    $attributes = $permalink_uri_parent->getOption('attributes') ?: [];
+    $attributes += ['class' => ['permalink'], 'rel' => 'bookmark'];
+    $permalink_uri_parent->setOption('attributes', $attributes);
+    $variables['parent_title'] = Link::fromTextAndUrl($reply_parent->label(), $permalink_uri_parent)->toString();
+    $variables['parent_permalink'] = Link::fromTextAndUrl(t('Parent permalink'), $permalink_uri_parent)->toString();
+    $variables['parent'] = t('In reply to @parent_title by @parent_username', [
+      '@parent_username' => $variables['parent_author'],
+      '@parent_title' => $variables['parent_title'],
+    ]);
+  }
+  else {
+    $variables['parent_reply'] = '';
+    $variables['parent_author'] = '';
+    $variables['parent_created'] = '';
+    $variables['parent_changed'] = '';
+    $variables['parent_title'] = '';
+    $variables['parent_permalink'] = '';
+    $variables['parent'] = '';
+  }
+
+  // Helpful $content variable for templates.
+  foreach (Element::children($variables['elements']) as $key) {
+    $variables['content'][$key] = $variables['elements'][$key];
+  }
+
+  // Set status to a string representation of thunder_forum_reply->status.
+  if (isset($reply->in_preview)) {
+    $variables['status'] = 'preview';
+  }
+  else {
+    $variables['status'] = $reply->isPublished() ? 'published' : 'unpublished';
+  }
+
+  // Add forum reply author user ID. Necessary for the forum-reply-by-viewer
+  // library.
+  $variables['attributes']['data-thunder-forum-reply-user-id'] = $reply->getOwnerId();
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete() for 'configurable_language'.
+ */
+function thunder_forum_reply_configurable_language_delete(ConfigurableLanguageInterface $language) {
+  /** @var \Drupal\thunder_forum_reply\ForumReplyStorageInterface $storage */
+  $storage = \Drupal::entityTypeManager()->getStorage('thunder_forum_reply');
+
+  // On forum replies with this language, unset the language.
+  $storage->clearRevisionsLanguage($language);
+}
+
+/**
+ * Implements hook_cron().
+ */
+function thunder_forum_reply_cron() {
+  /** @var \Drupal\thunder_forum_reply\ForumReplyStatisticsInterface $statistics */
+  $statistics = \Drupal::service('thunder_forum_reply.statistics');
+
+  // Store the maximum possible forum replies per thread (used for node search
+  // ranking by reply count). @todo Forum reply search support when needed!
+  \Drupal::state()->set('thunder_forum_reply.node_reply_statistics_scale', 1.0 / max(1, $statistics->getMaximumCount()));
+}
+
+/**
+ * Implements hook_entity_extra_field_info().
+ */
+function thunder_forum_reply_entity_extra_field_info() {
+  $info = [];
+
+  // Forum reply links.
+  $info['thunder_forum_reply']['thunder_forum_reply']['display']['links'] = array(
+    'label' => t('Links'),
+    'description' => t('Forum reply operation links'),
+    'weight' => 100,
+    'visible' => TRUE,
+  );
+
+  return $info;
+}
+
+/**
+ * Implements hook_entity_operation().
+ */
+function thunder_forum_reply_entity_operation(EntityInterface $entity) {
+  $operations = [];
+
+  // Is forum reply entity?
+  if ($entity instanceof ForumReplyInterface) {
+    // Operation: Revisions.
+    if ($entity->hasLinkTemplate('version-history') && \Drupal::currentUser()->hasPermission('view forum reply revisions')) {
+      $operations['revisions'] = array(
+        'title' => t('Revisions'),
+        'url' => $entity->toUrl('version-history'),
+        'weight' => 50,
+      );
+    }
+  }
+
+  return $operations;
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave() for entity_view_display entities.
+ */
+function thunder_forum_reply_entity_view_display_presave(EntityViewDisplayInterface $display) {
+  // Act only on forum reply view displays being disabled.
+  if ($display->isNew() || $display->getTargetEntityTypeId() !== 'thunder_forum_reply' || $display->status()) {
+    return;
+  }
+
+  $storage = \Drupal::entityTypeManager()->getStorage('entity_view_display');
+
+  if (!$storage->loadUnchanged($display->getOriginalId())->status()) {
+    return;
+  }
+
+  // Disable the forum reply field formatter when the used view display is
+  // disabled.
+  foreach ($storage->loadMultiple() as $id => $view_display) {
+    $changed = FALSE;
+
+    /** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface $view_display */
+    foreach ($view_display->getComponents() as $field => $component) {
+      if (isset($component['type']) && ($component['type'] === 'thunder_forum_reply_default')) {
+        if ($component['settings']['view_mode'] === $display->getMode()) {
+          $view_display->removeComponent($field);
+
+          /** @var \Drupal\Core\Entity\EntityViewModeInterface $mode */
+          $mode = EntityViewMode::load($display->getTargetEntityTypeId() . '.' . $display->getMode());
+
+          $arguments = [
+            '@id' => $view_display->id(),
+            '@name' => $field,
+            '@display' => $mode->label(),
+            '@mode' => $display->getMode(),
+          ];
+
+          \Drupal::logger('system')->warning("View display '@id': Forum reply field formatter '@name' was disabled because it is using the forum reply view display '@display' (@mode) that was just disabled.", $arguments);
+
+          $changed = TRUE;
+        }
+      }
+    }
+
+    if ($changed) {
+      $view_display->save();
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_create() for 'field_config'.
+ */
+function thunder_forum_reply_field_config_create(FieldConfigInterface $field) {
+  if ($field->getType() == 'thunder_forum_reply' && !$field->isSyncing()) {
+    // Assign default values for the field.
+    $default_value = $field->getDefaultValueLiteral();
+    $default_value += [[]];
+    $default_value[0] += [
+      'status' => ForumReplyItemInterface::OPEN,
+      'frid' => 0,
+      'last_reply_timestamp' => 0,
+      'last_reply_name' => '',
+      'last_reply_uid' => 0,
+      'reply_count' => 0,
+    ];
+    $field->setDefaultValue($default_value);
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete() for 'field_config'.
+ */
+function thunder_forum_reply_field_config_delete(FieldConfigInterface $field) {
+  if ($field->getType() == 'thunder_forum_reply') {
+    /** @var \Drupal\thunder_forum_reply\ForumReplyStorageInterface $storage */
+    $storage = \Drupal::entityTypeManager()->getStorage('thunder_forum_reply');
+
+    $frids = $storage->getQuery()
+      ->condition('field_name', $field->getName())
+      ->execute();
+
+    $replies = $storage->loadMultiple($frids);
+
+    // Delete all forum replies that used by the entity bundle.
+    $storage->delete($replies);
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update() for 'field_config'.
+ */
+function thunder_forum_reply_field_config_update(FieldConfigInterface $field) {
+  if ($field->getType() == 'thunder_forum_reply') {
+    // Forum reply field settings also affects the rendering of *forum reply*
+    // entities,/ not only the *replied* entities.
+    \Drupal::entityTypeManager()->getViewBuilder('thunder_forum_reply')->resetCache();
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert() for 'field_storage_config'.
+ */
+function thunder_forum_reply_field_storage_config_insert(FieldStorageConfigInterface $field_storage) {
+  if ($field_storage->getType() == 'thunder_forum_reply') {
+    // Check that the target entity type is 'node'.
+    if ($field_storage->getTargetEntityTypeId() !== 'node') {
+      throw new \UnexpectedValueException('You cannot attach a forum reply field to entities other than nodes');
+    }
+
+    /** @var \Drupal\thunder_forum\ThunderForumManagerInterface $forum_manager */
+    $forum_manager = \Drupal::service('forum_manager');
+
+    foreach ($field_storage->getBundles() as $bundle) {
+      $node = \Drupal::entityTypeManager()
+        ->getStorage('node')
+        ->create([
+          'type' => $bundle,
+        ]);
+
+      // Not attached to forum node?
+      if (!$forum_manager->checkNodeType($node)) {
+        throw new \UnexpectedValueException('You cannot attach a forum reply field to entities other than forum nodes');
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for 'field_ui_field_storage_add_form'.
+ */
+function thunder_forum_reply_form_field_ui_field_storage_add_form_alter(array &$form, FormStateInterface $form_state) {
+  /** @var \Drupal\thunder_forum\ThunderForumManagerInterface $forum_manager */
+  $forum_manager = \Drupal::service('forum_manager');
+
+  // Is a forum node?
+  if ($form_state->get('entity_type_id') === 'node') {
+    $node = \Drupal::entityTypeManager()
+      ->getStorage('node')
+      ->create([
+        'type' => $form_state->get('bundle'),
+      ]);
+
+    if ($forum_manager->checkNodeType($node)) {
+      return;
+    }
+  }
+
+  // You cannot use forum reply fields on non-forum entity types.
+  $optgroup = (string) t('General');
+  unset($form['add']['new_storage_type']['#options'][$optgroup]['thunder_forum_reply']);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for 'field_storage_config_edit_form'.
+ */
+function thunder_forum_reply_form_field_storage_config_edit_form_alter(&$form, FormStateInterface $form_state) {
+  if ($form_state->getFormObject()->getEntity()->getType() == 'thunder_forum_reply') {
+    // We only support posting one forum reply at the time so it doesn't make
+    // sense to let the site builder choose anything else.
+    $form['cardinality_container']['cardinality']['#default_value'] = 1;
+    $form['cardinality_container']['#access'] = FALSE;
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert() for node entities.
+ */
+function thunder_forum_reply_node_insert(NodeInterface $node) {
+  /** @var \Drupal\thunder_forum\ThunderForumManagerInterface $forum_manager */
+  $forum_manager = \Drupal::service('forum_manager');
+
+  if ($forum_manager->checkNodeType($node)) {
+    /** @var \Drupal\thunder_forum_reply\ForumReplyManagerInterface $reply_manager */
+    $reply_manager = \Drupal::service('thunder_forum_reply.manager');
+
+    // Allow bulk updates and inserts to temporarily disable the
+    // maintenance of the {thunder_forum_reply_node_statistics} table.
+    if (\Drupal::state()->get('thunder_forum_reply.maintain_node_statistics') && ($fields = $reply_manager->getFields())) {
+      \Drupal::service('thunder_forum_reply.statistics')->create($node, $fields);
+    }
+  }
+}
+
+/**
+ * Implements hook_node_links_alter().
+ */
+function thunder_forum_reply_node_links_alter(array &$links, NodeInterface $node, array &$context) {
+  /** @var \Drupal\thunder_forum\ThunderForumManagerInterface $forum_manager */
+  $forum_manager = \Drupal::service('forum_manager');
+
+  if ($forum_manager->checkNodeType($node)) {
+    /** @var \Drupal\thunder_forum_reply\ForumReplyLinkBuilderInterface $reply_link_builder */
+    $reply_link_builder = \Drupal::service('thunder_forum_reply.link_builder');
+
+    // Build forum reply links.
+    $reply_links = $reply_link_builder->buildRepliedNodeLinks($node, $context);
+
+    $links += $reply_links;
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_predelete() for node entities.
+ */
+function thunder_forum_reply_node_predelete(NodeInterface $node) {
+  /** @var \Drupal\thunder_forum\ThunderForumManagerInterface $forum_manager */
+  $forum_manager = \Drupal::service('forum_manager');
+
+  // Delete associated forum replies if a forum node is deleted.
+  if ($forum_manager->checkNodeType($node)) {
+    $entity_query = \Drupal::entityQuery('thunder_forum_reply');
+    $entity_query->condition('nid', (int) $node->id());
+    $frids = $entity_query->execute();
+
+    $storage = \Drupal::entityTypeManager()->getStorage('thunder_forum_reply');
+    $replies = $storage->loadMultiple($frids);
+    $storage->delete($replies);
+
+    /** @var \Drupal\thunder_forum_reply\ForumReplyStatisticsInterface $statistics */
+    $statistics = \Drupal::service('thunder_forum_reply.statistics');
+
+    $statistics->delete($node);
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_storage_load() for node entities.
+ */
+function thunder_forum_reply_node_storage_load(array $entities) {
+  /** @var \Drupal\thunder_forum\ThunderForumManagerInterface $forum_manager */
+  $forum_manager = \Drupal::service('forum_manager');
+
+  // Do not query database when forum nodes have no forum reply fields.
+  if (!\Drupal::service('thunder_forum_reply.manager')->getFields()) {
+    return;
+  }
+
+  /** @var \Drupal\thunder_forum_reply\ForumReplyStatisticsInterface $statistics */
+  $statistics = \Drupal::service('thunder_forum_reply.statistics');
+
+  // Load forum reply information from the database and update the entity's
+  // forum reply statistics properties, which are defined on each ForumReplyItem
+  // field.
+  $result = $statistics->read($entities);
+
+  foreach ($result as $record) {
+    // Skip non-forum nodes.
+    if (!$forum_manager->checkNodeType($entities[$record->nid])) {
+      continue;
+    }
+
+    // Skip fields that forum node entity does not have.
+    elseif (!$entities[$record->nid]->hasField($record->field_name)) {
+      continue;
+    }
+
+    $reply_statistics = $entities[$record->nid]->get($record->field_name);
+    $reply_statistics->frid = $record->frid;
+    $reply_statistics->last_reply_timestamp = $record->last_reply_timestamp;
+    $reply_statistics->last_reply_uid = $record->last_reply_uid;
+    $reply_statistics->reply_count = $record->reply_count;
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view() for node entities.
+ */
+function thunder_forum_reply_node_view(array &$build, NodeInterface $node, EntityViewDisplayInterface $display, $view_mode) {
+  if ($view_mode == 'rss' && $display->getComponent('links')) {
+    /** @var \Drupal\thunder_forum\ThunderForumManagerInterface $forum_manager */
+    $forum_manager = \Drupal::service('forum_manager');
+
+    if ($forum_manager->checkNodeType($node)) {
+      /** @var \Drupal\thunder_forum_reply\ForumReplyManagerInterface $reply_manager */
+      $reply_manager = \Drupal::service('thunder_forum_reply.manager');
+
+      $fields = $reply_manager->getFields();
+
+      foreach ($fields as $field_name => $detail) {
+        if ($node->hasField($field_name) && $node->get($field_name)->status != ForumReplyItemInterface::HIDDEN) {
+          // Add a comments RSS element which is a URL to the forum replies of
+          // this forum node.
+          $options = array(
+            'fragment' => 'forum-replies',
+            'absolute' => TRUE,
+          );
+
+          $node->rss_elements[] = array(
+            'key' => 'comments',
+            'value' => $node->toUrl('canonical', $options),
+          );
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view_alter() for node entities.
+ */
+function thunder_forum_reply_node_view_alter(array &$build, EntityInterface $node, EntityViewDisplayInterface $display) {
+  if (\Drupal::moduleHandler()->moduleExists('history')) {
+    /** @var \Drupal\thunder_forum\ThunderForumManagerInterface $forum_manager */
+    $forum_manager = \Drupal::service('forum_manager');
+
+    if ($forum_manager->checkNodeType($node)) {
+      $build['#attributes']['data-history-node-id'] = $node->id();
+    }
+  }
+}
+
+/**
+ * Forum reply entity URI callback.
+ */
+function thunder_forum_reply_uri(ForumReplyInterface $reply) {
+  return new Url('entity.thunder_forum_reply.canonical', ['thunder_forum_reply' => $reply->id()], [
+    'fragment' => 'forum-reply-' . $reply->id()
+  ]);
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for for forum reply field templates.
+ *
+ * Default template: field--thunder-forum-reply.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - element: An associative array containing render arrays for the list of
+ *     forum replies, and the forum reply form. Array keys: replies, reply_form.
+ */
+function thunder_forum_reply_preprocess_field__thunder_forum_reply(&$variables) {
+  $element = $variables['element'];
+
+  // Append additional attributes (eg. RDFa) from the first field item.
+  $variables['attributes'] += $variables['items'][0]['attributes']->storage();
+
+  // Create separate variables for the forum replies and forum reply form.
+  $variables['replies'] = isset($element[0]['replies']) ? $element[0]['replies'] : [];
+  $variables['reply_form'] = isset($element[0]['reply_form']) ? $element[0]['reply_form'] : [];
+}
+
+/**
+ * Implements hook_theme().
+ */
+function thunder_forum_reply_theme($existing, $type, $theme, $path) {
+  $items = [];
+
+  // Forum reply.
+  $items['thunder_forum_reply'] = [
+    'render element' => 'elements',
+  ];
+
+  // Forum reply field.
+  $items['field__thunder_forum_reply'] = [
+    'base hook' => 'field',
+  ];
+
+  return $items;
+}
+
+/**
+ * Implements hook_user_cancel().
+ */
+function thunder_forum_reply_user_cancel($edit, $account, $method) {
+  switch ($method) {
+    case 'user_cancel_block_unpublish':
+      /** @var \Drupal\thunder_forum_reply\ForumReplyInterface[] $replies */
+      $replies =  \Drupal::entityTypeManager()
+        ->getStorage('thunder_forum_reply')
+        ->loadByProperties(['uid' => $account->id()]);
+
+      foreach ($replies as $reply) {
+        $reply->setPublished(ForumReplyInterface::NOT_PUBLISHED);
+        $reply->save();
+      }
+      break;
+
+    case 'user_cancel_reassign':
+      /** @var \Drupal\thunder_forum_reply\ForumReplyInterface[] $replies */
+      $replies = \Drupal::entityTypeManager()
+        ->getStorage('thunder_forum_reply')
+        ->loadByProperties(['uid' => $account->id()]);
+
+      foreach ($replies as $reply) {
+        $reply->setOwnerId(0);
+        $reply->save();
+      }
+      break;
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_predelete() for user entities.
+ */
+function thunder_forum_reply_user_predelete($account) {
+  /** @var \Drupal\thunder_forum_reply\ForumReplyStorageInterface $storage */
+  $storage = \Drupal::entityTypeManager()->getStorage('thunder_forum_reply');
+
+  // Delete forum replies (current revisions).
+  $frids = $storage->getQuery()
+    ->condition('uid', $account->id())
+    ->execute();
+
+  $replies = $storage->loadMultiple($frids);
+  $storage->delete($replies);
+
+  // Delete old revisions.
+  $revisions = $storage->userRevisionIds($account);
+  foreach ($revisions as $revision) {
+    $storage->deleteRevision($revision);
+  }
+}

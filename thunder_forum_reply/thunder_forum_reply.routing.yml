@@ -1,0 +1,105 @@
+thunder_forum_reply.add:
+  path: '/forum/reply/add/{node}/{field_name}/{pfrid}'
+  defaults:
+    _title: 'Create forum reply'
+    _controller: '\Drupal\thunder_forum_reply\Controller\ForumReplyCreateController::form'
+    pfrid: ~
+  requirements:
+    _custom_access: '\Drupal\thunder_forum_reply\Controller\ForumReplyCreateController::formAccess'
+    node: \d+
+    pfrid: \d+
+  options:
+    parameters:
+      node:
+        type: 'entity:node'
+
+thunder_forum_reply.new_replies_node_links:
+  path: '/forum/render_new_replies_node_links'
+  defaults:
+    _controller: '\Drupal\thunder_forum_reply\Controller\ForumReplyController::renderNewRepliesNodeLinks'
+  requirements:
+    _permission: 'access content'
+
+entity.thunder_forum_reply.canonical:
+  path: '/forum/reply/{thunder_forum_reply}'
+  defaults:
+    _controller: '\Drupal\thunder_forum_reply\Controller\ForumReplyController::forumReplyPermalink'
+    _title_callback: '\Drupal\thunder_forum_reply\Controller\ForumReplyController::forumReplyPermalinkTitle'
+  requirements:
+    _entity_access: 'thunder_forum_reply.view'
+    thunder_forum_reply: \d+
+
+entity.thunder_forum_reply.edit_form:
+  path: '/forum/reply/{thunder_forum_reply}/edit'
+  defaults:
+    _entity_form: 'thunder_forum_reply.default'
+    _title: 'Edit forum reply'
+  requirements:
+    _entity_access: 'thunder_forum_reply.update'
+    thunder_forum_reply: \d+
+
+entity.thunder_forum_reply.delete_form:
+  path: '/forum/reply/{thunder_forum_reply}/delete'
+  defaults:
+    _entity_form: 'thunder_forum_reply.delete'
+    _title: 'Delete forum reply'
+  requirements:
+    _entity_access: 'thunder_forum_reply.delete'
+    thunder_forum_reply: \d+
+
+entity.thunder_forum_reply.collection:
+  path: 'admin/content/forum/reply'
+  defaults:
+    _entity_list: 'thunder_forum_reply'
+    _title: 'Forum replies'
+  requirements:
+    _permission: 'administer forums'
+
+entity.thunder_forum_reply.version_history:
+  path: '/forum/reply/{thunder_forum_reply}/revisions'
+  defaults:
+    _title: 'Forum reply revisions'
+    _controller: '\Drupal\thunder_forum_reply\Controller\ForumReplyRevisionController::overview'
+  requirements:
+    _permission: 'view forum reply revisions'
+    thunder_forum_reply: \d+
+
+entity.thunder_forum_reply.revision:
+  path: '/forum/reply/{thunder_forum_reply}/revisions/{thunder_forum_reply_revision}/view'
+  defaults:
+    _controller: '\Drupal\thunder_forum_reply\Controller\ForumReplyRevisionController::revisionPage'
+    _title_callback: '\Drupal\thunder_forum_reply\Controller\ForumReplyRevisionController::revisionPageTitle'
+  requirements:
+    _permission: 'view forum reply revisions'
+    thunder_forum_reply: \d+
+    thunder_forum_reply_revision: \d+
+
+entity.thunder_forum_reply.revision_revert:
+  path: '/forum/reply/{thunder_forum_reply}/revisions/{thunder_forum_reply_revision}/revert'
+  defaults:
+    _form: '\Drupal\thunder_forum_reply\Form\ForumReplyRevisionRevertForm'
+    _title: 'Revert to earlier revision'
+  requirements:
+    _permission: 'revert forum reply revisions'
+    thunder_forum_reply: \d+
+    thunder_forum_reply_revision: \d+
+
+entity.thunder_forum_reply.revision_delete:
+  path: '/forum/reply/{thunder_forum_reply}/revisions/{thunder_forum_reply_revision}/delete'
+  defaults:
+    _form: '\Drupal\thunder_forum_reply\Form\ForumReplyRevisionDeleteForm'
+    _title: 'Delete earlier revision'
+  requirements:
+    _permission: 'delete forum reply revisions'
+    thunder_forum_reply: \d+
+    thunder_forum_reply_revision: \d+
+
+entity.thunder_forum_reply.translation_revision_revert:
+  path: '/forum/reply/{default_entity}/revisions/{thunder_forum_reply_revision}/revert/{langcode}'
+  defaults:
+    _form: '\Drupal\myentity\Form\DefaultEntityRevisionRevertTranslationForm'
+    _title: 'Revert to earlier revision of a translation'
+  requirements:
+    _permission: 'revert forum reply revisions'
+    thunder_forum_reply: \d+
+    thunder_forum_reply_revision: \d+

@@ -1,0 +1,9 @@
+name: Thunder Forum Reply
+description: Provides a custom reply entity for the Drupal core forum.
+core: 8.x
+type: module
+dependencies:
+  - drupal:forum
+  - thunder:thunder_ach
+  - thunder_forum:thunder_forum
+package: Thunder Community

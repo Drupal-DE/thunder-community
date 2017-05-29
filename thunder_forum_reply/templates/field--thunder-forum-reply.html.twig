@@ -1,0 +1,41 @@
+{#
+/**
+ * @file
+ * Default theme override for forum reply fields.
+ *
+ * Available variables:
+ *   - attributes: HTML attributes for the containing element.
+ *   - label_hidden: Whether to show the field label or not.
+ *   - title_attributes: HTML attributes for the title.
+ *   - label: The label for the field.
+ *   - title_prefix: Additional output populated by modules, intended to be
+ *     displayed in front of the main title tag that appears in the template.
+ *   - title_suffix: Additional title output populated by modules, intended to
+ *     be displayed after the main title tag that appears in the template.
+ *   - replies: List of forum replies rendered through
+ *     thunder-forum-reply.html.twig.
+ *   - content_attributes: HTML attributes for the form title.
+ *   - reply_form: The 'Add new reply' form.
+ *   - entity_type: The entity type to which the field belongs.
+ *   - field_name: The name of the field.
+ *   - field_type: The type of the field.
+ *   - label_display: The display settings for the label.
+ *
+ * @see template_preprocess_field()
+ * @see thunder_forum_reply_preprocess_field__thunder_forum_reply()
+ */
+#}
+<section{{ attributes }}>
+  {%- if replies and not label_hidden -%}
+    {{ title_prefix }}
+    <h2{{ title_attributes }}>{{ label }}</h2>
+    {{ title_suffix }}
+  {%- endif -%}
+
+  {{- replies -}}
+
+  {%- if reply_form -%}
+    <h2{{ content_attributes }}>{{ 'Add new reply'|t }}</h2>
+    {{ reply_form }}
+  {%- endif -%}
+</section>
