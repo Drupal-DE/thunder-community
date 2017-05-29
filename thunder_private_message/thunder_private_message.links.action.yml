@@ -1,0 +1,7 @@
+thunder_private_message.reply:
+  route_name: entity.message.pmreply
+  route_parameters:
+    message_template: 'thunder_private_message'
+  title: 'Reply'
+  appears_on:
+    - entity.message.canonical

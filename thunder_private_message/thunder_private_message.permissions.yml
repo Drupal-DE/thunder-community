@@ -1,0 +1,6 @@
+bypass thunder_private_message access:
+  title: 'Bypass Thunder Private Message access'
+  description: 'Bypass all access checks for messages provided by Thunder Private Message.'
+  restrict access: true
+administer thunder_private_message:
+  title: 'Administer Thunder Private Messages'

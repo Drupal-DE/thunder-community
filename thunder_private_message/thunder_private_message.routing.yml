@@ -1,0 +1,38 @@
+thunder_private_message.message.settings:
+  path: '/admin/config/message/pm'
+  defaults:
+    _title: 'Thunder Private Message'
+    _description: 'Settings for private messages'
+    _form: 'Drupal\thunder_private_message\Form\MessageSettingsForm'
+  requirements:
+    _permission: 'administer thunder_private_message'
+
+# Clone message route for private messages.
+thunder_private_message.add:
+  path: '/user/{user}/pm/add/{recipient}'
+  defaults:
+    _controller: '\Drupal\thunder_private_message\Controller\PrivateMessageController::addMessage'
+    _title: 'Create message'
+    message_template: 'thunder_private_message'
+    recipient: NULL
+  requirements:
+    _entity_create_access: 'message:thunder_private_message'
+  options:
+    _admin_route: FALSE
+    parameters:
+      recipient:
+        type: entity:user
+entity.message.pmreply:
+  path: '/message/{message}/reply'
+  defaults:
+    _controller: '\Drupal\thunder_private_message\Controller\PrivateMessageController::reply'
+    _title: 'Reply'
+    message_template: 'thunder_private_message'
+  requirements:
+    _entity_create_access: 'message:thunder_private_message'
+    _custom_access: '\Drupal\thunder_private_message\Controller\PrivateMessageController::replyAccess'
+  options:
+    _admin_route: FALSE
+    parameters:
+      message:
+        type: entity:message
