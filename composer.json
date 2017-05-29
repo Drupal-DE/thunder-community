@@ -8,6 +8,7 @@
     "drupal/core": "^8.0",
     "drupal/flag": "^4.0",
     "drupal/message": "1.x-dev",
-    "drupal/message_ui": "1.x-dev"
+    "drupal/message_ui": "1.x-dev",
+    "drupal/pach": "1.x-dev"
   }
 }
