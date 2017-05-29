@@ -61,7 +61,7 @@ class PrivateMessageController extends MessageController {
    */
   public function replyAccess(MessageInterface $message, AccountInterface $account) {
     // Only message recipients are allowed to reply to a private message.
-    return AccessResult::allowedIf($message->get('tpm_recipient')->first()->entity->id() === $account->id());
+    return AccessResult::allowedIf($message->get('tpm_recipient')->first()->entity->id() === $account->id())->addCacheContexts(['user']);
   }
 
 }

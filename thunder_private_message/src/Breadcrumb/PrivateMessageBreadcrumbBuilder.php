@@ -91,7 +91,7 @@ class PrivateMessageBreadcrumbBuilder implements BreadcrumbBuilderInterface {
       $breadcrumb->addLink(Link::createFromRoute($this->configFactory->get('views.view.private_messages')->get('display.outbox.display_options.title'), 'view.private_messages.outbox', ['user' => $this->account->id()]));
     }
 
-    $breadcrumb->addCacheContexts(['url']);
+    $breadcrumb->addCacheContexts(['url', 'user']);
 
     return $breadcrumb;
   }

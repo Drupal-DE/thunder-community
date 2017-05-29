@@ -53,7 +53,7 @@ class MessagelistOwnerOrAdmin extends AccessPluginBase implements CacheableDepen
    * {@inheritdoc}
    */
   public function getCacheContexts() {
-    return ['user.permissions'];
+    return ['user.permissions', 'user'];
   }
 
   /**
