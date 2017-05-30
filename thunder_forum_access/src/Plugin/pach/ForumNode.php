@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\thunder_forum_access\Plugin\thunder_ach;
+namespace Drupal\thunder_forum_access\Plugin\pach;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
@@ -9,18 +9,16 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\thunder_forum_access\Access\ForumAccessMatrixInterface;
 
-// @todo Rewrite to use new pACH module.
-
 /**
  * Provides a basic access control handler for forum terms.
  *
- * @ThunderAccessControlHandler(
- *   id = "forum_node_base",
+ * @AccessControlHandler(
+ *   id = "thunder_forum_access_node",
  *   type = "node",
  *   weight = 1
  * )
  */
-class ForumNodeBase extends ForumBase {
+class ForumNode extends ForumBase {
 
   /**
    * {@inheritdoc}

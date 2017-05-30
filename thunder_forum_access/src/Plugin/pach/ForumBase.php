@@ -1,21 +1,19 @@
 <?php
 
-namespace Drupal\thunder_forum_access\Plugin\thunder_ach;
+namespace Drupal\thunder_forum_access\Plugin\pach;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\thunder_ach\Plugin\ThunderAccessControlHandlerBase;
+use Drupal\pach\Plugin\AccessControlHandlerBase;
 use Drupal\thunder_forum\ThunderForumManagerInterface;
 use Drupal\thunder_forum_access\Access\ForumAccessManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-// @todo Rewrite to use new pACH module.
-
 /**
  * Provides a base class for forum access control handlers.
  */
-abstract class ForumBase extends ThunderAccessControlHandlerBase implements ContainerFactoryPluginInterface {
+abstract class ForumBase extends AccessControlHandlerBase implements ContainerFactoryPluginInterface {
 
   /**
    * The forum access manager.

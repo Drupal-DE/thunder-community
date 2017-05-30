@@ -5,6 +5,6 @@ core: 8.x
 dependencies:
   - drupal:forum
   - drupal:taxonomy
-  - thunder:thunder_ach
+  - pach:pach
   - thunder_forum:thunder_forum
 package: Thunder Community
