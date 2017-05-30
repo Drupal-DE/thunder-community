@@ -3,6 +3,7 @@
 namespace Drupal\thunder_forum_reply\Form;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -16,6 +17,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ForumReplyForm extends ContentEntityForm {
 
   /**
+   * The date formatter.
+   *
+   * @var \Drupal\Core\Datetime\DateFormatterInterface
+   */
+  protected $dateForamtter;
+
+  /**
    * The renderer.
    *
    * @var \Drupal\Core\Render\RendererInterface
@@ -27,12 +35,15 @@ class ForumReplyForm extends ContentEntityForm {
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.
+   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
+   *   The date formatter.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer service.
    */
-  public function __construct(EntityManagerInterface $entity_manager, RendererInterface $renderer) {
+  public function __construct(EntityManagerInterface $entity_manager, DateFormatterInterface $date_formatter, RendererInterface $renderer) {
     parent::__construct($entity_manager);
 
+    $this->dateForamtter = $date_formatter;
     $this->renderer = $renderer;
   }
 
@@ -79,6 +90,7 @@ class ForumReplyForm extends ContentEntityForm {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('entity.manager'),
+      $container->get('date.formatter'),
       $container->get('renderer')
     );
   }
@@ -139,7 +151,23 @@ class ForumReplyForm extends ContentEntityForm {
     // Merge form structure build by parent.
     $form = parent::form($form, $form_state);
 
-    // @todo Display author information to administrative users.
+    // Display author information.
+    if (!$reply->isNew()) {
+      $account = $reply->getOwner();
+
+      $username = [
+        '#theme' => 'username',
+        '#account' => $account,
+      ];
+
+      $form['submitted'] = [
+        '#markup' => $this->t('Submitted by @username on @datetime', [
+          '@username' => $this->renderer->render($username),
+          '@datetime' => $this->dateForamtter->format($reply->getCreatedTime()),
+        ]),
+        '#weight' => -100,
+      ];
+    }
 
     return $form;
   }
