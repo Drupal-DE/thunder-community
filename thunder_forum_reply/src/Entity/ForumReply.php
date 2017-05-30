@@ -130,7 +130,6 @@ class ForumReply extends ContentEntityBase implements ForumReplyInterface {
     // Title.
     $fields['title'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Subject'))
-      ->setDefaultValue('')
       ->setRevisionable(TRUE)
       ->setTranslatable(TRUE)
       ->setSetting('max_length', 255)
