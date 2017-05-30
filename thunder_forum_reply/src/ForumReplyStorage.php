@@ -114,10 +114,10 @@ class ForumReplyStorage extends SqlContentEntityStorage implements ForumReplySto
     $query->addExpression('COUNT(*)', 'count');
     $query->condition('fr2.frid', $reply->id());
 
-    // @todo This might has to be be improved for 'view own unpublished forum
-    // replies' permission.
+    // Narrow result based on publishing status and permissions.
     if (!$this->currentUser->hasPermission('administer forums')) {
-      $query->condition('fr1.status', ForumReplyInterface::PUBLISHED);
+      $condition = $this->queryConditionPublishingStatus('fr1');
+      $query->condition($condition);
     }
 
     // For rendering flat forum replies, frid is used for ordering forum replies
@@ -213,19 +213,11 @@ class ForumReplyStorage extends SqlContentEntityStorage implements ForumReplySto
 
     // Narrow result based on publishing status and permissions.
     if (!$this->currentUser->hasPermission('administer forums')) {
-      $condition_published = new Condition('OR');
-      $condition_published->condition('fr.status', ForumReplyInterface::PUBLISHED);
-
-      $condition_own_unpublished = new Condition('AND');
-      $condition_own_unpublished->condition('fr.uid', $this->currentUser->id());
-      $condition_own_unpublished->condition('1', intval($this->currentUser->hasPermission('view own unpublished forum replies')));
-
-      $condition_published->condition($condition_own_unpublished);
-
-      $query->condition($condition_published);
+      $condition = $this->queryConditionPublishingStatus('fr');
+      $query->condition($condition);
 
       if ($replies_per_page) {
-        $count_query->condition($condition_published);
+        $count_query->condition($condition);
       }
     }
 
@@ -239,6 +231,28 @@ class ForumReplyStorage extends SqlContentEntityStorage implements ForumReplySto
     }
 
     return $replies;
+  }
+
+  /**
+   * Return database query condition for forum reply publishing status.
+   *
+   * @param string $table
+   *   The database table name.
+   *
+   * @return \Drupal\Core\Database\Query\Condition
+   *   The database query condition.
+   */
+  protected function queryConditionPublishingStatus($table) {
+    $condition_published = new Condition('OR');
+    $condition_published->condition($table . '.status', ForumReplyInterface::PUBLISHED);
+
+    $condition_own_unpublished = new Condition('AND');
+    $condition_own_unpublished->condition($table . '.uid', $this->currentUser->id());
+    $condition_own_unpublished->condition('1', intval($this->currentUser->hasPermission('view own unpublished forum replies')));
+
+    $condition_published->condition($condition_own_unpublished);
+
+    return $condition_published;
   }
 
 }
