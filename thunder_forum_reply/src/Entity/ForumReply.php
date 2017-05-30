@@ -2,12 +2,15 @@
 
 namespace Drupal\thunder_forum_reply\Entity;
 
+use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\thunder_forum_reply\ForumReplyInterface;
 use Drupal\user\UserInterface;
@@ -72,6 +75,8 @@ use Drupal\user\UserInterface;
  */
 class ForumReply extends ContentEntityBase implements ForumReplyInterface {
 
+  use StringTranslationTrait;
+  
   /**
    * Whether the forum reply is being previewed or not.
    *
@@ -379,6 +384,13 @@ class ForumReply extends ContentEntityBase implements ForumReplyInterface {
   /**
    * {@inheritdoc}
    */
+  public function getSubject() {
+    return $this->get('title')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function hasParentReply() {
     return (bool) $this->get('pfrid')->target_id;
   }
@@ -498,6 +510,25 @@ class ForumReply extends ContentEntityBase implements ForumReplyInterface {
     if (!$this->getRevisionUser()) {
       $this->setRevisionUserId($this->getOwnerId());
     }
+
+    // Validate the forum reply's subject. If not specified, extract from forum
+    // reply body.
+    if (trim($this->getSubject()) == '') {
+      if ($this->hasField('body')) {
+        // The body may be in any format, so:
+        // 1) Filter it into HTML
+        // 2) Strip out all HTML tags
+        // 3) Convert entities back to plain-text.
+        $body = $this->body->processed;
+        $this->setSubject(Unicode::truncate(trim(Html::decodeEntities(strip_tags($body))), 29, TRUE, TRUE));
+      }
+
+      // Edge cases where the forum reply body is populated only by HTML tags
+      // will require a default subject.
+      if ($this->getSubject() == '') {
+        $this->setSubject($this->t('(No subject)'));
+      }
+    }
   }
 
   /**
@@ -610,6 +641,15 @@ class ForumReply extends ContentEntityBase implements ForumReplyInterface {
    */
   public function setRevisionUserId($user_id) {
     $this->set('revision_uid', $user_id);
+
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setSubject($subject) {
+    $this->set('title', $subject);
 
     return $this;
   }

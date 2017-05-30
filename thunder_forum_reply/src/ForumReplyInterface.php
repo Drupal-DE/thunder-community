@@ -73,6 +73,14 @@ interface ForumReplyInterface extends ContentEntityInterface, EntityOwnerInterfa
   public function getRepliedNodeId();
 
   /**
+   * Returns the subject of the forum reply.
+   *
+   * @return string
+   *   The subject of the forum reply.
+   */
+  public function getSubject();
+
+  /**
    * Determines if this forum reply is a response to another forum reply.
    *
    * @return bool
@@ -129,5 +137,16 @@ interface ForumReplyInterface extends ContentEntityInterface, EntityOwnerInterfa
    *   The class instance that this method is called on.
    */
   public function setPublished($published);
+
+  /**
+   * Sets the subject of the forum reply.
+   *
+   * @param string $subject
+   *   The subject of the forum reply.
+   *
+   * @return static
+   *   The class instance that this method is called on.
+   */
+  public function setSubject($subject);
 
 }
