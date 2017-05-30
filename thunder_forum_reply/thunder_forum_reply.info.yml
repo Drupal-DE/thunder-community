@@ -4,6 +4,5 @@ core: 8.x
 type: module
 dependencies:
   - drupal:forum
-  - thunder:thunder_ach
   - thunder_forum:thunder_forum
 package: Thunder Community
