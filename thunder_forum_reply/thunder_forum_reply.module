@@ -65,7 +65,7 @@ function template_preprocess_thunder_forum_reply(array &$variables) {
   }
 
   // Forum reply is previewed?
-  if (isset($reply->in_preview)) {
+  if (isset($reply->inPreview)) {
     $variables['title'] = Link::createFromRoute($reply->label(), '<front>');
     $variables['permalink'] = Link::createFromRoute(t('Permalink'), '<front>');
   }
@@ -135,7 +135,7 @@ function template_preprocess_thunder_forum_reply(array &$variables) {
   }
 
   // Set status to a string representation of thunder_forum_reply->status.
-  if (isset($reply->in_preview)) {
+  if (isset($reply->inPreview)) {
     $variables['status'] = 'preview';
   }
   else {
@@ -597,9 +597,9 @@ function thunder_forum_reply_preprocess_forums(array &$variables) {
           $forum_reply_storage = \Drupal::entityTypeManager()->getStorage('thunder_forum_reply');
 
           $page_number = $forum_reply_storage->getNewReplyPageNumber($topic->comment_count, $topic->_new_replies, $topic, 'forum_replies');
-          $query = $page_number ? array('page' => $page_number) : NULL;
+          $query = $page_number ? ['page' => $page_number] : NULL;
 
-          $new_text = \Drupal::translation()->formatPlural($topic->_new_replies, '1 new post<span class="visually-hidden"> in topic %title</span>', '@count new posts<span class="visually-hidden"> in topic %title</span>', array('%title' => $topic->label()));
+          $new_text = \Drupal::translation()->formatPlural($topic->_new_replies, '1 new post<span class="visually-hidden"> in topic %title</span>', '@count new posts<span class="visually-hidden"> in topic %title</span>', ['%title' => $topic->label()]);
           $new_url = Url::fromRoute('entity.node.canonical', ['node' => $topic->id()], ['query' => $query, 'fragment' => 'new']);
           $new_replies = '<br /><a href="' . $new_url->toString() . '">' . $new_text . '</a>';
 

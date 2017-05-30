@@ -68,10 +68,10 @@ class ThunderForumIndexStorage extends ForumIndexStorage {
       ])->fetchObject();
 
       $this->database->update('forum_index')
-        ->fields( array(
+        ->fields([
           'comment_count' => $count,
           'last_comment_timestamp' => $last_reply->created,
-        ))
+        ])
         ->condition('nid', $nid)
         ->execute();
     }
@@ -80,10 +80,10 @@ class ThunderForumIndexStorage extends ForumIndexStorage {
     else {
       // @todo This should be actually filtering on the desired node language
       $this->database->update('forum_index')
-        ->fields( array(
+        ->fields([
           'comment_count' => 0,
           'last_comment_timestamp' => $node->getCreatedTime(),
-        ))
+        ])
         ->condition('nid', $nid)
         ->execute();
     }

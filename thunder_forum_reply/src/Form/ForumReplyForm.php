@@ -197,7 +197,7 @@ class ForumReplyForm extends ContentEntityForm {
     $build = [];
 
     if (!$form_state->getErrors()) {
-      $this->entity->in_preview = TRUE;
+      $this->entity->inPreview = TRUE;
       $build['reply_preview'] = $this->entityTypeManager
         ->getViewBuilder('thunder_forum_reply')
         ->view($this->entity);

@@ -190,15 +190,6 @@ class ForumReplyLazyBuilders {
       ];
     }
 
-    // @todo Add translations link for translation-enabled forum reply bundles.
-    if ($this->moduleHandler->moduleExists('content_translation')) {
-      // && $this->access($reply)->isAllowed()) {
-      // $links['thunder_forum_reply-translations'] = [
-      // 'title' => t('Translate'),
-      // 'url' => $reply->toUrl('drupal:content-translation-overview'),
-      // ];
-    }
-
     return [
       '#theme' => 'links__thunder_forum_reply__thunder_forum_reply',
       '#links' => $links,

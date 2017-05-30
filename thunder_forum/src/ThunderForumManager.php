@@ -110,7 +110,7 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
 
     // Query "Last Post" information for this forum.
     $query = $this->connection->select('node_field_data', 'n');
-    $query->join('forum', 'f', 'n.vid = f.vid AND f.tid = :tid', array(':tid' => $tid));
+    $query->join('forum', 'f', 'n.vid = f.vid AND f.tid = :tid', [':tid' => $tid]);
     $query->join('thunder_forum_reply_node_statistics', 'frns', "n.nid = frns.nid AND frns.field_name = 'forum_replies'");
     $query->join('users_field_data', 'u', 'frns.last_reply_uid = u.uid AND u.default_langcode = 1');
     $query->addField('n', 'nid');
@@ -278,8 +278,8 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
 
     foreach ($result as $topic) {
       if ($account->isAuthenticated()) {
-        // A forum is new if the topic is new, or if there are new comments since
-        // the user's last visit.
+        // A forum is new if the topic is new, or if there are new forum replies
+        // since the user's last visit.
         if ($topic->forum_tid != $tid) {
           $topic->new = 0;
         }
@@ -296,7 +296,8 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
         }
       }
       else {
-        // Do not track "new replies" status for topics if the user is anonymous.
+        // Do not track "new replies" status for topics if the user is
+        // anonymous.
         $topic->new_replies = 0;
         $topic->new = 0;
       }
@@ -323,7 +324,7 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
 
     return [
       'topics' => $topics,
-      'header' => $header
+      'header' => $header,
     ];
   }
 

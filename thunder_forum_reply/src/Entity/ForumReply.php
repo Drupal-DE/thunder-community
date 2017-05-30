@@ -76,14 +76,14 @@ use Drupal\user\UserInterface;
 class ForumReply extends ContentEntityBase implements ForumReplyInterface {
 
   use StringTranslationTrait;
-  
+
   /**
    * Whether the forum reply is being previewed or not.
    *
    * @var true|null
    *   TRUE if the forum reply is being previewed and NULL if it is not.
    */
-  public $in_preview = NULL;
+  public $inPreview = NULL;
 
   /**
    * {@inheritdoc}

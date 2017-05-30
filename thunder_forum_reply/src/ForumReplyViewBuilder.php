@@ -47,7 +47,7 @@ class ForumReplyViewBuilder extends EntityViewBuilder {
   protected function alterBuild(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
     parent::alterBuild($build, $entity, $display, $view_mode);
 
-    if (empty($entity->in_preview)) {
+    if (empty($entity->inPreview)) {
       // Add anchor for each forum reply.
       $build['#prefix'] = "<a id=\"forum-reply-{$entity->id()}\"></a>\n";
     }
@@ -90,7 +90,7 @@ class ForumReplyViewBuilder extends EntityViewBuilder {
               $entity->id(),
               $view_mode,
               $entity->language()->getId(),
-              !empty($entity->in_preview),
+              !empty($entity->inPreview),
             ],
           ],
           '#create_placeholder' => TRUE,
@@ -134,7 +134,7 @@ class ForumReplyViewBuilder extends EntityViewBuilder {
     $defaults = parent::getBuildDefaults($entity, $view_mode);
 
     // Don't cache forum replies that are in 'preview' mode.
-    if (isset($defaults['#cache']) && isset($entity->in_preview)) {
+    if (isset($defaults['#cache']) && isset($entity->inPreview)) {
       unset($defaults['#cache']);
     }
 
