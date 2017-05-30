@@ -5,6 +5,7 @@
  * Install and update functions for "Thunder Forum Access" module.
  */
 
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\thunder_forum_access\Access\ForumAccessMatrixInterface;
 
 /**
@@ -135,7 +136,7 @@ function thunder_forum_access_schema() {
         'description' => 'The target entity type ID the permission is for.',
         'type' => 'varchar_ascii',
         'not null' => TRUE,
-        'length' => 16,
+        'length' => EntityTypeInterface::ID_MAX_LENGTH,
         'default' => '',
       ],
       'permission' => [
