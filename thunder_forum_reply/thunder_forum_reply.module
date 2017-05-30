@@ -590,6 +590,36 @@ function thunder_forum_reply_theme($existing, $type, $theme, $path) {
 }
 
 /**
+ * Implements hook_ENTITY_TYPE_delete() for forum reply entities.
+ */
+function thunder_forum_reply_thunder_forum_reply_delete(ForumReplyInterface $reply) {
+  /** @var \Drupal\forum\ForumIndexStorageInterface $forum_index_storage */
+  $forum_index_storage = \Drupal::service('forum.index_storage');
+
+  $forum_index_storage->updateIndex($reply->getRepliedNode());
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert() for forum reply entities.
+ */
+function thunder_forum_reply_thunder_forum_reply_insert(ForumReplyInterface $reply) {
+  /** @var \Drupal\forum\ForumIndexStorageInterface $forum_index_storage */
+  $forum_index_storage = \Drupal::service('forum.index_storage');
+
+  $forum_index_storage->updateIndex($reply->getRepliedNode());
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update() for forum reply entities.
+ */
+function thunder_forum_reply_thunder_forum_reply_update(ForumReplyInterface $reply) {
+  /** @var \Drupal\forum\ForumIndexStorageInterface $forum_index_storage */
+  $forum_index_storage = \Drupal::service('forum.index_storage');
+
+  $forum_index_storage->updateIndex($reply->getRepliedNode());
+}
+
+/**
  * Implements hook_user_cancel().
  */
 function thunder_forum_reply_user_cancel($edit, $account, $method) {
