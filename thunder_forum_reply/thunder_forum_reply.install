@@ -29,7 +29,7 @@ function thunder_forum_reply_requirements($phase) {
         if ($count_forum_comments > 0) {
           $requirements['thunder_forum_reply'] = [
             'title' => t('Thunder Forum Reply'),
-            'value' => t('Unable to install @module. All existing forum comments would be lost.', ['@module' => t('Thunder Forum Reply')]),
+            'description' => t('Unable to install @module. All existing forum comments would be lost.', ['@module' => t('Thunder Forum Reply')]),
             'severity' => REQUIREMENT_ERROR,
           ];
         }
