@@ -58,6 +58,7 @@ class ForumReplyAccessControlHandler extends EntityAccessControlHandler implemen
    */
   public function access(EntityInterface $entity, $operation, AccountInterface $account = NULL, $return_as_object = FALSE) {
     /** @var \Drupal\thunder_forum_reply\ForumReplyInterface $entity */
+    $account = $this->prepareUser($account);
 
     $field_name = $entity->getFieldName();
     $node = $entity->getRepliedNode();
