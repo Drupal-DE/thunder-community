@@ -5,7 +5,6 @@
  * Main functions for "Thunder Forum Reply" module.
  */
 
-// TODO Alter forum index service to use forum reply entity instead of comments.
 // FIXME Revision field data is not deleted upon revision delete.
 
 use Drupal\Core\Entity\EntityInterface;
@@ -571,6 +570,49 @@ function thunder_forum_reply_preprocess_field__thunder_forum_reply(array &$varia
 }
 
 /**
+ * Implements hook_preprocess_HOOK() for for forums.html.twig.
+ *
+ * This function is called twice during preprocessing. This is necessary to
+ * save a copy of the forum topic node array needed for special new_replies
+ * variable treatment.
+ *
+ * @see thunder_forum_reply_theme_registry_alter()
+ * @see \Drupal\thunder_forum\ThunderForumManager::getTopics()
+ */
+function thunder_forum_reply_preprocess_forums(array &$variables) {
+  if ($variables['topics']) {
+    // First pass: Save a copy of topics array.
+    if (!isset($variables['topics']['#theme'])) {
+      $variables['_topics'] = $variables['topics'];
+    }
+
+    // Second pass: Preprocess forums variables.
+    elseif (!empty($variables['_topics'])) {
+      $i = 0;
+      /** @var \Drupal\node\NodeInterface $topic */
+      foreach ($variables['_topics'] as $id => $topic) {
+        // Insert correct 'X new post(s)' in topic lists.
+        if ($topic->_new_replies) {
+          /** @var \Drupal\thunder_forum_reply\ForumReplyStorageInterface $forum_reply_storage */
+          $forum_reply_storage = \Drupal::entityTypeManager()->getStorage('thunder_forum_reply');
+
+          $page_number = $forum_reply_storage->getNewReplyPageNumber($topic->comment_count, $topic->_new_replies, $topic, 'forum_replies');
+          $query = $page_number ? array('page' => $page_number) : NULL;
+
+          $new_text = \Drupal::translation()->formatPlural($topic->_new_replies, '1 new post<span class="visually-hidden"> in topic %title</span>', '@count new posts<span class="visually-hidden"> in topic %title</span>', array('%title' => $topic->label()));
+          $new_url = Url::fromRoute('entity.node.canonical', ['node' => $topic->id()], ['query' => $query, 'fragment' => 'new']);
+          $new_replies = '<br /><a href="' . $new_url->toString() . '">' . $new_text . '</a>';
+
+          $variables['topics']['#rows'][$i][1]['data'][0]['#markup'] = $new_replies;
+        }
+
+        $i++;
+      }
+    }
+  }
+}
+
+/**
  * Implements hook_theme().
  */
 function thunder_forum_reply_theme($existing, $type, $theme, $path) {
@@ -587,6 +629,21 @@ function thunder_forum_reply_theme($existing, $type, $theme, $path) {
   ];
 
   return $items;
+}
+
+/**
+ * Implements hook_theme_registry_alter().
+ */
+function thunder_forum_reply_theme_registry_alter(&$theme_registry) {
+  if (isset($theme_registry['forums'])) {
+    $item =& $theme_registry['forums'];
+
+    // Inject own preprocessing function for 'forums' theme hook to be able to
+    // save a copy of originals forum topic node array.
+    if (($index = array_search('template_preprocess_forums', $item['preprocess functions'], TRUE)) !== FALSE) {
+      array_splice($item['preprocess functions'], $index, 0, ['thunder_forum_reply_preprocess_forums']);
+    }
+  }
 }
 
 /**

@@ -19,6 +19,8 @@ class ThunderForumServiceProvider extends ServiceProviderBase {
     if ($container->hasDefinition('forum_manager')) {
       $definition = $container->getDefinition('forum_manager');
       $definition->setClass('Drupal\thunder_forum\ThunderForumManager');
+      $definition->addArgument(new Reference('module_handler'));
+    }
 
     // Override default forum index storage service to use forum replies instead
     // of comments (if thunder_forum_reply module is enabled).
