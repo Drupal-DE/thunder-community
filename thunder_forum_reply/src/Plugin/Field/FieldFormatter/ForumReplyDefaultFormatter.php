@@ -152,9 +152,24 @@ class ForumReplyDefaultFormatter extends FormatterBase implements ContainerFacto
     /** @var \Drupal\node\NodeInterface $entity */
     $entity = $items->getEntity();
 
+    // Create dummy forum reply with necessary values for access checking.
+    $reply = $this->storage->create([
+      'nid' => $entity->id(),
+      'field_name' => $field_name,
+    ]);
+
     // Replies thread.
     $replies_per_page = $settings['per_page'];
-    $replies = $this->storage->loadThread($entity, $field_name, $replies_per_page, $this->getSetting('pager_id'));
+
+    /** @var \Drupal\thunder_forum_reply\ForumReplyInterface[] $replies */
+    $replies = $reply->access('view', $this->currentUser) ? $this->storage->loadThread($entity, $field_name, $replies_per_page, $this->getSetting('pager_id')) : [];
+
+    // Filter out non-accessible forum replies.
+    foreach ($replies as $key => $reply) {
+      if (!$reply->access('view', $this->currentUser)) {
+        unset($replies[$key]);
+      }
+    }
 
     if ($replies) {
       $build = $this->viewBuilder->viewMultiple($replies, $this->getSetting('view_mode'));
@@ -175,12 +190,6 @@ class ForumReplyDefaultFormatter extends FormatterBase implements ContainerFacto
       $output['replies'] = [];
       $output['replies'] += $build;
     }
-
-    // Create dummy forum reply with necessary values for access checking.
-    $reply = $this->storage->create([
-      'nid' => $entity->id(),
-      'field_name' => $field_name,
-    ]);
 
     // Append forum reply form (if access is granted and the form is set to
     // display below the entity). Do not show the form for the print view mode.

@@ -4,6 +4,7 @@ namespace Drupal\thunder_forum_reply;
 
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
@@ -210,13 +211,21 @@ class ForumReplyStorage extends SqlContentEntityStorage implements ForumReplySto
       $query->setCountQuery($count_query);
     }
 
-    // @todo This might has to be be improved for 'view own unpublished forum
-    // replies' permission.
+    // Narrow result based on publishing status and permissions.
     if (!$this->currentUser->hasPermission('administer forums')) {
-      $query->condition('fr.status', ForumReplyInterface::PUBLISHED);
+      $condition_published = new Condition('OR');
+      $condition_published->condition('fr.status', ForumReplyInterface::PUBLISHED);
+
+      $condition_own_unpublished = new Condition('AND');
+      $condition_own_unpublished->condition('fr.uid', $this->currentUser->id());
+      $condition_own_unpublished->condition('1', intval($this->currentUser->hasPermission('view own unpublished forum replies')));
+
+      $condition_published->condition($condition_own_unpublished);
+
+      $query->condition($condition_published);
 
       if ($replies_per_page) {
-        $count_query->condition('fr.status', ForumReplyInterface::PUBLISHED);
+        $count_query->condition($condition_published);
       }
     }
 
