@@ -21,6 +21,7 @@ use Drupal\language\ConfigurableLanguageInterface;
 use Drupal\node\NodeInterface;
 use Drupal\thunder_forum_reply\ForumReplyInterface;
 use Drupal\thunder_forum_reply\Plugin\Field\FieldType\ForumReplyItemInterface;
+use Drupal\user\Entity\Role;
 
 /**
  * Implements hook_preprocess_HOOK() for forum reply templates.
@@ -369,6 +370,31 @@ function thunder_forum_reply_form_field_storage_config_edit_form_alter(&$form, F
     // sense to let the site builder choose anything else.
     $form['cardinality_container']['cardinality']['#default_value'] = 1;
     $form['cardinality_container']['#access'] = FALSE;
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function thunder_forum_reply_form_user_admin_permissions_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $disabled_permissions_for_anonymous = [
+    'administer forum replies',
+    'create forum replies',
+    'delete forum replies',
+    'delete forum reply revisions',
+    'delete own forum replies',
+    'edit forum replies',
+    'edit own forum replies',
+    'revert forum reply revisions',
+    'view forum reply revisions',
+    'view own unpublished forum replies',
+  ];
+
+  // Disable irrelevant forum reply permission checkboxes for anonymous users.
+  foreach ($disabled_permissions_for_anonymous as $permission) {
+    if (isset($form['permissions'][$permission][Role::ANONYMOUS_ID])) {
+      $form['permissions'][$permission][Role::ANONYMOUS_ID]['#disabled'] = TRUE;
+    }
   }
 }
 
