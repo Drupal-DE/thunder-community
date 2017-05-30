@@ -480,8 +480,10 @@ class ForumReply extends ContentEntityBase implements ForumReplyInterface {
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
 
-    // Set current host name (IP).
-    $this->setHostname(\Drupal::request()->getClientIP());
+    // Ensure current host name (IP).
+    if (!$this->getHostname()) {
+      $this->setHostname(\Drupal::request()->getClientIP());
+    }
 
     foreach (array_keys($this->getTranslationLanguages()) as $langcode) {
       $translation = $this->getTranslation($langcode);
