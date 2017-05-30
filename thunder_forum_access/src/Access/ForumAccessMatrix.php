@@ -57,7 +57,7 @@ class ForumAccessMatrix implements ForumAccessMatrixInterface {
           ],
         ],
       ],
-      'comment' => [
+      'thunder_forum_reply' => [
         'label' => $this->t('Reply'),
         'description' => $this->t('Replies are the answers to a topic.'),
         'permissions' => [

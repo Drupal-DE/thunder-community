@@ -67,22 +67,6 @@ class ForumAccessHelper implements ForumAccessHelperInterface {
   /**
    * {@inheritdoc}
    */
-  public function alterForumCommentForm(array &$form, FormStateInterface $form_state, $form_id) {
-    /** @var \Drupal\comment\CommentInterface $comment */
-    $comment = $form_state->getFormObject()->getEntity();
-
-    // Is forum comment form?
-    if ($comment->bundle() === 'comment_forum') {
-      // Display status field for moderator/admin/users.
-      if (!$comment->isNew() && ($term = $this->forumAccessRecordStorage->getForumManagerService()->getForumTermByNode($comment->getCommentedEntity())) && isset($form['author']['status'])) {
-        $form['author']['status']['#access'] = $this->forumAccessManager->userIsForumModerator($term->id(), $this->currentUser);
-      }
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function alterForumNodeForm(array &$form, FormStateInterface $form_state, $form_id) {
     /** @var \Drupal\node\NodeInterface $node */
     $node = $form_state->getFormObject()->getEntity();
@@ -96,9 +80,9 @@ class ForumAccessHelper implements ForumAccessHelperInterface {
           $form['shadow']['#access'] = $this->forumAccessManager->userIsForumModerator($term->id(), $this->currentUser);
         }
 
-        // Display comment settings for moderator/admin users.
-        if (isset($form['comment_forum'])) {
-          $form['comment_forum']['#access'] = $this->forumAccessManager->userIsForumModerator($term->id(), $this->currentUser);
+        // Display forum reply settings for moderator/admin users.
+        if (isset($form['forum_replies'])) {
+          $form['forum_replies']['#access'] = $this->forumAccessManager->userIsForumModerator($term->id(), $this->currentUser);
         }
       }
     }

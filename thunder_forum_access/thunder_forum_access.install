@@ -228,7 +228,7 @@ function thunder_forum_access_install() {
           ForumAccessMatrixInterface::PERMISSION_CREATE,
           ForumAccessMatrixInterface::PERMISSION_UPDATE_OWN,
         ],
-        'comment' => [
+        'thunder_forum_reply' => [
           ForumAccessMatrixInterface::PERMISSION_CREATE,
           ForumAccessMatrixInterface::PERMISSION_UPDATE_OWN,
         ],
@@ -244,7 +244,7 @@ function thunder_forum_access_install() {
           ForumAccessMatrixInterface::PERMISSION_DELETE_OWN,
           ForumAccessMatrixInterface::PERMISSION_UPDATE_OWN,
         ],
-        'comment' => [
+        'thunder_forum_reply' => [
           ForumAccessMatrixInterface::PERMISSION_CREATE,
           ForumAccessMatrixInterface::PERMISSION_DELETE_OWN,
           ForumAccessMatrixInterface::PERMISSION_UPDATE_OWN,
@@ -261,7 +261,7 @@ function thunder_forum_access_install() {
           ForumAccessMatrixInterface::PERMISSION_DELETE,
           ForumAccessMatrixInterface::PERMISSION_UPDATE,
         ],
-        'comment' => [
+        'thunder_forum_reply' => [
           ForumAccessMatrixInterface::PERMISSION_CREATE,
           ForumAccessMatrixInterface::PERMISSION_DELETE,
           ForumAccessMatrixInterface::PERMISSION_UPDATE,

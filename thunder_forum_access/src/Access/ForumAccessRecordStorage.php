@@ -173,7 +173,7 @@ class ForumAccessRecordStorage implements ForumAccessRecordStorageInterface {
    *         'create' => 'create',
    *         'update_own' => 'update_own',
    *       ],
-   *       'comment' => [
+   *       'thunder_forum_reply' => [
    *         'create' => 'create',
    *         'update_own' => 'update_own',
    *       ],

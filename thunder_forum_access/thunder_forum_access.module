@@ -11,8 +11,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\taxonomy\TermInterface;
 
-// @todo Rewrite to not use comment entities but forum reply entities instead.
-
 /**
  * Implements hook_entity_bundle_field_info_alter().
  */
@@ -32,17 +30,6 @@ function thunder_forum_access_form_forum_overview_alter(&$form, FormStateInterfa
 
   // Alter forum taxonomy term overview form.
   $forum_access_helper->alterForumTermOverviewForm($form, $form_state, $form_id);
-}
-
-/**
- * Implements hook_form_BASE_FORM_ID_alter() for \Drupal\comment\CommentForm.
- */
-function thunder_forum_access_form_comment_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  /** @var \Drupal\thunder_forum_access\Access\ForumAccessHelperInterface $forum_access_helper */
-  $forum_access_helper = \Drupal::service('thunder_forum_access.forum_access_helper');
-
-  // Alter forum comment form.
-  $forum_access_helper->alterForumCommentForm($form, $form_state, $form_id);
 }
 
 /**
