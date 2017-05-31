@@ -72,8 +72,8 @@ class ForumReplyListBuilder extends EntityListBuilder {
       ],
       'status' => $this->t('Status'),
       'title' => $this->t('Title'),
-      'posted_on' => [
-        'data' => $this->t('Posted on'),
+      'topic' => [
+        'data' => $this->t('Topic'),
         'class' => [RESPONSIVE_PRIORITY_LOW],
       ],
       'author' => [
@@ -106,7 +106,7 @@ class ForumReplyListBuilder extends EntityListBuilder {
     ];
 
     // Replied forum topic node.
-    $row['posted_on'] = [
+    $row['topic'] = [
       'data' => $entity->getRepliedNode()->toLink(),
     ];
 
