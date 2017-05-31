@@ -71,7 +71,7 @@ class ForumReplyListBuilder extends EntityListBuilder {
         'class' => [RESPONSIVE_PRIORITY_MEDIUM],
       ],
       'status' => $this->t('Status'),
-      'title' => $this->t('Title'),
+      'subject' => $this->t('Subject'),
       'topic' => [
         'data' => $this->t('Topic'),
         'class' => [RESPONSIVE_PRIORITY_LOW],
@@ -100,8 +100,8 @@ class ForumReplyListBuilder extends EntityListBuilder {
     // Status.
     $row['status'] = $entity->isPublished() ? $this->t('published') : $this->t('not published');
 
-    // Title.
-    $row['title'] = [
+    // Subject.
+    $row['subject'] = [
       'data' => $entity->toLink(),
     ];
 
