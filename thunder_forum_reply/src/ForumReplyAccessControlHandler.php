@@ -58,19 +58,22 @@ class ForumReplyAccessControlHandler extends EntityAccessControlHandler implemen
    */
   public function access(EntityInterface $entity, $operation, AccountInterface $account = NULL, $return_as_object = FALSE) {
     /** @var \Drupal\thunder_forum_reply\ForumReplyInterface $entity */
+
     $account = $this->prepareUser($account);
+
+    // Take parent access checks into account.
+    $access = parent::access($entity, $operation, $account, TRUE);
 
     $field_name = $entity->getFieldName();
     $node = $entity->getRepliedNode();
     $parent = $entity->hasParentReply() ? $entity->getParentReply() : NULL;
 
     // Perform parent entity access checks.
-    if (($access = $this->parentEntityAccessChecks($field_name, $account, $node, $parent))->isForbidden()) {
-      return $access;
-    }
+    $access = $access->orIf($this->parentEntityAccessChecks($field_name, $account, $node, $parent));
 
-    // Take parent access checks into account.
-    $access = $access->orIf(parent::access($entity, $operation, $account, TRUE));
+    $access
+      // Add forum reply entity to cache dependencies.
+      ->addCacheableDependency($entity);
 
     return $return_as_object ? $access : $access->isAllowed();
   }
@@ -81,14 +84,15 @@ class ForumReplyAccessControlHandler extends EntityAccessControlHandler implemen
   public function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     /** @var \Drupal\thunder_forum_reply\ForumReplyInterface $entity */
 
+    // Take parent access checks into account.
+    $access = parent::checkAccess($entity, $operation, $account);
+
     $field_name = $entity->getFieldName();
     $node = $entity->getRepliedNode();
     $parent = $entity->hasParentReply() ? $entity->getParentReply() : NULL;
 
     // Perform parent entity access checks.
-    if (($access = $this->parentEntityAccessChecks($field_name, $account, $node, $parent))->isForbidden()) {
-      return $access;
-    }
+    $access = $access->orIf($this->parentEntityAccessChecks($field_name, $account, $node, $parent));
 
     switch ($operation) {
       case 'view':
@@ -119,11 +123,11 @@ class ForumReplyAccessControlHandler extends EntityAccessControlHandler implemen
           );
 
         $access = $access->orIf($delete_access);
+        break;
     }
 
-    // Take parent access checks into account.
-    $access = $access->orIf(parent::checkAccess($entity, $operation, $account))
-      ->cachePerPermissions()
+    $access
+      // Add forum reply entity to cache dependencies.
       ->addCacheableDependency($entity);
 
     return $access;
@@ -133,6 +137,8 @@ class ForumReplyAccessControlHandler extends EntityAccessControlHandler implemen
    * {@inheritdoc}
    */
   public function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
+    $access = parent::checkCreateAccess($account, $context, $entity_bundle);
+
     $field_name = !empty($context['field_name']) ? $context['field_name'] : NULL;
 
     /** @var \Drupal\node\NodeInterface $node */
@@ -142,18 +148,13 @@ class ForumReplyAccessControlHandler extends EntityAccessControlHandler implemen
     $parent = !empty($context['pfrid']) ? $this->forumReplyStorage->load($context['pfrid']) : NULL;
 
     // Perform parent entity access checks.
-    if (($access = $this->parentEntityAccessChecks($field_name, $account, $node, $parent))->isForbidden()) {
-      return $access;
-    }
+    $access = $access->orIf($this->parentEntityAccessChecks($field_name, $account, $node, $parent));
 
     // User is allowed to create forum replies and forum replies are not
     // hidden/closed?
     $access = $access->orIf(AccessResult::allowedIf(
       $account->hasPermission('create forum replies')
     ));
-
-    // Take parent access checks into account.
-    $access = $access->orIf(parent::checkCreateAccess($account, $context, $entity_bundle));
 
     return $access;
   }
@@ -162,15 +163,16 @@ class ForumReplyAccessControlHandler extends EntityAccessControlHandler implemen
    * {@inheritdoc}
    */
   public function checkFieldAccess($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, FieldItemListInterface $items = NULL) {
+    $access = parent::checkFieldAccess($operation, $field_definition, $account, $items);
+
     if ($operation === 'edit') {
       // Status field is only visible for forum administrators.
       if ($field_definition->getName() === 'status') {
-        return AccessResult::allowedIfHasPermission($account, 'administer forums')
-          ->cachePerPermissions();
+        $access = $access->andIf(AccessResult::allowedIfHasPermission($account, 'administer forums'));
       }
     }
 
-    return parent::checkFieldAccess($operation, $field_definition, $account, $items);
+    return $access;
   }
 
   /**
