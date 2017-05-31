@@ -46,7 +46,7 @@ use Drupal\user\UserInterface;
  *   revision_table = "thunder_forum_reply_revision",
  *   revision_data_table = "thunder_forum_reply_field_revision",
  *   uri_callback = "thunder_forum_reply_uri",
- *   admin_permission = "administer forum replies",
+ *   admin_permission = "administer forums",
  *   translatable = TRUE,
  *   entity_keys = {
  *     "id" = "frid",

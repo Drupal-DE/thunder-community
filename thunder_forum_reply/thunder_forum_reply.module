@@ -377,7 +377,6 @@ function thunder_forum_reply_form_field_storage_config_edit_form_alter(&$form, F
  */
 function thunder_forum_reply_form_user_admin_permissions_alter(&$form, FormStateInterface $form_state, $form_id) {
   $disabled_permissions_for_anonymous = [
-    'administer forum replies',
     'create forum replies',
     'delete forum replies',
     'delete forum reply revisions',
