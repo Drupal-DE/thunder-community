@@ -1,0 +1,29 @@
+drupal.forum-reply-by-viewer:
+  version: VERSION
+  js:
+    js/forum-reply-by-viewer.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupalSettings
+
+drupal.forum-reply-new-indicator:
+  version: VERSION
+  js:
+    js/forum-reply-new-indicator.js: {}
+  dependencies:
+    - core/jquery
+    - core/jquery.once
+    - core/drupal
+    - history/api
+    - core/drupal.displace
+
+drupal.node-new-forum-replies-link:
+  version: VERSION
+  js:
+    js/node-new-forum-replies-link.js: {}
+  dependencies:
+    - core/jquery
+    - core/jquery.once
+    - core/drupal
+    - history/api

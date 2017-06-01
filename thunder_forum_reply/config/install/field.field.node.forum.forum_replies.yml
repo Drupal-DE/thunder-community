@@ -1,0 +1,29 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.forum_replies
+    - node.type.forum
+  module:
+    - thunder_forum_reply
+id: node.forum.forum_replies
+field_name: forum_replies
+entity_type: node
+bundle: forum
+label: Forum replies
+description: ''
+required: true
+translatable: true
+default_value:
+  -
+    status: 2
+    frid: 0
+    last_reply_timestamp: 0
+    last_reply_uid: 0
+    reply_count: 0
+default_value_callback: ''
+settings:
+  per_page: 50
+  form_location: 1
+  preview: 1
+field_type: thunder_forum_reply

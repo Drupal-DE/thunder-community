@@ -1,0 +1,272 @@
+<?php
+
+/**
+ * @file
+ * Install and update functions for "Thunder Forum Access" module.
+ */
+
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\thunder_forum_access\Access\ForumAccessMatrixInterface;
+
+/**
+ * Implements hook_schema().
+ */
+function thunder_forum_access_schema() {
+  $schema = [];
+
+  // Forum access settings.
+  $schema['thunder_forum_access'] = [
+    'description' => 'Records which {users} are a member/moderator of a forum {taxonomy_term}.',
+    'fields' => [
+      'tid' => [
+        'description' => 'The {taxonomy_term}.tid of the forum the settings are for.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'inherit_permissions' => [
+        'description' => 'Boolean indicating whether the forum {taxonomy_term} inherits its permissions from its parent.',
+        'type' => 'int',
+        'not null' => FALSE,
+        'default' => 1,
+        'size' => 'tiny',
+      ],
+      'inherit_members' => [
+        'description' => 'Boolean indicating whether the forum {taxonomy_term} inherits its member list from its parent.',
+        'type' => 'int',
+        'not null' => FALSE,
+        'default' => 1,
+        'size' => 'tiny',
+      ],
+      'inherit_moderators' => [
+        'description' => 'Boolean indicating whether the forum {taxonomy_term} inherits its moderator list from its parent.',
+        'type' => 'int',
+        'not null' => FALSE,
+        'default' => 1,
+        'size' => 'tiny',
+      ],
+    ],
+    'primary key' => [
+      'tid',
+    ],
+    'indexes' => [
+      'tid' => ['tid'],
+    ],
+    'foreign keys' => [
+      'term' => [
+        'table' => 'taxonomy_term_data',
+        'columns' => [
+          'tid' => 'tid',
+        ],
+      ],
+    ],
+  ];
+
+  // Forum users.
+  $schema['thunder_forum_access_user'] = [
+    'description' => 'Records which {users} are members/moderators of forum {taxonomy_term}s.',
+    'fields' => [
+      'tid' => [
+        'description' => 'The forum {taxonomy_term}.tid the user is a member/moderator of.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'uid' => [
+        'description' => 'The {users}.uid of the member/moderator.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'role' => [
+        'description' => 'The forum role of the member/moderator.',
+        'type' => 'varchar_ascii',
+        'not null' => TRUE,
+        'length' => 16,
+        'default' => '',
+      ],
+    ],
+    'primary key' => [
+      'tid',
+      'uid',
+      'role',
+    ],
+    'indexes' => [
+      'uid' => ['uid'],
+      'tid' => ['tid'],
+      'role' => ['role'],
+    ],
+    'foreign keys' => [
+      'user' => [
+        'table' => 'users_data',
+        'columns' => [
+          'uid' => 'uid',
+        ],
+      ],
+      'term' => [
+        'table' => 'taxonomy_term_data',
+        'columns' => [
+          'tid' => 'tid',
+        ],
+      ],
+    ],
+  ];
+
+  // Forum permissions.
+  $schema['thunder_forum_access_permission'] = [
+    'description' => 'Records permissions for forum {taxonomy_term}s.',
+    'fields' => [
+      'tid' => [
+        'description' => 'The {taxonomy_term}.tid of the forum the permission is for.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'role' => [
+        'description' => 'The forum role the permission is for.',
+        'type' => 'varchar_ascii',
+        'not null' => TRUE,
+        'length' => 16,
+        'default' => '',
+      ],
+      'target_entity_type_id' => [
+        'description' => 'The target entity type ID the permission is for.',
+        'type' => 'varchar_ascii',
+        'not null' => TRUE,
+        'length' => EntityTypeInterface::ID_MAX_LENGTH,
+        'default' => '',
+      ],
+      'permission' => [
+        'description' => 'The machine name of the permission.',
+        'type' => 'varchar_ascii',
+        'not null' => TRUE,
+        'length' => 16,
+        'default' => '',
+      ],
+    ],
+    'primary key' => [
+      'tid',
+      'role',
+      'target_entity_type_id',
+      'permission',
+    ],
+    'indexes' => [
+      'tid' => ['tid'],
+      'role' => ['role'],
+      'target_entity_type_id' => ['target_entity_type_id'],
+      'permission' => ['permission'],
+    ],
+    'foreign keys' => [
+      'term' => [
+        'table' => 'taxonomy_term_data',
+        'columns' => [
+          'tid' => 'tid',
+        ],
+      ],
+    ],
+  ];
+
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function thunder_forum_access_install() {
+  /** @var \Drupal\thunder_forum_access\Access\ForumAccessRecordStorageInterface $forum_access_record_storage */
+  $forum_access_record_storage = \Drupal::service('thunder_forum_access.forum_access_record_storage');
+
+  // Load existing forum term IDs.
+  $tids = \Drupal::database()->select('taxonomy_term_data', 'td')
+    ->fields('td', ['tid'])
+    ->condition('vid', \Drupal::config('forum.settings')->get('vocabulary'))
+    ->execute()
+    ->fetchCol();
+
+  // Add '0' for vocabulary level settings.
+  $tids[] = 0;
+
+  // Insert default forum access settings for all existing terms.
+  $query = \Drupal::database()->insert('thunder_forum_access')
+    ->fields([
+      'tid',
+      'inherit_members',
+      'inherit_moderators',
+      'inherit_permissions',
+    ]);
+
+  foreach ($tids as $tid) {
+    $query->values([
+      'tid' => $tid,
+      'inherit_members' => (int) ($tid !== 0),
+      'inherit_moderators' => (int) ($tid !== 0),
+      'inherit_permissions' => (int) ($tid !== 0),
+    ]);
+  }
+
+  $query->execute();
+
+  // Set up default top-level forum permissions.
+  $forum_access_record_storage->accessRecordLoad(0)
+    ->setPermissions(FALSE, [
+      // Anonymous user.
+      ForumAccessMatrixInterface::ROLE_ANONYMOUS => [
+        'taxonomy_term' => [
+          ForumAccessMatrixInterface::PERMISSION_VIEW,
+        ],
+      ],
+
+      // Authenticated user.
+      ForumAccessMatrixInterface::ROLE_AUTHENTICATED => [
+        'taxonomy_term' => [
+          ForumAccessMatrixInterface::PERMISSION_VIEW,
+        ],
+        'node' => [
+          ForumAccessMatrixInterface::PERMISSION_CREATE,
+          ForumAccessMatrixInterface::PERMISSION_UPDATE_OWN,
+        ],
+        'thunder_forum_reply' => [
+          ForumAccessMatrixInterface::PERMISSION_CREATE,
+          ForumAccessMatrixInterface::PERMISSION_UPDATE_OWN,
+        ],
+      ],
+
+      // Member.
+      ForumAccessMatrixInterface::ROLE_MEMBER => [
+        'taxonomy_term' => [
+          ForumAccessMatrixInterface::PERMISSION_VIEW,
+        ],
+        'node' => [
+          ForumAccessMatrixInterface::PERMISSION_CREATE,
+          ForumAccessMatrixInterface::PERMISSION_DELETE_OWN,
+          ForumAccessMatrixInterface::PERMISSION_UPDATE_OWN,
+        ],
+        'thunder_forum_reply' => [
+          ForumAccessMatrixInterface::PERMISSION_CREATE,
+          ForumAccessMatrixInterface::PERMISSION_DELETE_OWN,
+          ForumAccessMatrixInterface::PERMISSION_UPDATE_OWN,
+        ],
+      ],
+
+      // Moderator.
+      ForumAccessMatrixInterface::ROLE_MODERATOR => [
+        'taxonomy_term' => [
+          ForumAccessMatrixInterface::PERMISSION_VIEW,
+        ],
+        'node' => [
+          ForumAccessMatrixInterface::PERMISSION_CREATE,
+          ForumAccessMatrixInterface::PERMISSION_DELETE,
+          ForumAccessMatrixInterface::PERMISSION_UPDATE,
+        ],
+        'thunder_forum_reply' => [
+          ForumAccessMatrixInterface::PERMISSION_CREATE,
+          ForumAccessMatrixInterface::PERMISSION_DELETE,
+          ForumAccessMatrixInterface::PERMISSION_UPDATE,
+        ],
+      ],
+    ])
+    ->save();
+}

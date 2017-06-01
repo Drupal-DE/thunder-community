@@ -2,8 +2,8 @@
 
 namespace Drupal\thunder_forum;
 
-use Drupal\Core\Session\AccountInterface;
 use Drupal\forum\ForumManagerInterface;
+use Drupal\node\NodeInterface;
 use Drupal\taxonomy\TermInterface;
 
 /**
@@ -12,73 +12,70 @@ use Drupal\taxonomy\TermInterface;
 interface ThunderForumManagerInterface extends ForumManagerInterface {
 
   /**
-   * Returns TRUE if the forum is private (and thus only accessible by members).
+   * Return forum taxonomy term for forum node.
+   *
+   * @param \Drupal\node\NodeInterface $node
+   *   A forum node.
+   *
+   * @return \Drupal\taxonomy\TermInterface|null
+   *   The forum taxonomy term on success, otherwise NULL.
+   */
+  public function getForumTermByNode(NodeInterface $node);
+
+  /**
+   * Utility method to fetch the direct ancestor forum for a given forum.
+   *
+   * @param int $tid
+   *   The forum ID to fetch the parent for.
+   *
+   * @return \Drupal\taxonomy\TermInterface[]|null
+   *   The parent forum taxonomy term on success, otherwise NULL.
+   */
+  public function getParent($tid);
+
+  /**
+   * Utility method to fetch the direct ancestor forum ID for a given forum.
+   *
+   * @param int $tid
+   *   The forum ID to fetch the parent ID for.
+   *
+   * @return int
+   *   The parent forum taxonomy term ID on success, otherwise '0'.
+   */
+  public function getParentId($tid);
+
+  /**
+   * Returns TRUE if the given taxonomy term is a forum container.
    *
    * @param \Drupal\taxonomy\TermInterface $term
-   *   Forum term.
+   *   A taxonomy term.
    *
    * @return bool
-   *   TRUE if the forum is private.
+   *   Boolean indicating whether the given taxonomy term is a forum container.
    */
-  public function isPrivate(TermInterface $term);
+  public function isForumContainer(TermInterface $term);
 
   /**
-   * Returns TRUE if the forum is locked.
+   * Returns TRUE if the given taxonomy term is a forum term.
    *
    * @param \Drupal\taxonomy\TermInterface $term
-   *   Forum term.
+   *   A taxonomy term.
    *
    * @return bool
-   *   TRUE if the forum is locked.
+   *   Boolean indicating whether the given taxonomy term is a forum term.
    */
-  public function isLocked(TermInterface $term);
+  public function isForumTerm(TermInterface $term);
 
   /**
-   * Get list of moderators of the forum.
+   * Returns TRUE if the given form ID is for a forum taxonomy term form.
    *
-   * @param \Drupal\taxonomy\TermInterface $term
-   *   Forum term.
-   *
-   * @return \Drupal\user\UserInterface[]
-   *   List of forum moderators.
-   */
-  public function getModerators(TermInterface $term);
-
-  /**
-   * Get list of members associated to the forum.
-   *
-   * @param \Drupal\taxonomy\TermInterface $term
-   *   Forum term.
-   *
-   * @return \Drupal\user\UserInterface[]
-   *   List of forum members.
-   */
-  public function getMembers(TermInterface $term);
-
-  /**
-   * Returns TRUE if the given account is a moderator of the forum.
-   *
-   * @param \Drupal\taxonomy\TermInterface $term
-   *   Forum term.
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   Account to check.
+   * @param string $form_id
+   *   A form ID.
    *
    * @return bool
-   *   TRUE if the given account is a moderator of the forum.
+   *   Boolean indicating whether the given form ID is for a forum taxonomy term
+   *   form.
    */
-  public function isModerator(TermInterface $term, AccountInterface $account);
-
-  /**
-   * Returns TRUE if the given account is a member of the forum.
-   *
-   * @param \Drupal\taxonomy\TermInterface $term
-   *   Forum term.
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   Account to check.
-   *
-   * @return bool
-   *   TRUE if the given account is a member of the forum.
-   */
-  public function isMember(TermInterface $term, AccountInterface $account);
+  public function isForumTermForm($form_id);
 
 }

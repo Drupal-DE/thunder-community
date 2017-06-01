@@ -1,0 +1,125 @@
+<?php
+
+/**
+ * @file
+ * Provide extended access control for forums.
+ */
+
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\taxonomy\TermInterface;
+
+/**
+ * Implements hook_entity_bundle_field_info_alter().
+ */
+function thunder_forum_access_entity_bundle_field_info_alter(&$fields, EntityTypeInterface $entity_type, $bundle) {
+  // Add constraint to ensure posting to selected forum is allowed.
+  if ($entity_type->id() == 'node'  && !empty($fields['taxonomy_forums'])) {
+    $fields['taxonomy_forums']->addConstraint('ThunderForumAccessAllowedToPostInForum', []);
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function thunder_forum_access_form_forum_overview_alter(&$form, FormStateInterface $form_state, $form_id) {
+  /** @var \Drupal\thunder_forum_access\Access\ForumAccessHelperInterface $forum_access_helper */
+  $forum_access_helper = \Drupal::service('thunder_forum_access.forum_access_helper');
+
+  // Alter forum taxonomy term overview form.
+  $forum_access_helper->alterForumTermOverviewForm($form, $form_state, $form_id);
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter() for \Drupal\node\NodeForm.
+ */
+function thunder_forum_access_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  /** @var \Drupal\thunder_forum_access\Access\ForumAccessHelperInterface $forum_access_helper */
+  $forum_access_helper = \Drupal::service('thunder_forum_access.forum_access_helper');
+
+  // Alter forum node form.
+  $forum_access_helper->alterForumNodeForm($form, $form_state, $form_id);
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function thunder_forum_access_form_taxonomy_term_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  /** @var \Drupal\thunder_forum_access\Access\ForumAccessHelperInterface $forum_access_helper */
+  $forum_access_helper = \Drupal::service('thunder_forum_access.forum_access_helper');
+
+  // Alter forum taxonomy term form.
+  $forum_access_helper->alterForumTermForm($form, $form_state, $form_id);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert() for taxonomy_term entities.
+ */
+function thunder_forum_access_taxonomy_term_insert(TermInterface $entity) {
+  /** @var \Drupal\thunder_forum_access\Access\ForumAccessRecordStorageInterface $forum_access_storage */
+  $forum_access_storage = \Drupal::service('thunder_forum_access.forum_access_record_storage');
+
+  // Insert forum access record.
+  $forum_access_storage->termInsert($entity);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete() for taxonomy_term entities.
+ */
+function thunder_forum_access_taxonomy_term_delete(TermInterface $entity) {
+  /** @var \Drupal\thunder_forum_access\Access\ForumAccessRecordStorageInterface $forum_access_storage */
+  $forum_access_storage = \Drupal::service('thunder_forum_access.forum_access_record_storage');
+
+  // Delete forum access record.
+  $forum_access_storage->termDelete($entity);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave() for taxonomy_term entities.
+ */
+function thunder_forum_access_taxonomy_term_presave(TermInterface $entity) {
+  /** @var \Drupal\thunder_forum_access\Access\ForumAccessRecordStorageInterface $forum_access_storage */
+  $forum_access_storage = \Drupal::service('thunder_forum_access.forum_access_record_storage');
+
+  // Perform pre-save operations.
+  $forum_access_storage->termPreSave($entity);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update() for taxonomy_term entities.
+ */
+function thunder_forum_access_taxonomy_term_update(TermInterface $entity) {
+  /** @var \Drupal\thunder_forum_access\Access\ForumAccessRecordStorageInterface $forum_access_storage */
+  $forum_access_storage = \Drupal::service('thunder_forum_access.forum_access_record_storage');
+
+  // Update forum access record.
+  $forum_access_storage->termUpdate($entity);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete() for user entities.
+ */
+function thunder_forum_access_user_delete(AccountInterface $entity) {
+  /** @var \Drupal\thunder_forum_access\Access\ForumAccessRecordStorageInterface $forum_access_storage */
+  $forum_access_storage = \Drupal::service('thunder_forum_access.forum_access_record_storage');
+
+  // Delete forum access records.
+  $forum_access_storage->userDelete($entity);
+}
+
+/**
+ * Implements hook_thunder_forum_access_records_change().
+ */
+function thunder_forum_access_thunder_forum_access_records_change(array $tids) {
+  $tags = [];
+
+  // Build list of cache tags for affected forum taxonomy terms.
+  foreach ($tids as $tid) {
+    $tags[] = 'taxonomy_term:' . $tid;
+  }
+
+  // Invalidate cache records for affected forum taxonomy terms.
+  Cache::invalidateTags($tags);
+}

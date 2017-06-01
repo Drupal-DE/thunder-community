@@ -1,0 +1,11 @@
+forum.thunder_forum_access:
+  route_name: forum.thunder_forum_access
+  base_route: forum.overview
+  title: Access
+  weight: 200
+
+forum.page.thunder_forum_access:
+  route_name: entity.taxonomy_term.thunder_forum_access
+  base_route: forum.page
+  title: Access
+  weight: 200

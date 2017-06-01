@@ -1,0 +1,25 @@
+entity.thunder_forum_reply.view:
+  route_name: entity.thunder_forum_reply.canonical
+  base_route: entity.thunder_forum_reply.canonical
+  title: View
+
+entity.thunder_forum_reply.edit:
+  route_name: entity.thunder_forum_reply.edit_form
+  base_route: entity.thunder_forum_reply.canonical
+  title: Edit
+
+#entity.thunder_forum_reply.version_history:
+#  route_name: entity.thunder_forum_reply.version_history
+#  base_route: entity.thunder_forum_reply.canonical
+#  title: 'Revisions'
+
+entity.thunder_forum_reply.delete:
+  route_name: entity.thunder_forum_reply.delete_form
+  base_route: entity.thunder_forum_reply.canonical
+  title: Delete
+  weight: 10
+
+thunder_forum_reply.collection:
+  title: List
+  route_name: entity.thunder_forum_reply.collection
+  base_route: entity.thunder_forum_reply.collection

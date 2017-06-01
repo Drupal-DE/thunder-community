@@ -1,0 +1,8 @@
+form:
+  js:
+    js/thunder_forum_access.form.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupalSettings
+    - core/drupal.form

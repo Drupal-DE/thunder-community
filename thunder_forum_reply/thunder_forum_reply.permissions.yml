@@ -1,0 +1,31 @@
+access forum replies:
+  title: 'View published forum replies'
+
+view own unpublished forum replies:
+  title: 'View own unpublished content'
+
+create forum replies:
+  title: 'Create forum replies'
+
+delete forum replies:
+  title: 'Delete forum replies'
+
+delete own forum replies:
+  title: 'Delete own forum replies'
+
+edit forum replies:
+  title: 'Edit forum replies'
+
+edit own forum replies:
+  title: 'Edit own forum replies'
+
+view forum reply revisions:
+  title: 'View forum reply revisions'
+
+revert forum reply revisions:
+  title: 'Revert forum reply revisions'
+  description: 'Role requires permission <em>view revisions</em> and <em>edit rights</em> for nodes in question or <em>administer forums</em>.'
+
+delete forum reply revisions:
+  title: 'Delete forum reply revisions'
+  description: 'Role requires permission to <em>view revisions</em> and <em>delete rights</em> for nodes in question or <em>administer forums</em>.'

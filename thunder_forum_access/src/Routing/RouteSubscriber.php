@@ -23,11 +23,33 @@ class RouteSubscriber extends RouteSubscriberBase {
    * {@inheritdoc}
    */
   protected function alterRoutes(RouteCollection $collection) {
+    // Forum page.
     if ($route = $collection->get('forum.page')) {
       $requirements = [
         '_entity_access' => 'taxonomy_term.view',
         'taxonomy_term' => '\d+',
       ];
+
+      $route->addRequirements($requirements);
+    }
+
+    // Edit forum.
+    if ($route = $collection->get('entity.taxonomy_term.forum_edit_form')) {
+      $requirements = [
+        '_entity_access' => 'taxonomy_term.update',
+        'taxonomy_term' => '\d+',
+      ];
+
+      $route->setRequirements($requirements);
+    }
+
+    // Edit forum container.
+    if ($route = $collection->get('entity.taxonomy_term.forum_edit_container_form')) {
+      $requirements = [
+        '_entity_access' => 'taxonomy_term.update',
+        'taxonomy_term' => '\d+',
+      ];
+
       $route->setRequirements($requirements);
     }
   }

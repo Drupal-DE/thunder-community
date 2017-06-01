@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+    - thunder_forum_reply
+id: node.forum_replies
+field_name: forum_replies
+entity_type: node
+type: thunder_forum_reply
+settings: { }
+module: thunder_forum_reply
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

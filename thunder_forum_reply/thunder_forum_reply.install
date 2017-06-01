@@ -1,0 +1,163 @@
+<?php
+
+/**
+ * @file
+ * Install and update functions for "Thunder Forum Reply" module.
+ */
+
+use Drupal\comment\Entity\CommentType;
+use Drupal\field\Entity\FieldStorageConfig;
+
+/**
+ * Implements hook_requirements().
+ */
+function thunder_forum_reply_requirements($phase) {
+  $requirements = [];
+
+  switch ($phase) {
+    case 'install':
+      if (\Drupal::moduleHandler()->moduleExists('comment')) {
+        $count_forum_comments = \Drupal::entityTypeManager()
+          ->getStorage('comment')
+          ->getQuery()
+          ->condition('comment_type', 'comment_forum')
+          ->count()
+          ->execute();
+
+        // Disallow installation of module, because it would delete all existing
+        // forum comments.
+        if ($count_forum_comments > 0) {
+          $requirements['thunder_forum_reply'] = [
+            'title' => t('Thunder Forum Reply'),
+            'description' => t('Unable to install @module. All existing forum comments would be lost.', ['@module' => t('Thunder Forum Reply')]),
+            'severity' => REQUIREMENT_ERROR,
+          ];
+        }
+      }
+      break;
+  }
+
+  return $requirements;
+}
+
+/**
+ * Implements hook_schema().
+ */
+function thunder_forum_reply_schema() {
+  // Forum reply statistics.
+  $schema['thunder_forum_reply_node_statistics'] = [
+    'description' => 'Maintains statistics of forum node and forum replies posts to show "new" and "updated" flags.',
+    'fields' => [
+      'nid' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The {node}.nid of the forum node for which the statistics are compiled.',
+      ],
+      'field_name' => [
+        'type' => 'varchar_ascii',
+        'not null' => TRUE,
+        'default' => '',
+        'length' => FieldStorageConfig::NAME_MAX_LENGTH,
+        'description' => 'The field_name of the field that was used to add this forum reply.',
+      ],
+      'frid' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The {thunder_forum_reply}.frid of the last forum reply.',
+      ],
+      'last_reply_timestamp' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The Unix timestamp of the last forum reply that was posted within this node, from {thunder_forum_reply_field_data}.changed.',
+      ],
+      'last_reply_uid' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The user ID of the latest author to post a forum reply on this node, from {thunder_forum_reply_field_data}.uid.',
+      ],
+      'reply_count' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The total number of forum reply on this node.',
+      ],
+    ],
+    'primary key' => [
+      'nid',
+      'field_name',
+    ],
+    'indexes' => [
+      'last_reply_timestamp' => ['last_reply_timestamp'],
+      'reply_count' => ['reply_count'],
+      'last_reply_uid' => ['last_reply_uid'],
+    ],
+    'foreign keys' => [
+      'last_reply_author' => [
+        'table' => 'users',
+        'columns' => [
+          'last_reply_uid' => 'uid',
+        ],
+      ],
+    ],
+  ];
+
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function thunder_forum_reply_install() {
+  // By default, maintain forum node statistics for forum replies.
+  // @see \Drupal\thunder_forum_reply\ForumReplyStatisticsInterface
+  \Drupal::state()->set('thunder_forum_reply.maintain_node_statistics', TRUE);
+
+  // Uninstall default forum comments completely. Forum replies are handled via
+  // custom entity type for better access handling features.
+  if (!\Drupal::service('config.installer')->isSyncing()) {
+    // Delete 'comment_forum' node field from 'forum' bundle.
+    if (($field = FieldStorageConfig::loadByName('node', 'comment_forum'))) {
+      $field->delete();
+    }
+
+    // Delete 'comment_forum' comment type.
+    if (($comment_type = CommentType::load('comment_forum'))) {
+      $comment_type->delete();
+    }
+
+    // Purge field data now.
+    field_purge_batch(10);
+
+    // Attach 'Forum replies' field to 'Forum topic' node form.
+    /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $form_display */
+    $form_display = \Drupal::entityTypeManager()
+      ->getStorage('entity_form_display')
+      ->load('node.forum.default');
+
+    if ($form_display) {
+      $form_display->setComponent('forum_replies', [
+        'type' => 'thunder_forum_reply_default',
+      ])->save();
+    }
+
+    // Display 'Forum replies' field in 'Default' view mode of 'Forum topic'
+    // nodes.
+    /** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display */
+    $display = \Drupal::entityTypeManager()
+      ->getStorage('entity_view_display')
+      ->load('node.forum.default');
+
+    if ($display) {
+      $display->setComponent('forum_replies', [
+        'type' => 'thunder_forum_reply_default',
+      ])->save();
+    }
+  }
+}
