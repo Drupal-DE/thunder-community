@@ -147,8 +147,8 @@ class ForumReply extends ForumBase {
           ->addCacheableDependency($term);
       }
 
-      // Always hide path field, because URL paths have a given structure with no
-      // need to change.
+      // Always hide path field, because URL paths have a given structure with
+      // no need to change.
       if ($field_definition->getName() === 'path' && $operation === 'edit') {
         $access = $access->andIf(AccessResult::forbidden());
       }
