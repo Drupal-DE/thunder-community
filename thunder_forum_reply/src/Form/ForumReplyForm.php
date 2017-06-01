@@ -265,8 +265,18 @@ class ForumReplyForm extends ContentEntityForm {
         $query['page'] = $page;
       }
 
-      // Redirect to the newly posted forum reply.
-      $form_state->setRedirectUrl($reply->toUrl()
+      // Redirect to the newly posted forum reply (if access is allowed).
+      $url = Url::fromRoute('<front>');
+
+      if ($reply->access('view', $this->currentUser())) {
+        $url = $reply->toUrl();
+      }
+
+      elseif ($reply->getRepliedNode()->access('view', $this->currentUser())) {
+        $url = $reply->getRepliedNode()->toUrl();
+      }
+
+      $form_state->setRedirectUrl($url
         ->setOption('query', $query)
         ->setOption('fragment', 'forum-reply-' . $reply->id()));
     }
