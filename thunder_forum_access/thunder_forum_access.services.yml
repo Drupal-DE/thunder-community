@@ -1,4 +1,9 @@
 services:
+  access_check.thunder_forum_access.forum_term:
+    class: Drupal\thunder_forum_access\Access\ForumTermAccessCheck
+    arguments: ['@forum_manager']
+    tags:
+      - { name: access_check, applies_to: _thunder_forum_access_forum_term_access }
   thunder_forum_access.forum_access_helper:
     class: Drupal\thunder_forum_access\Access\ForumAccessHelper
     arguments: ['@thunder_forum_access.forum_access_manager', '@thunder_forum_access.forum_access_record_storage', '@current_user', '@redirect.destination']
