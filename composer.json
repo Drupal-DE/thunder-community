@@ -4,6 +4,7 @@
   "description": "Provides commmunity components for the Thunder distribution.",
   "minimum-stability": "dev",
   "require": {
+    "cweagans/composer-patches": "~1.0",
     "drupal/allowed_formats": "^1.0",
     "drupal/core": "^8.0",
     "drupal/flag": "^4.0",
@@ -11,5 +12,13 @@
     "drupal/message_history": "1.x-dev",
     "drupal/message_ui": "1.x-dev",
     "drupal/pach": "1.x-dev"
+  },
+  "enable-patching": true,
+  "extra": {
+    "patches": {
+      "drupal/core": {
+        "(DRUPAL 8.2.x only) Canonical taxonomy term link for forum vocabulary is broken [#2010132]": "https://www.drupal.org/files/issues/2010132-forum_uri_2-8.2.x.patch"
+      }
+    }
   }
 }
