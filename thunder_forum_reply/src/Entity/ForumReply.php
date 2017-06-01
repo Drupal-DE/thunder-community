@@ -421,7 +421,7 @@ class ForumReply extends ContentEntityBase implements ForumReplyInterface {
     /** @var \Drupal\thunder_forum_reply\ForumReplyStatisticsInterface $statistics */
     $statistics = \Drupal::service('thunder_forum_reply.statistics');
 
-    foreach ($entities as $id => $entity) {
+    foreach ($entities as $entity) {
       $statistics->update($entity);
     }
   }

@@ -73,7 +73,7 @@ class ForumReplyForm extends ContentEntityForm {
     $element['preview'] = [
       '#type' => 'submit',
       '#access' => $preview_mode != DRUPAL_DISABLED,
-      '#value' => t('Preview'),
+      '#value' => $this->t('Preview'),
       '#weight' => 20,
       '#submit' => ['::submitForm', '::preview'],
     ];
@@ -243,11 +243,11 @@ class ForumReplyForm extends ContentEntityForm {
       // Log action / display message to user.
       if ($insert) {
         $logger->notice('@type: added %title.', $logger_context);
-        drupal_set_message(t('@type %title has been created.', $t_args));
+        drupal_set_message($this->t('@type %title has been created.', $t_args));
       }
       else {
         $logger->notice('@type: updated %title.', $logger_context);
-        drupal_set_message(t('@type %title has been updated.', $t_args));
+        drupal_set_message($this->t('@type %title has been updated.', $t_args));
       }
 
       $query = [];
@@ -317,7 +317,7 @@ class ForumReplyForm extends ContentEntityForm {
     // Always save as a new revision.
     $reply->setNewRevision();
     $reply->setRevisionCreationTime(REQUEST_TIME);
-    $reply->setRevisionUserId(\Drupal::currentUser()->id());
+    $reply->setRevisionUserId($this->currentUser()->id());
   }
 
 }

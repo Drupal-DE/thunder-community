@@ -5,6 +5,7 @@ namespace Drupal\thunder_forum_reply\Plugin\Field\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\thunder_forum_reply\Plugin\Field\FieldType\ForumReplyItemInterface;
 
 /**
@@ -20,6 +21,8 @@ use Drupal\thunder_forum_reply\Plugin\Field\FieldType\ForumReplyItemInterface;
  */
 class ForumReplyWidget extends WidgetBase {
 
+  use StringTranslationTrait;
+
   /**
    * {@inheritdoc}
    */
@@ -29,22 +32,22 @@ class ForumReplyWidget extends WidgetBase {
     // Status.
     $element['status'] = [
       '#type' => 'radios',
-      '#title' => t('Forum replies'),
+      '#title' => $this->t('Forum replies'),
       '#title_display' => 'invisible',
       '#default_value' => $items->status,
       '#options' => [
-        ForumReplyItemInterface::OPEN => t('Open'),
-        ForumReplyItemInterface::CLOSED => t('Closed'),
-        ForumReplyItemInterface::HIDDEN => t('Hidden'),
+        ForumReplyItemInterface::OPEN => $this->t('Open'),
+        ForumReplyItemInterface::CLOSED => $this->t('Closed'),
+        ForumReplyItemInterface::HIDDEN => $this->t('Hidden'),
       ],
       ForumReplyItemInterface::OPEN => [
-        '#description' => t('Users with the "Create forum replies" permission can post forum replies.'),
+        '#description' => $this->t('Users with the "Create forum replies" permission can post forum replies.'),
       ],
       ForumReplyItemInterface::CLOSED => [
-        '#description' => t('Users cannot post forum replies, but existing forum replies will be displayed.'),
+        '#description' => $this->t('Users cannot post forum replies, but existing forum replies will be displayed.'),
       ],
       ForumReplyItemInterface::HIDDEN => [
-        '#description' => t('Forum replies are hidden from view.'),
+        '#description' => $this->t('Forum replies are hidden from view.'),
       ],
     ];
 
@@ -54,7 +57,7 @@ class ForumReplyWidget extends WidgetBase {
     if (!$this->isDefaultValueWidget($form_state) && !$items->reply_count) {
       $element['status'][ForumReplyItemInterface::HIDDEN]['#access'] = FALSE;
       // Also adjust the description of the "closed" option.
-      $element['status'][ForumReplyItemInterface::CLOSED]['#description'] = t('Users cannot post forum replies.');
+      $element['status'][ForumReplyItemInterface::CLOSED]['#description'] = $this->t('Users cannot post forum replies.');
     }
 
     // If the advanced settings tabs-set is available (normally rendered in the

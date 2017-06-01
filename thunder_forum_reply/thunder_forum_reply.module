@@ -6,7 +6,6 @@
  */
 
 // FIXME Revision field data is not deleted upon revision delete.
-
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
@@ -225,7 +224,7 @@ function thunder_forum_reply_entity_view_display_presave(EntityViewDisplayInterf
 
   // Disable the forum reply field formatter when the used view display is
   // disabled.
-  foreach ($storage->loadMultiple() as $id => $view_display) {
+  foreach ($storage->loadMultiple() as $view_display) {
     $changed = FALSE;
 
     /** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface $view_display */
@@ -589,7 +588,7 @@ function thunder_forum_reply_preprocess_forums(array &$variables) {
     elseif (!empty($variables['_topics'])) {
       $i = 0;
       /** @var \Drupal\node\NodeInterface $topic */
-      foreach ($variables['_topics'] as $id => $topic) {
+      foreach ($variables['_topics'] as $topic) {
         // Insert correct 'X new post(s)' in topic lists.
         if ($topic->_new_replies) {
           /** @var \Drupal\thunder_forum_reply\ForumReplyStorageInterface $forum_reply_storage */

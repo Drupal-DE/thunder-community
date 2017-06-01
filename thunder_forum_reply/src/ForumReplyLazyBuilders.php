@@ -8,6 +8,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RedirectDestinationInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
 
@@ -15,6 +16,8 @@ use Drupal\node\NodeInterface;
  * Defines a service for forum teply #lazy_builder callbacks.
  */
 class ForumReplyLazyBuilders {
+
+  use StringTranslationTrait;
 
   /**
    * The entity type manager.
@@ -166,7 +169,7 @@ class ForumReplyLazyBuilders {
 
     if ($reply->access('delete')) {
       $links['thunder_forum_reply-delete'] = [
-        'title' => t('Delete'),
+        'title' => $this->t('Delete'),
         'url' => $reply->toUrl('delete-form')
           ->setOption('query', $this->redirectDestination->getAsArray()),
       ];
@@ -174,14 +177,14 @@ class ForumReplyLazyBuilders {
 
     if ($reply->access('update')) {
       $links['thunder_forum_reply-edit'] = [
-        'title' => t('Edit'),
+        'title' => $this->t('Edit'),
         'url' => $reply->toUrl('edit-form'),
       ];
     }
 
     if ($reply->access('create')) {
       $links['thunder_forum_reply-create'] = [
-        'title' => t('Reply'),
+        'title' => $this->t('Reply'),
         'url' => Url::fromRoute('thunder_forum_reply.add', [
           'node' => $reply->getRepliedNodeId(),
           'field_name' => $reply->getFieldName(),

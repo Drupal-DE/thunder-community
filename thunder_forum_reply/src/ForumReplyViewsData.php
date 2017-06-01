@@ -280,7 +280,7 @@ class ForumReplyViewsData extends EntityViewsData {
     ];
 
     // Provide a relationship(s) for node entity type.
-    if ($fields = \Drupal::service('thunder_forum_reply.manager')->getFields()) {
+    if (\Drupal::service('thunder_forum_reply.manager')->getFields()) {
       $node_entity_type = \Drupal::entityTypeManager()
         ->getStorage('node')
         ->getEntityType();

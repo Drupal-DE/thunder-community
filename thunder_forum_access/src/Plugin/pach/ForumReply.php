@@ -71,7 +71,7 @@ class ForumReply extends ForumBase {
       }
 
       $access
-        // Add forum reply to cache dependencies
+        // Add forum reply to cache dependencies.
         ->addCacheableDependency($entity)
         // Add forum node to cache dependencies.
         ->addCacheableDependency($entity->getRepliedNode())
