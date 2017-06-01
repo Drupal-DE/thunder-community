@@ -135,57 +135,61 @@ class ForumReply extends ForumBase {
    * {@inheritdoc}
    */
   public function fieldAccess(AccessResultInterface &$access, $operation, FieldDefinitionInterface $field_definition, AccountInterface $account = NULL, FieldItemListInterface $items = NULL) {
-    /** @var \Drupal\thunder_forum_reply\ForumReplyInterface $reply */
-    $reply = $items->getEntity();
+    if ($items) {
+      /** @var \Drupal\thunder_forum_reply\ForumReplyInterface $reply */
+      $reply = $items->getEntity();
 
-    $term = $this->forumManager->getForumTermByNode($reply->getRepliedNode());
+      $term = $this->forumManager->getForumTermByNode($reply->getRepliedNode());
 
-    // Add forum term to cache dependencies (if available).
-    if ($term) {
-      $access
-        ->addCacheableDependency($term);
-    }
-
-    // Always hide path field, because URL paths have a given structure with no
-    // need to change.
-    if ($field_definition->getName() === 'path' && $operation === 'edit') {
-      $access = $access->andIf(AccessResult::forbidden());
-    }
-
-    // Always grant access on all fields for forum administrators.
-    elseif ($this->forumAccessManager->userIsForumAdmin($account) && !$access->isAllowed()) {
-      $access = $access->orIf(AccessResult::allowed());
-    }
-
-    // Restrict fields for non-admin users (while respecting moderators).
-    elseif (!$this->forumAccessManager->userIsForumAdmin($account) && $operation === 'edit') {
-      $is_moderator = $this->forumAccessManager->userIsForumModerator($term ? $term->id() : 0, $account);
-
-      // Build list of conditions for restricted fields.
-      $restricted_fields = [
-        'status' => $is_moderator,
-        'langcode' => FALSE,
-        'revision_log' => $is_moderator,
-      ];
-
-      if (isset($restricted_fields[$field_definition->getName()])) {
-        $field_access = AccessResult::allowedIf(
-          $restricted_fields[$field_definition->getName()]
-        );
-
-        $access = $access->isAllowed() ? $access->andIf($field_access) : $access->orIf($field_access);
+      // Add forum term to cache dependencies (if available).
+      if ($term) {
+        $access
+          ->addCacheableDependency($term);
       }
+
+      // Always hide path field, because URL paths have a given structure with no
+      // need to change.
+      if ($field_definition->getName() === 'path' && $operation === 'edit') {
+        $access = $access->andIf(AccessResult::forbidden());
+      }
+
+      // Always grant access on all fields for forum administrators.
+      elseif ($this->forumAccessManager->userIsForumAdmin($account) && !$access->isAllowed()) {
+        $access = $access->orIf(AccessResult::allowed());
+      }
+
+      // Restrict fields for non-admin users (while respecting moderators).
+      elseif (!$this->forumAccessManager->userIsForumAdmin($account) && $operation === 'edit') {
+        $is_moderator = $this->forumAccessManager->userIsForumModerator($term ? $term->id() : 0, $account);
+
+        // Build list of conditions for restricted fields.
+        $restricted_fields = [
+          'status' => $is_moderator,
+          'langcode' => FALSE,
+          'revision_log' => $is_moderator,
+        ];
+
+        if (isset($restricted_fields[$field_definition->getName()])) {
+          $field_access = AccessResult::allowedIf(
+            $restricted_fields[$field_definition->getName()]
+          );
+
+          $access = $access->isAllowed() ? $access->andIf($field_access) : $access->orIf($field_access);
+        }
+      }
+
+      $access
+        // Add forum node to cache dependencies.
+        ->addCacheableDependency($reply->getRepliedNode())
+        // Add forum reply to cache dependencies.
+        ->addCacheableDependency($reply);
     }
 
     $access
       // Cache access result per user.
       ->cachePerUser()
       // Cache per permissions.
-      ->cachePerPermissions()
-      // Add forum node to cache dependencies.
-      ->addCacheableDependency($reply->getRepliedNode())
-      // Add forum reply to cache dependencies.
-      ->addCacheableDependency($reply);
+      ->cachePerPermissions();
   }
 
 }

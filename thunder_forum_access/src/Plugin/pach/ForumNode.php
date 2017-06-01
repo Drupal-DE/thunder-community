@@ -127,59 +127,63 @@ class ForumNode extends ForumBase {
    * @see \Drupal\thunder_forum_access\Access\ForumAccessHelperInterface::alterForumNodeForm()
    */
   public function fieldAccess(AccessResultInterface &$access, $operation, FieldDefinitionInterface $field_definition, AccountInterface $account = NULL, FieldItemListInterface $items = NULL) {
-    $term = $this->forumManager->getForumTermByNode($items->getEntity());
+    if ($items) {
+      $term = $this->forumManager->getForumTermByNode($items->getEntity());
 
-    // Add forum term to cache dependencies (if available).
-    if ($term) {
-      $access
-        ->addCacheableDependency($term);
-    }
-
-    // Always hide path field, because URL paths have a given structure with no
-    // need to change.
-    if ($field_definition->getName() === 'path' && $operation === 'edit') {
-      $access = $access->andIf(AccessResult::forbidden());
-    }
-
-    // Always grant access on all fields for forum administrators.
-    elseif ($this->forumAccessManager->userIsForumAdmin($account) && !$access->isAllowed()) {
-      $access = $access->orIf(AccessResult::allowed());
-    }
-
-    // Restrict fields for non-admin users (while respecting moderators).
-    elseif (!$this->forumAccessManager->userIsForumAdmin($account) && $operation === 'edit') {
-      $is_moderator = $this->forumAccessManager->userIsForumModerator($term ? $term->id() : 0, $account);
-
-      // Build list of conditions for restricted fields.
-      $restricted_fields = [
-        'created' => FALSE,
-        'forum_replies' => $is_moderator,
-        'langcode' => FALSE,
-        'promote' => $is_moderator,
-        'publish_on' => FALSE,
-        'sticky' => $is_moderator,
-        'taxonomy_forums' => $items->getEntity()->isNew() || $is_moderator,
-        'uid' => FALSE,
-        'unpublish_on' => FALSE,
-        'revision_log' => $is_moderator,
-      ];
-
-      if (isset($restricted_fields[$field_definition->getName()])) {
-        $field_access = AccessResult::allowedIf(
-          $restricted_fields[$field_definition->getName()]
-        );
-
-        $access = $access->isAllowed() ? $access->andIf($field_access) : $access->orIf($field_access);
+      // Add forum term to cache dependencies (if available).
+      if ($term) {
+        $access
+          ->addCacheableDependency($term);
       }
+
+      // Always hide path field, because URL paths have a given structure with no
+      // need to change.
+      if ($field_definition->getName() === 'path' && $operation === 'edit') {
+        $access = $access->andIf(AccessResult::forbidden());
+      }
+
+      // Always grant access on all fields for forum administrators.
+      elseif ($this->forumAccessManager->userIsForumAdmin($account) && !$access->isAllowed()) {
+        $access = $access->orIf(AccessResult::allowed());
+      }
+
+      // Restrict fields for non-admin users (while respecting moderators).
+      elseif (!$this->forumAccessManager->userIsForumAdmin($account) && $operation === 'edit') {
+        $is_moderator = $this->forumAccessManager->userIsForumModerator($term ? $term->id() : 0, $account);
+
+        // Build list of conditions for restricted fields.
+        $restricted_fields = [
+          'created' => FALSE,
+          'forum_replies' => $is_moderator,
+          'langcode' => FALSE,
+          'promote' => $is_moderator,
+          'publish_on' => FALSE,
+          'sticky' => $is_moderator,
+          'taxonomy_forums' => $items->getEntity()->isNew() || $is_moderator,
+          'uid' => FALSE,
+          'unpublish_on' => FALSE,
+          'revision_log' => $is_moderator,
+        ];
+
+        if (isset($restricted_fields[$field_definition->getName()])) {
+          $field_access = AccessResult::allowedIf(
+            $restricted_fields[$field_definition->getName()]
+          );
+
+          $access = $access->isAllowed() ? $access->andIf($field_access) : $access->orIf($field_access);
+        }
+      }
+
+      $access
+        // Add forum node to cache dependencies.
+        ->addCacheableDependency($items->getEntity());
     }
 
     $access
       // Cache access result per user.
       ->cachePerUser()
       // Cache per permissions.
-      ->cachePerPermissions()
-      // Add forum node to cache dependencies.
-      ->addCacheableDependency($items->getEntity());
+      ->cachePerPermissions();
   }
 
 }
