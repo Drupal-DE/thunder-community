@@ -26,7 +26,7 @@ class RouteSubscriber extends RouteSubscriberBase {
     // Forum page.
     if ($route = $collection->get('forum.page')) {
       $requirements = [
-        '_entity_access' => 'taxonomy_term.view',
+        '_thunder_forum_access_forum_term_access' => 'taxonomy_term.view',
         'taxonomy_term' => '\d+',
       ];
 
@@ -36,7 +36,7 @@ class RouteSubscriber extends RouteSubscriberBase {
     // Edit forum.
     if ($route = $collection->get('entity.taxonomy_term.forum_edit_form')) {
       $requirements = [
-        '_entity_access' => 'taxonomy_term.update',
+        '_thunder_forum_access_forum_term_access' => 'taxonomy_term.update',
         'taxonomy_term' => '\d+',
       ];
 
@@ -46,7 +46,7 @@ class RouteSubscriber extends RouteSubscriberBase {
     // Edit forum container.
     if ($route = $collection->get('entity.taxonomy_term.forum_edit_container_form')) {
       $requirements = [
-        '_entity_access' => 'taxonomy_term.update',
+        '_thunder_forum_access_forum_term_access' => 'taxonomy_term.update',
         'taxonomy_term' => '\d+',
       ];
 
