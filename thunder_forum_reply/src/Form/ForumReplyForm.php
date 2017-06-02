@@ -183,6 +183,18 @@ class ForumReplyForm extends ContentEntityForm {
       // Remove the revision log message from the original forum reply entity.
       $reply->revision_log = NULL;
     }
+
+    else {
+      if (!$reply->getSubject()) {
+        $default_subject = $reply->getRepliedNode() ? $reply->getRepliedNode()->label() : '';
+
+        if ($reply->hasParentReply() && ($parent = $reply->getParentReply())) {
+          $default_subject = ltrim(preg_replace('!^' . preg_quote($this->t('RE:')) . '!i', '', $parent->getSubject()));
+        }
+
+        $reply->setSubject($this->t('RE: @title', ['@title' => $default_subject]));
+      }
+    }
   }
 
   /**
