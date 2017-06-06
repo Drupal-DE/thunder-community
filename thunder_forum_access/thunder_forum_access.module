@@ -4,8 +4,9 @@
  * @file
  * Provide extended access control for forums.
  */
-
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Database\Query\AlterableInterface;
+use Drupal\Core\Database\Query\ConditionInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -16,7 +17,7 @@ use Drupal\taxonomy\TermInterface;
  */
 function thunder_forum_access_entity_bundle_field_info_alter(&$fields, EntityTypeInterface $entity_type, $bundle) {
   // Add constraint to ensure posting to selected forum is allowed.
-  if ($entity_type->id() == 'node'  && !empty($fields['taxonomy_forums'])) {
+  if ($entity_type->id() == 'node' && !empty($fields['taxonomy_forums'])) {
     $fields['taxonomy_forums']->addConstraint('ThunderForumAccessAllowedToPostInForum', []);
   }
 }
@@ -122,4 +123,95 @@ function thunder_forum_access_thunder_forum_access_records_change(array $tids) {
 
   // Invalidate cache records for affected forum taxonomy terms.
   Cache::invalidateTags($tags);
+}
+
+/**
+ * Implements hook_query_alter().
+ */
+function thunder_forum_access_query_taxonomy_term_access_alter(AlterableInterface $query) {
+  /* @var $query \Drupal\Core\Database\Query\SelectInterface */
+  if ($query->hasTag('thunder_forum_access')) {
+    return;
+  }
+  $account = \Drupal::currentUser();
+  if ($account->hasPermission('administer forums')) {
+    // No need to add additional checks.
+    return;
+  }
+
+  $table = array_filter($query->getTables(), function ($data) {
+    return !empty($data['table']) && 'taxonomy_term_field_data' === $data['table'];
+  });
+  if (empty($table)) {
+    // Something really strange is happening.
+    return;
+  }
+  $table = reset($table);
+
+  if (!_thunder_forum_access_query_has_forum_condition($query, $table['alias'], \Drupal::config('forum.settings')->get('vocabulary'))) {
+    // The query does not return forum terms.
+    return;
+  }
+
+  // Add custom tag.
+  $query->addTag('thunder_forum_access');
+
+  // Ensure to have only terms controlled by thunder_forum_access.
+  $query->leftJoin('thunder_forum_access', 'tfa', "tfa.tid = {$table['alias']}.tid");
+  // Join to permission table (for anonymous and authenticated users).
+  $query_args = [
+    ':entity_type' => 'taxonomy_term',
+    ':permission' => 'view',
+    ':role' => $account->isAnonymous() ? 'anonymous' : 'authenticated',
+    ':uid' => $account->id(),
+  ];
+  $query->leftJoin('thunder_forum_access_permission', 'tfp1', "(tfp1.tid = {$table['alias']}.tid) AND (tfp1.target_entity_type_id = :entity_type) AND (tfp1.permission = :permission) AND (tfp1.role = :role)", $query_args);
+  // Join to collect members/moderators.
+  $query->leftJoin('thunder_forum_access_user', 'tfu', "tfu.tid = {$table['alias']}.tid");
+  // Join to permission table for members/moderators.
+  $query->leftJoin('thunder_forum_access_permission', 'tfp2', "(tfp2.tid = {$table['alias']}.tid) AND (tfp2.target_entity_type_id = :entity_type) AND (tfp2.permission = :permission) AND (tfp2.role = tfu.role) AND (tfu.uid = :uid)", $query_args);
+  // Exclude items without view permission.
+  $or = $query->orConditionGroup();
+  $or->isNull('tfa.tid');
+  $or_null = $query->orConditionGroup();
+  $or_null->isNotNull('tfp1.tid');
+  $or_null->isNotNull('tfp2.tid');
+  $or->condition($or_null);
+  $query->condition($or);
+
+  $query->distinct();
+}
+
+/**
+ * Helper function to check if a query contains a condition for "forums".
+ *
+ * @param \Drupal\Core\Database\Query\ConditionInterface $condition
+ *   The database condition to search for "vid = forums".
+ * @param string $alias
+ *   Table alias of "taxonomy_term_field_data".
+ * @param string $vid
+ *   Vocabulary name of forum terms (usually "forums").
+ *
+ * @return boolean
+ *   TRUE, if the query returns forum terms.
+ */
+function _thunder_forum_access_query_has_forum_condition(ConditionInterface $condition, $alias, $vid) {
+  foreach ($condition->conditions() as $c) {
+    if (is_scalar($c) || empty($c['field'])) {
+      continue;
+    }
+    if (is_scalar($c['field']) && ("{$alias}.vid" === $c['field'])) {
+      $value = $c['value'];
+      if (!is_array($value)) {
+        $value = [$value];
+      }
+      return in_array($vid, $value);
+    }
+    if ($c['field'] instanceof ConditionInterface) {
+      // Recurse items.
+      return _thunder_forum_access_query_has_forum_condition($c['field'], $alias, $vid);
+    }
+  }
+  // Fallback.
+  return FALSE;
 }
