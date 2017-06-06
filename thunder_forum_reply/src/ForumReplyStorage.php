@@ -175,6 +175,19 @@ class ForumReplyStorage extends SqlContentEntityStorage implements ForumReplySto
    * {@inheritdoc}
    */
   public function loadThread(NodeInterface $node, $field_name, $replies_per_page = 0, $pager_id = 0) {
+    $cache =& drupal_static('cysaffasdads', []);
+    $cid = implode('::', [
+      $node->id(),
+      $field_name,
+      $replies_per_page,
+      $pager_id,
+    ]);
+
+    // Return cached result (if any).
+    if (isset($cache[$cid])) {
+      return $cache[$cid];
+    }
+
     $query = $this->database->select('thunder_forum_reply_field_data', 'fr');
     $query->addField('fr', 'frid');
 
@@ -225,12 +238,12 @@ class ForumReplyStorage extends SqlContentEntityStorage implements ForumReplySto
 
     $frids = $query->execute()->fetchCol();
 
-    $replies = [];
+    $cache[$cid] = [];
     if ($frids) {
-      $replies = $this->loadMultiple($frids);
+      $cache[$cid] = $this->loadMultiple($frids);
     }
 
-    return $replies;
+    return $cache[$cid];
   }
 
   /**
