@@ -17,7 +17,7 @@
   "extra": {
     "patches": {
       "drupal/core": {
-        "(DRUPAL 8.2.x only) Canonical taxonomy term link for forum vocabulary is broken [#2010132]": "https://www.drupal.org/files/issues/2010132-forum_uri_2-8.2.x.patch"
+        "(DRUPAL 8.2.x only) Canonical taxonomy term link for forum vocabulary is broken [#2010132]": "https://www.drupal.org/files/issues/2010132-forum_uri_96-8.2.x.patch"
       }
     }
   }
