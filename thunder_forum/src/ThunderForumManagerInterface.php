@@ -12,6 +12,17 @@ use Drupal\taxonomy\TermInterface;
 interface ThunderForumManagerInterface extends ForumManagerInterface {
 
   /**
+   * Provides statistics for a forum.
+   *
+   * @param int $tid
+   *   The forum tid.
+   *
+   * @return \stdClass|null
+   *   Statistics for the given forum if statistics exist, else NULL.
+   */
+  public function getForumStatistics($tid);
+
+  /**
    * Return forum taxonomy term for forum node.
    *
    * @param \Drupal\node\NodeInterface $node
