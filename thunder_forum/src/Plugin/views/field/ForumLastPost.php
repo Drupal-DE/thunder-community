@@ -33,6 +33,7 @@ class ForumLastPost extends FieldPluginBase {
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\thunder_forum\ThunderForumManagerInterface $forum_manager
+   *   The forum manager.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, ThunderForumManagerInterface $forum_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);

@@ -49,7 +49,7 @@ function thunder_forum_theme($existing, $type, $theme, $path) {
       'uid' => NULL,
       'entity_id' => NULL,
       'entity_type_id' => NULL,
-    ]
+    ],
   ];
 
   // Forum statistics.
@@ -57,7 +57,7 @@ function thunder_forum_theme($existing, $type, $theme, $path) {
     'variables' => [
       'topic_count' => 0,
       'reply_count' => 0,
-    ]
+    ],
   ];
 
   return $items;

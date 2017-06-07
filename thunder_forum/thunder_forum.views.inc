@@ -13,7 +13,7 @@ function thunder_forum_views_data_alter(array &$data) {
     // Forum statistics.
     $data['taxonomy_term_field_data']['thunder_forum_statistics'] = [
       'title' => t('Forum statistics'),
-      'help' => t('Statistics about the forum.'), // TODO
+      'help' => t('Statistics about the forum.'),
       'field' => [
         'field' => 'tid',
         'id' => 'thunder_forum_statistics',
