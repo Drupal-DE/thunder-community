@@ -1,4 +1,10 @@
 services:
+  path_processor.thunder_forum:
+    class: Drupal\thunder_forum\PathProcessor\PathProcessorForum
+    tags:
+      - { name: path_processor_inbound, priority: 200 }
+      - { name: path_processor_outbound, priority: 200 }
+    arguments: ['@config.factory', '@entity_type.manager']
   thunder_forum.forum_helper:
     class: Drupal\thunder_forum\ThunderForumHelper
     arguments: ['@forum_manager']
