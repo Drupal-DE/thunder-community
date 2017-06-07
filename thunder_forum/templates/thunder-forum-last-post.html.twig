@@ -1,0 +1,23 @@
+{#
+/**
+ * @file
+ * Default theme implementation to present a forum's last post information.
+ *
+ * Available variables:
+ *   - created: The last post's created timestamp.
+ *   - name: The name of the last post's author.
+ *   - uid: The user ID of the last post's author.
+ *   - entity_id: The entity ID of the last post.
+ *   - entity_type_id: The entity type of the last post (either 'node' or
+ *     'thunder_forum_reply').
+ *   - author: The username of the post author.
+ *   - time: How long ago the post was created.
+ *
+ * @see template_preprocess_thunder_forum_last_post()
+ *
+ * @ingroup themeable
+ */
+#}
+{%- if time -%}
+  <span>{% trans %}By {{ author }} {{ time }} ago{% endtrans %}</span>
+{%- endif -%}

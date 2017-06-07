@@ -6,6 +6,24 @@
  */
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\user\Entity\User;
+
+/**
+ * Implements hook_preprocess_HOOK() for forum last post information.
+ *
+ * Default template: thunder-forum-last-post.html.twig.
+ */
+function template_preprocess_thunder_forum_last_post(&$variables) {
+  // Author name.
+  $username = [
+    '#theme' => 'username',
+    '#account' => isset($variables['uid']) ? User::load($variables['uid']) : NULL,
+  ];
+  $variables['author'] = \Drupal::service('renderer')->render($username);
+
+  // Time ago.
+  $variables['time'] = !empty($variables['created']) ? \Drupal::service('date.formatter')->formatTimeDiffSince($variables['created']) : '';
+}
 
 /**
  * Implements hook_form_BASE_FORM_ID_alter().
@@ -23,6 +41,16 @@ function thunder_forum_form_taxonomy_term_form_alter(&$form, FormStateInterface 
  */
 function thunder_forum_theme($existing, $type, $theme, $path) {
   $items = [];
+
+  // Last forum post.
+  $items['thunder_forum_last_post'] = [
+    'variables' => [
+      'created' => NULL,
+      'uid' => NULL,
+      'entity_id' => NULL,
+      'entity_type_id' => NULL,
+    ]
+  ];
 
   // Forum statistics.
   $items['thunder_forum_statistics'] = [
