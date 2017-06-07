@@ -1,0 +1,34 @@
+{#
+/**
+ * @file
+ * Default theme implementation to present forum statistics data.
+ *
+ * Available variables:
+ *   - topic_count: The number of topics a forum has.
+ *   - reply_count: The number of replies a forum has.
+ *
+ * @ingroup themeable
+ */
+#}
+{%- if topic_count or reply_count -%}
+  <ul class="thunder-forum-statistics">
+    {%- if topic_count -%}
+      <li>
+        {%- trans -%}
+          1 topic
+        {%- plural topic_count -%}
+          @count topics
+        {%- endtrans -%}
+      </li>
+    {%- endif -%}
+    {%- if topic_count -%}
+      <li>
+        {%- trans -%}
+          1 reply
+        {%- plural reply_count -%}
+          @count replies
+        {%- endtrans -%}
+      </li>
+    {%- endif -%}
+  </ul>
+{%- endif -%}

@@ -17,3 +17,20 @@ function thunder_forum_form_taxonomy_term_form_alter(&$form, FormStateInterface 
   // Alter forum taxonomy term form.
   $forum_helper->alterForumTermForm($form, $form_state, $form_id);
 }
+
+/**
+ * Implements hook_theme().
+ */
+function thunder_forum_theme($existing, $type, $theme, $path) {
+  $items = [];
+
+  // Forum statistics.
+  $items['thunder_forum_statistics'] = [
+    'variables' => [
+      'topic_count' => 0,
+      'reply_count' => 0,
+    ]
+  ];
+
+  return $items;
+}
