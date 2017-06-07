@@ -60,7 +60,7 @@ class ForumLastPost extends FieldPluginBase {
     $tid = $this->getValue($values);
     $last_post = $this->forumManager->getLastPost($tid);
 
-    if ($last_post) {
+    if ($last_post && isset($last_post->created)) {
       return [
         '#theme' => 'thunder_forum_last_post',
         '#created' => $last_post->created,
