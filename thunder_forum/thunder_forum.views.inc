@@ -19,5 +19,15 @@ function thunder_forum_views_data_alter(array &$data) {
         'id' => 'thunder_forum_statistics',
       ],
     ];
+
+    // Last forum post.
+    $data['taxonomy_term_field_data']['thunder_forum_last_post'] = [
+      'title' => t('Last forum post'),
+      'help' => t('Information about the last post in the forum.'),
+      'field' => [
+        'field' => 'tid',
+        'id' => 'thunder_forum_last_post',
+      ],
+    ];
   }
 }
