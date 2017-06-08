@@ -595,7 +595,7 @@ class ForumReply extends ContentEntityBase implements ForumReplyInterface {
    * {@inheritdoc}
    */
   public function setOwner(UserInterface $account) {
-    $this->set('user_id', $account->id());
+    $this->set('uid', $account->id());
 
     return $this;
   }
