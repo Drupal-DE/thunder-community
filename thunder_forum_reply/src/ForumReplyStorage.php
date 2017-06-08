@@ -175,7 +175,7 @@ class ForumReplyStorage extends SqlContentEntityStorage implements ForumReplySto
    * {@inheritdoc}
    */
   public function loadThread(NodeInterface $node, $field_name, $replies_per_page = 0, $pager_id = 0) {
-    $cache =& drupal_static('cysaffasdads', []);
+    $cache =& drupal_static('ForumReplyStorageInterface::loadThread', []);
     $cid = implode('::', [
       $node->id(),
       $field_name,
