@@ -53,7 +53,7 @@ class Friendship extends RelationshipPluginBase {
     $def['left_field'] = $this->definition['other field'];
     $join_other = Views::pluginManager('join')->createInstance($id, $def);
 
-    // use a short alias for this:
+    // Use a short alias for this.
     $alias = $def['table'] . '_' . $this->table;
 
     $this->alias = $this->query->addRelationship($alias, $join, $this->definition['base'], $this->relationship);
