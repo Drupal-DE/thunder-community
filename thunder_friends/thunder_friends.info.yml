@@ -1,0 +1,5 @@
+name: Thunder Friends
+description: Provides a simple way to connect users.
+core: 8.x
+type: module
+package: Thunder Community
