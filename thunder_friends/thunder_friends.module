@@ -1,0 +1,37 @@
+<?php
+
+/**
+ * @file
+ * Main functions for "Thunder Friends".
+ */
+
+use Drupal\Core\Database\Query\AlterableInterface;
+
+/**
+ * Implements hook_query_TAG_alter().
+ */
+function thunder_friends_query_thunder_friendship_relation_alter(AlterableInterface $query) {
+  if (!$query->hasTag('self_or_friend')) {
+    return;
+  }
+  /* @var $query Drupal\Core\Database\Query\SelectInterface */
+  $fields =& $query->getFields();
+  if (empty($fields['users_field_data_thunder_friendship_uid'])) {
+    return;
+  }
+
+  $current_user = \Drupal::currentUser()->id();
+
+  /* @var $view \Drupal\views\ViewExecutable */
+  $view = $query->getMetaData('view');
+  if (isset($view->argument['uid_me'])) {
+    // Set current user from argument.
+    $current_user = $view->argument['uid_me']->getValue();
+  }
+
+  $field_info = $fields['users_field_data_thunder_friendship_uid'];
+  // Replace field with expression. Unfortunately this is not possible within
+  // the relation itself.
+  $query->addExpression("CASE WHEN {$field_info['table']}.uid = :current_user THEN {$field_info['table']}_1.uid ELSE {$field_info['table']}.uid END", $field_info['alias'], [':current_user' => $current_user]);
+  unset($fields['users_field_data_thunder_friendship_uid']);
+}
