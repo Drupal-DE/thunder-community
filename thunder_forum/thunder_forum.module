@@ -5,8 +5,75 @@
  * Main functions for "Thunder Forum" module.
  */
 
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\user\Entity\User;
+
+/**
+ * Implements hook_entity_extra_field_info().
+ */
+function thunder_forum_entity_extra_field_info() {
+  $info = [];
+
+  // Node links (header).
+  $info['node']['forum']['display']['thunder_forum_links_header'] = [
+    'label' => t('Links (Header)'),
+    'description' => t('Node links for forum topic header.'),
+    'weight' => 0,
+    'visible' => FALSE,
+  ];
+
+  // Node links (footer).
+  $info['node']['forum']['display']['thunder_forum_links_footer'] = [
+    'label' => t('Links (Footer)'),
+    'description' => t('Node links for forum topic footer.'),
+    'weight' => 0,
+    'visible' => FALSE,
+  ];
+
+  return $info;
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view() for node entities.
+ */
+function thunder_forum_node_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
+  // Forum topic.
+  if ($entity->bundle() === 'forum') {
+    // Build special links array for forum topic header (if needed).
+    if ($display->getComponent('thunder_forum_links_header')) {
+      $build['thunder_forum_links_header'] = [
+        '#lazy_builder' => [
+          '\Drupal\thunder_forum\ThunderForumNodeViewBuilder::renderLinks',
+          [
+            $entity->id(),
+            $view_mode,
+            $entity->language()->getId(),
+            !empty($entity->in_preview),
+            'header',
+          ],
+        ],
+      ];
+    }
+
+    if ($display->getComponent('thunder_forum_links_header')) {
+      // Build special links array for forum topic footer (if needed).
+      $build['thunder_forum_links_footer'] = [
+        '#lazy_builder' => [
+          '\Drupal\thunder_forum\ThunderForumNodeViewBuilder::renderLinks',
+          [
+            $entity->id(),
+            $view_mode,
+            $entity->language()->getId(),
+            !empty($entity->in_preview),
+            'footer',
+          ],
+        ],
+      ];
+    }
+  }
+}
 
 /**
  * Implements hook_preprocess_HOOK() for forum last post information.

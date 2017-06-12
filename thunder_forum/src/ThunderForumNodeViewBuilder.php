@@ -25,7 +25,7 @@ class ThunderForumNodeViewBuilder extends NodeViewBuilder {
   }
 
   /**
-   * #lazy_builder callback; builds a forum node's links.
+   * Lazy builder callback; builds a forum node's links.
    *
    * This is a verbatim copy of \Drupal\node\NodeViewBuilder::renderLinks() with
    * modifications to allow splitting up forum node links to different
