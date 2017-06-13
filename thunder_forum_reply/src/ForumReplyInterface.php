@@ -23,6 +23,16 @@ interface ForumReplyInterface extends ContentEntityInterface, EntityOwnerInterfa
   const PUBLISHED = 1;
 
   /**
+   * Returns the default subject of for a forum reply.
+   *
+   * In the form 'RE: Parent item title'.
+   *
+   * @return string
+   *   The default subject.
+   */
+  public function getDefaultSubject();
+
+  /**
    * Returns the name of the field the forum reply is attached to.
    *
    * @return string

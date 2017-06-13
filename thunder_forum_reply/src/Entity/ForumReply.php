@@ -300,6 +300,22 @@ class ForumReply extends ContentEntityBase implements ForumReplyInterface {
   /**
    * {@inheritdoc}
    */
+  public function getDefaultSubject() {
+    $node = $this->getRepliedNode();
+    $parent = $this->hasParentReply() ? $this->getParentReply() : NULL;
+
+    $default_subject = $node ? $node->label() : '';
+
+    if ($parent) {
+      $default_subject = ltrim(preg_replace('!^' . preg_quote($this->t('RE:')) . '!i', '', $parent->getSubject()));
+    }
+
+    return $this->t('RE: @title', ['@title' => $default_subject]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getFieldName() {
     return $this->get('field_name')->value;
   }
