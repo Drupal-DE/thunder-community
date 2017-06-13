@@ -1,4 +1,8 @@
 services:
+  cache_context.thunder_forum_reply_link_location:
+    class: Drupal\thunder_forum_reply\Cache\ForumReplyLinkLocationCacheContext
+    tags:
+      - { name: cache.context }
   thunder_forum_reply.lazy_builders:
     class: Drupal\thunder_forum_reply\ForumReplyLazyBuilders
     arguments: ['@entity.manager', '@entity.form_builder', '@current_user', '@module_handler', '@renderer', '@redirect.destination']
