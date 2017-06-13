@@ -39,6 +39,14 @@ interface ForumReplyInterface extends ContentEntityInterface, EntityOwnerInterfa
   public function getHostname();
 
   /**
+   * Return quote text of the parent.
+   *
+   * @return string
+   *   The quotable text of the parent.
+   */
+  public function getParentQuoteText();
+
+  /**
    * Returns parent forum reply if a response to another forum reply.
    *
    * @return \Drupal\thunder_forum_reply\ForumReplyInterface|null
@@ -71,6 +79,15 @@ interface ForumReplyInterface extends ContentEntityInterface, EntityOwnerInterfa
    *   The ID of the forum topic node to which the forum reply is attached.
    */
   public function getRepliedNodeId();
+
+  /**
+   * Whether forum reply message should contain a quote of the parent on create.
+   *
+   * @return bool
+   *   Whether the forum reply message should contain a quote of the parent on
+   *   creation.
+   */
+  public function getShouldContainParentQuoteOnCreate();
 
   /**
    * Returns the subject of the forum reply.
@@ -137,6 +154,18 @@ interface ForumReplyInterface extends ContentEntityInterface, EntityOwnerInterfa
    *   The class instance that this method is called on.
    */
   public function setPublished($published);
+
+  /**
+   * Sets whether the forum reply message should contain a quote of the parent.
+   *
+   * @param bool $quote
+   *   Whether the forum reply message should contain a quote of the parent on
+   *   creation.
+   *
+   * @return static
+   *   The class instance that this method is called on.
+   */
+  public function setShouldContainParentQuoteOnCreate($quote);
 
   /**
    * Sets the subject of the forum reply.

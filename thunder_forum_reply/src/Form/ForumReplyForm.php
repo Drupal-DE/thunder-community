@@ -125,10 +125,18 @@ class ForumReplyForm extends ContentEntityForm {
 
     // Use dedicated page callback for new forum replies on entities.
     if ($reply->isNew() && !$reply->hasParentReply()) {
-      $form['#action'] = Url::fromRoute('thunder_forum_reply.add', [
-        'node' => $node->id(),
-        'field_name' => $reply->getFieldName(),
-      ])->toString();
+      if ($reply->getShouldContainParentQuoteOnCreate()) {
+        $form['#action'] = Url::fromRoute('thunder_forum_reply.quote', [
+          'node' => $node->id(),
+          'field_name' => $reply->getFieldName(),
+        ])->toString();
+      }
+      else {
+        $form['#action'] = Url::fromRoute('thunder_forum_reply.add', [
+          'node' => $node->id(),
+          'field_name' => $reply->getFieldName(),
+        ])->toString();
+      }
     }
 
     // Is in preview?
@@ -193,6 +201,11 @@ class ForumReplyForm extends ContentEntityForm {
         }
 
         $reply->setSubject($this->t('RE: @title', ['@title' => $default_subject]));
+      }
+
+      // Set quote text of parent (if any).
+      if ($reply->getShouldContainParentQuoteOnCreate() && ($quote = $reply->getParentQuoteText())) {
+        $reply->set('body', '<blockquote>' . $quote . '</blockquote>');
       }
     }
   }

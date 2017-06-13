@@ -13,6 +13,22 @@ thunder_forum_reply.add:
       node:
         type: 'entity:node'
 
+thunder_forum_reply.quote:
+  path: '/forum/reply/quote/{node}/{field_name}/{pfrid}'
+  defaults:
+    _title: 'Quote forum reply'
+    _controller: '\Drupal\thunder_forum_reply\Controller\ForumReplyCreateController::form'
+    pfrid: ~
+    quote: true
+  requirements:
+    _custom_access: '\Drupal\thunder_forum_reply\Controller\ForumReplyCreateController::formAccess'
+    node: \d+
+    pfrid: \d+
+  options:
+    parameters:
+      node:
+        type: 'entity:node'
+
 thunder_forum_reply.new_replies_node_links:
   path: '/forum/render_new_replies_node_links'
   defaults:

@@ -86,6 +86,13 @@ class ForumReply extends ContentEntityBase implements ForumReplyInterface {
   public $inPreview = NULL;
 
   /**
+   * Whether forum reply message should contain a quote of the parent on create.
+   *
+   * @var bool
+   */
+  protected $shouldContainParentQuoteOnCreate;
+
+  /**
    * {@inheritdoc}
    */
   public function access($operation = 'view', AccountInterface $account = NULL, $return_as_object = FALSE) {
@@ -307,6 +314,22 @@ class ForumReply extends ContentEntityBase implements ForumReplyInterface {
   /**
    * {@inheritdoc}
    */
+  public function getParentQuoteText() {
+    $node = $this->getRepliedNode();
+    $parent = $this->hasParentReply() ? $this->getParentReply() : NULL;
+
+    $quote = $node->hasField('body') ? $node->get('body')->first()->value : '';
+
+    if ($parent) {
+      $quote = $parent->get('body')->first()->value;
+    }
+
+    return $quote;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getParentReply() {
     return $this->get('pfrid')->entity;
   }
@@ -379,6 +402,13 @@ class ForumReply extends ContentEntityBase implements ForumReplyInterface {
    */
   public function getRevisionUserId() {
     return $this->get('revision_uid')->entity->id();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getShouldContainParentQuoteOnCreate() {
+    return $this->isNew() && $this->shouldContainParentQuoteOnCreate;
   }
 
   /**
@@ -641,6 +671,15 @@ class ForumReply extends ContentEntityBase implements ForumReplyInterface {
    */
   public function setRevisionUserId($user_id) {
     $this->set('revision_uid', $user_id);
+
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setShouldContainParentQuoteOnCreate($quote) {
+    $this->shouldContainParentQuoteOnCreate = $quote;
 
     return $this;
   }

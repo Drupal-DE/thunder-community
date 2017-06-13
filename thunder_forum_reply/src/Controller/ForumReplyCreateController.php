@@ -90,11 +90,13 @@ class ForumReplyCreateController extends ControllerBase {
    * @param int|null $pfrid
    *   (optional) Some forum replies are responses to other forum replies. In
    *   those cases, $pfrid is the parent forum reply's ID. Defaults to NULL.
+   * @param bool $quote
+   *   Whether to quote the forum reply's parent.
    *
    * @return array
    *   An renderable array containing the forum reply form.
    */
-  public function form(Request $request, NodeInterface $node, $field_name, $pfrid = NULL) {
+  public function form(Request $request, NodeInterface $node, $field_name, $pfrid = NULL, $quote = FALSE) {
     $build = [];
 
     // The user is just previewing a forum reply.
@@ -103,7 +105,8 @@ class ForumReplyCreateController extends ControllerBase {
     }
 
     // Create dummy reply entity.
-    $reply = $this->createNewForumReplyEntity($node, $field_name, $pfrid);
+    $reply = $this->createNewForumReplyEntity($node, $field_name, $pfrid)
+      ->setShouldContainParentQuoteOnCreate($quote);
 
     // Show the actual forum reply box.
     $build['reply_form'] = $this->entityFormBuilder()->getForm($reply);
