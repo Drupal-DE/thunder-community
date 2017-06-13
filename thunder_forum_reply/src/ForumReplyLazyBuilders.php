@@ -2,6 +2,7 @@
 
 namespace Drupal\thunder_forum_reply;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityFormBuilderInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -121,13 +122,16 @@ class ForumReplyLazyBuilders {
    *   The language in which the forum reply entity is being viewed.
    * @param bool $is_in_preview
    *   Whether the forum reply entity is currently being previewed.
+   * @param string|null $location
+   *   An optional links location (e.g. to split up forum reply links to several
+   *   link lists).
    *
    * @return array
    *   A renderable array representing the forum reply links.
    */
-  public function renderLinks($reply_entity_id, $view_mode, $langcode, $is_in_preview) {
+  public function renderLinks($reply_entity_id, $view_mode, $langcode, $is_in_preview, $location = NULL) {
     $links = [
-      '#theme' => 'links__thunder_forum_reply',
+      '#theme' => 'links__thunder_forum_reply' . (!empty($location) ? '__' . $location : ''),
       '#pre_render' => ['drupal_pre_render_links'],
       '#attributes' => ['class' => ['links', 'inline']],
     ];
@@ -141,11 +145,20 @@ class ForumReplyLazyBuilders {
 
       $links['thunder_forum_reply'] = $this->buildLinks($reply, $node);
 
+      // Set up cache metadata.
+      CacheableMetadata::createFromRenderArray($links)
+        ->addCacheTags($reply->getCacheTags())
+        ->addCacheContexts($reply->getCacheContexts())
+        ->addCacheContexts(['thunder_forum_reply_link_location' . (!empty($location) ? ':' . $location : '')])
+        ->mergeCacheMaxAge($reply->getCacheMaxAge())
+        ->applyTo($links);
+
       // Allow other modules to alter the forum reply links.
       $hook_context = [
         'view_mode' => $view_mode,
         'langcode' => $langcode,
         'replied_node' => $node,
+        'location' => $location,
       ];
 
       $this->moduleHandler->alter('thunder_forum_reply_links', $links, $reply, $hook_context);
@@ -160,11 +173,14 @@ class ForumReplyLazyBuilders {
    *   The forum reply object.
    * @param \Drupal\node\NodeInterface $node
    *   The forum node to which the forum reply is attached.
+   * @param string|null $location
+   *   An optional links location (e.g. to split up forum reply links to several
+   *   link lists).
    *
    * @return array
    *   An array that can be processed by drupal_pre_render_links().
    */
-  protected function buildLinks(ForumReplyInterface $reply, NodeInterface $node) {
+  protected function buildLinks(ForumReplyInterface $reply, NodeInterface $node, $location = NULL) {
     $links = [];
 
     if ($reply->access('delete')) {
@@ -194,7 +210,7 @@ class ForumReplyLazyBuilders {
     }
 
     return [
-      '#theme' => 'links__thunder_forum_reply__thunder_forum_reply',
+      '#theme' => 'links__thunder_forum_reply__thunder_forum_reply' . (!empty($location) ? '__' . $location : ''),
       '#links' => $links,
       '#attributes' => ['class' => ['links', 'inline']],
     ];

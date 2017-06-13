@@ -97,6 +97,40 @@ class ForumReplyViewBuilder extends EntityViewBuilder {
         ];
       }
 
+      // Links (header).
+      if ($display->getComponent('links_header')) {
+        $build[$id]['links_header'] = [
+          '#lazy_builder' => [
+            'thunder_forum_reply.lazy_builders:renderLinks',
+            [
+              $entity->id(),
+              $view_mode,
+              $entity->language()->getId(),
+              !empty($entity->inPreview),
+              'header',
+            ],
+          ],
+          '#create_placeholder' => TRUE,
+        ];
+      }
+
+      // Links (footer).
+      if ($display->getComponent('links_footer')) {
+        $build[$id]['links_footer'] = [
+          '#lazy_builder' => [
+            'thunder_forum_reply.lazy_builders:renderLinks',
+            [
+              $entity->id(),
+              $view_mode,
+              $entity->language()->getId(),
+              !empty($entity->inPreview),
+              'footer',
+            ],
+          ],
+          '#create_placeholder' => TRUE,
+        ];
+      }
+
       if (!isset($build[$id]['#attached'])) {
         $build[$id]['#attached'] = [];
       }
