@@ -78,6 +78,18 @@ class ForumReplyForm extends ContentEntityForm {
       '#submit' => ['::submitForm', '::preview'],
     ];
 
+    // Only show 'Cancel' button if in preview.
+    $element['cancel'] = [
+      '#type' => 'link',
+      '#title' => $this->t('Cancel'),
+      '#url' => $reply->getRepliedNode()->toUrl(),
+      '#access' => $reply->inPreview ? TRUE : FALSE,
+      '#weight' => 200,
+      '#attributes' => [
+        'class' => ['button'],
+      ],
+    ];
+
     $element['delete']['#access'] = $reply->access('delete');
     $element['delete']['#weight'] = 100;
 
