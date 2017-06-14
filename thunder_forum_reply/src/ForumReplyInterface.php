@@ -23,6 +23,14 @@ interface ForumReplyInterface extends ContentEntityInterface, EntityOwnerInterfa
   const PUBLISHED = 1;
 
   /**
+   * Gets the forum reply creation timestamp.
+   *
+   * @return int
+   *   Creation timestamp of the forum reply.
+   */
+  public function getCreatedTime();
+
+  /**
    * Returns the default subject of for a forum reply.
    *
    * In the form 'RE: Parent item title'.
