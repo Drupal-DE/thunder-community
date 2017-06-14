@@ -183,6 +183,22 @@ function thunder_forum_reply_entity_extra_field_info() {
     'visible' => TRUE,
   ];
 
+  // Forum reply links (header).
+  $info['thunder_forum_reply']['thunder_forum_reply']['display']['links_header'] = [
+    'label' => t('Links (Header)'),
+    'description' => t('Forum reply operation links for header.'),
+    'weight' => 0,
+    'visible' => FALSE,
+  ];
+
+  // Forum reply links (footer).
+  $info['thunder_forum_reply']['thunder_forum_reply']['display']['links_footer'] = [
+    'label' => t('Links (Footer)'),
+    'description' => t('Forum reply operation links for footer.'),
+    'weight' => 0,
+    'visible' => FALSE,
+  ];
+
   return $info;
 }
 

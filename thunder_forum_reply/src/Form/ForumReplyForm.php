@@ -78,6 +78,18 @@ class ForumReplyForm extends ContentEntityForm {
       '#submit' => ['::submitForm', '::preview'],
     ];
 
+    // Only show 'Cancel' button if in preview.
+    $element['cancel'] = [
+      '#type' => 'link',
+      '#title' => $this->t('Cancel'),
+      '#url' => $reply->getRepliedNode()->toUrl(),
+      '#access' => $reply->inPreview ? TRUE : FALSE,
+      '#weight' => 200,
+      '#attributes' => [
+        'class' => ['button'],
+      ],
+    ];
+
     $element['delete']['#access'] = $reply->access('delete');
     $element['delete']['#weight'] = 100;
 
@@ -125,10 +137,18 @@ class ForumReplyForm extends ContentEntityForm {
 
     // Use dedicated page callback for new forum replies on entities.
     if ($reply->isNew() && !$reply->hasParentReply()) {
-      $form['#action'] = Url::fromRoute('thunder_forum_reply.add', [
-        'node' => $node->id(),
-        'field_name' => $reply->getFieldName(),
-      ])->toString();
+      if ($reply->getShouldContainParentQuoteOnCreate()) {
+        $form['#action'] = Url::fromRoute('thunder_forum_reply.quote', [
+          'node' => $node->id(),
+          'field_name' => $reply->getFieldName(),
+        ])->toString();
+      }
+      else {
+        $form['#action'] = Url::fromRoute('thunder_forum_reply.add', [
+          'node' => $node->id(),
+          'field_name' => $reply->getFieldName(),
+        ])->toString();
+      }
     }
 
     // Is in preview?
@@ -185,14 +205,14 @@ class ForumReplyForm extends ContentEntityForm {
     }
 
     else {
+      // Set default subject.
       if (!$reply->getSubject()) {
-        $default_subject = $reply->getRepliedNode() ? $reply->getRepliedNode()->label() : '';
+        $reply->setSubject($reply->getDefaultSubject());
+      }
 
-        if ($reply->hasParentReply() && ($parent = $reply->getParentReply())) {
-          $default_subject = ltrim(preg_replace('!^' . preg_quote($this->t('RE:')) . '!i', '', $parent->getSubject()));
-        }
-
-        $reply->setSubject($this->t('RE: @title', ['@title' => $default_subject]));
+      // Set quote text of parent (if any).
+      if ($reply->getShouldContainParentQuoteOnCreate() && ($quote = $reply->getParentQuoteText())) {
+        $reply->set('body', '<blockquote>' . $quote . '</blockquote>');
       }
     }
   }

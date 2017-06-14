@@ -12,6 +12,17 @@ use Drupal\taxonomy\TermInterface;
 interface ThunderForumManagerInterface extends ForumManagerInterface {
 
   /**
+   * Provides statistics for a forum.
+   *
+   * @param int $tid
+   *   The forum tid.
+   *
+   * @return \stdClass|null
+   *   Statistics for the given forum if statistics exist, else NULL.
+   */
+  public function getForumStatistics($tid);
+
+  /**
    * Return forum taxonomy term for forum node.
    *
    * @param \Drupal\node\NodeInterface $node
@@ -21,6 +32,23 @@ interface ThunderForumManagerInterface extends ForumManagerInterface {
    *   The forum taxonomy term on success, otherwise NULL.
    */
   public function getForumTermByNode(NodeInterface $node);
+
+  /**
+   * Provides the last post information for the given forum tid.
+   *
+   * @param int $tid
+   *   The forum tid.
+   *
+   * @return \stdClass
+   *   The last post for the given forum with the following properties:
+   *     - created: The last post's created timestamp.
+   *     - name: The name of the last post's author.
+   *     - uid: The user ID of the last post's author.
+   *     - entity_id: The entity ID of the last post.
+   *     - entity_type_id: The entity type of the last post (either 'node' or
+   *       'thunder_forum_reply').
+   */
+  public function getLastPost($tid);
 
   /**
    * Utility method to fetch the direct ancestor forum for a given forum.

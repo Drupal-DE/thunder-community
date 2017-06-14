@@ -86,6 +86,13 @@ class ForumReply extends ContentEntityBase implements ForumReplyInterface {
   public $inPreview = NULL;
 
   /**
+   * Whether forum reply message should contain a quote of the parent on create.
+   *
+   * @var bool
+   */
+  protected $shouldContainParentQuoteOnCreate;
+
+  /**
    * {@inheritdoc}
    */
   public function access($operation = 'view', AccountInterface $account = NULL, $return_as_object = FALSE) {
@@ -293,6 +300,22 @@ class ForumReply extends ContentEntityBase implements ForumReplyInterface {
   /**
    * {@inheritdoc}
    */
+  public function getDefaultSubject() {
+    $node = $this->getRepliedNode();
+    $parent = $this->hasParentReply() ? $this->getParentReply() : NULL;
+
+    $default_subject = $node ? $node->label() : '';
+
+    if ($parent) {
+      $default_subject = ltrim(preg_replace('!^' . preg_quote($this->t('RE:')) . '!i', '', $parent->getSubject()));
+    }
+
+    return $this->t('RE: @title', ['@title' => $default_subject]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getFieldName() {
     return $this->get('field_name')->value;
   }
@@ -302,6 +325,22 @@ class ForumReply extends ContentEntityBase implements ForumReplyInterface {
    */
   public function getHostname() {
     return $this->get('hostname')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getParentQuoteText() {
+    $node = $this->getRepliedNode();
+    $parent = $this->hasParentReply() ? $this->getParentReply() : NULL;
+
+    $quote = $node->hasField('body') ? $node->get('body')->first()->value : '';
+
+    if ($parent) {
+      $quote = $parent->get('body')->first()->value;
+    }
+
+    return $quote;
   }
 
   /**
@@ -379,6 +418,13 @@ class ForumReply extends ContentEntityBase implements ForumReplyInterface {
    */
   public function getRevisionUserId() {
     return $this->get('revision_uid')->entity->id();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getShouldContainParentQuoteOnCreate() {
+    return $this->isNew() && $this->shouldContainParentQuoteOnCreate;
   }
 
   /**
@@ -648,10 +694,31 @@ class ForumReply extends ContentEntityBase implements ForumReplyInterface {
   /**
    * {@inheritdoc}
    */
+  public function setShouldContainParentQuoteOnCreate($quote) {
+    $this->shouldContainParentQuoteOnCreate = $quote;
+
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function setSubject($subject) {
     $this->set('title', $subject);
 
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function toUrl($rel = 'canonical', array $options = []) {
+    // Ensure URL fragment for canonical URLs.
+    if ($rel === 'canonical') {
+      $options['fragment'] = 'forum-reply-' . $this->id();
+    }
+
+    return parent::toUrl($rel, $options);
   }
 
 }

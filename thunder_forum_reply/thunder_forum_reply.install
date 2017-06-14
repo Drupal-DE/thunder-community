@@ -99,6 +99,12 @@ function thunder_forum_reply_schema() {
       'last_reply_uid' => ['last_reply_uid'],
     ],
     'foreign keys' => [
+      'last_reply' => [
+        'table' => 'thunder_forum_reply',
+        'columns' => [
+          'frid' => 'frid',
+        ],
+      ],
       'last_reply_author' => [
         'table' => 'users',
         'columns' => [

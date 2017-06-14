@@ -27,7 +27,7 @@ class MessageReplyForm extends MessageForm {
       'template' => 'thunder_private_message',
       'tpm_recipient' => $message->getOwner(),
       'tpm_title' => $this->t('Re: @title', ['@title' => $message->tpm_title->first()->value]),
-      'tpm_message' => '[quote]' . $message->tpm_message->first()->value . '[/quote]',
+      'tpm_message' => '<blockquote>' . $message->tpm_message->first()->value . '</blockquote>',
     ];
     $this->entity = Message::create($defaults);
 

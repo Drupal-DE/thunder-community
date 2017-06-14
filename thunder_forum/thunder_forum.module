@@ -5,7 +5,92 @@
  * Main functions for "Thunder Forum" module.
  */
 
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\user\Entity\User;
+
+/**
+ * Implements hook_entity_extra_field_info().
+ */
+function thunder_forum_entity_extra_field_info() {
+  $info = [];
+
+  // Forum node links (header).
+  $info['node']['forum']['display']['thunder_forum_links_header'] = [
+    'label' => t('Links (Header)'),
+    'description' => t('Node links for forum topic header.'),
+    'weight' => 0,
+    'visible' => FALSE,
+  ];
+
+  // Forum node links (footer).
+  $info['node']['forum']['display']['thunder_forum_links_footer'] = [
+    'label' => t('Links (Footer)'),
+    'description' => t('Node links for forum topic footer.'),
+    'weight' => 0,
+    'visible' => FALSE,
+  ];
+
+  return $info;
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view() for node entities.
+ */
+function thunder_forum_node_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
+  // Forum topic.
+  if ($entity->bundle() === 'forum') {
+    // Build special links array for forum topic header (if needed).
+    if ($display->getComponent('thunder_forum_links_header')) {
+      $build['thunder_forum_links_header'] = [
+        '#lazy_builder' => [
+          '\Drupal\thunder_forum\ThunderForumNodeViewBuilder::renderLinks',
+          [
+            $entity->id(),
+            $view_mode,
+            $entity->language()->getId(),
+            !empty($entity->in_preview),
+            'header',
+          ],
+        ],
+      ];
+    }
+
+    if ($display->getComponent('thunder_forum_links_header')) {
+      // Build special links array for forum topic footer (if needed).
+      $build['thunder_forum_links_footer'] = [
+        '#lazy_builder' => [
+          '\Drupal\thunder_forum\ThunderForumNodeViewBuilder::renderLinks',
+          [
+            $entity->id(),
+            $view_mode,
+            $entity->language()->getId(),
+            !empty($entity->in_preview),
+            'footer',
+          ],
+        ],
+      ];
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for forum last post information.
+ *
+ * Default template: thunder-forum-last-post.html.twig.
+ */
+function template_preprocess_thunder_forum_last_post(&$variables) {
+  // Author name.
+  $username = [
+    '#theme' => 'username',
+    '#account' => isset($variables['uid']) ? User::load($variables['uid']) : NULL,
+  ];
+  $variables['author'] = \Drupal::service('renderer')->render($username);
+
+  // Time ago.
+  $variables['time'] = !empty($variables['created']) ? \Drupal::service('date.formatter')->formatTimeDiffSince($variables['created']) : '';
+}
 
 /**
  * Implements hook_form_BASE_FORM_ID_alter().
@@ -16,4 +101,31 @@ function thunder_forum_form_taxonomy_term_form_alter(&$form, FormStateInterface 
 
   // Alter forum taxonomy term form.
   $forum_helper->alterForumTermForm($form, $form_state, $form_id);
+}
+
+/**
+ * Implements hook_theme().
+ */
+function thunder_forum_theme($existing, $type, $theme, $path) {
+  $items = [];
+
+  // Last forum post.
+  $items['thunder_forum_last_post'] = [
+    'variables' => [
+      'created' => NULL,
+      'uid' => NULL,
+      'entity_id' => NULL,
+      'entity_type_id' => NULL,
+    ],
+  ];
+
+  // Forum statistics.
+  $items['thunder_forum_statistics'] = [
+    'variables' => [
+      'topic_count' => 0,
+      'reply_count' => 0,
+    ],
+  ];
+
+  return $items;
 }

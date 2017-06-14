@@ -1,4 +1,7 @@
 services:
+  thunder_private_message.helper:
+    class: Drupal\thunder_private_message\PrivateMessageHelper
+    arguments: ['@current_user']
   thunder_private_message.message:
     class: Drupal\thunder_private_message\Breadcrumb\PrivateMessageBreadcrumbBuilder
     arguments: ['@config.factory', '@current_user']

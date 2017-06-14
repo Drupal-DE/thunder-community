@@ -231,8 +231,7 @@ class ForumReplyViewsData extends EntityViewsData {
       'relationship' => [
         'title' => $this->t('Last forum reply'),
         'help' => $this->t('The last forum reply of an entity.'),
-        'group' => $this->t('Forum reply'),
-        'base' => 'thunder_forum_reply',
+        'base' => 'thunder_forum_reply_field_data',
         'base field' => 'frid',
         'id' => 'standard',
         'label' => $this->t('Last forum reply'),
@@ -245,7 +244,7 @@ class ForumReplyViewsData extends EntityViewsData {
       'help' => $this->t('The User ID of the author of the last forum reply of an entity.'),
       'relationship' => [
         'title' => $this->t('Last forum reply author'),
-        'base' => 'users',
+        'base' => 'users_field_data',
         'base field' => 'uid',
         'id' => 'standard',
         'label' => $this->t('Last forum reply author'),
