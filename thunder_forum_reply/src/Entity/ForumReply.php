@@ -709,6 +709,9 @@ class ForumReply extends ContentEntityBase implements ForumReplyInterface {
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function toUrl($rel = 'canonical', array $options = []) {
     // Ensure URL fragment for canonical URLs.
     if ($rel === 'canonical') {
