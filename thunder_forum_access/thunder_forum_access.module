@@ -206,13 +206,13 @@ function _thunder_forum_access_query_has_forum_condition(ConditionInterface $con
       if (!is_array($value)) {
         $value = [$value];
       }
-      return in_array($vid, $value);
+      if (in_array($vid, $value)) {
+        return TRUE;
+      }
     }
-    if ($c['field'] instanceof ConditionInterface) {
-      // Recurse items.
-      return _thunder_forum_access_query_has_forum_condition($c['field'], $alias, $vid);
+    if ($c['field'] instanceof ConditionInterface && _thunder_forum_access_query_has_forum_condition($c['field'], $alias, $vid)) {
+      return TRUE;
     }
   }
-  // Fallback.
   return FALSE;
 }
