@@ -64,8 +64,8 @@ class ForumReplyAccessControlHandler extends EntityAccessControlHandler implemen
     $langcode = $entity->language()->getId();
 
     // Cache hit, no work necessary.
-    if (($return = $this->getCache($entity->uuid(), $operation, $langcode, $account)) !== NULL) {
-      return $return_as_object ? $return : $return->isAllowed();
+    if (($access = $this->getCache($entity->uuid(), $operation, $langcode, $account)) !== NULL) {
+      return $return_as_object ? $access : $access->isAllowed();
     }
 
     $access = AccessResult::neutral();
@@ -88,7 +88,7 @@ class ForumReplyAccessControlHandler extends EntityAccessControlHandler implemen
       ->addCacheableDependency($entity);
 
     // Save to cache.
-    $this->setCache($return, $entity->uuid(), $operation, $langcode, $account);
+    $this->setCache($access, $entity->uuid(), $operation, $langcode, $account);
 
     return $return_as_object ? $access : $access->isAllowed();
   }
