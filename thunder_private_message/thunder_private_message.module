@@ -267,3 +267,19 @@ function thunder_private_message_entity_type_alter(array &$entity_types) {
     ->setFormClass('pm-reply', 'Drupal\thunder_private_message\Form\MessageReplyForm')
     ->setLinkTemplate('pm-reply', '/message/{message}/reply');
 }
+
+/**
+ * Implements hook_theme().
+ */
+function thunder_private_message_theme($existing, $type, $theme, $path) {
+  $items = [];
+
+  // Unread message count.
+  $items['thunder_private_message_unread_count'] = [
+    'variables' => [
+      'unread_count' => 0,
+    ],
+  ];
+
+  return $items;
+}
