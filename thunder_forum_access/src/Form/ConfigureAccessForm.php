@@ -285,7 +285,7 @@ class ConfigureAccessForm extends FormBase {
     $permissions = !$inherit_permissions && !empty($values['permissions']) ? $values['permissions'] : [];
 
     // Create, populate and save access record.
-    $result = ($this->forumAccessRecordStorage->accessRecordCreate($values['tid']))
+    $result = $this->forumAccessRecordStorage->accessRecordCreate($values['tid'])
       ->setMemberUserIds($inherit_members, $members)
       ->setModeratorUserIds($inherit_moderators, $moderators)
       ->setPermissions($inherit_permissions, $permissions)
