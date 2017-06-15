@@ -12,6 +12,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\node\NodeInterface;
 use Drupal\node\NodeStorageInterface;
+use Drupal\thunder_forum_reply\Entity\ForumReply;
 use Drupal\thunder_forum_reply\Plugin\Field\FieldType\ForumReplyItemInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -60,6 +61,12 @@ class ForumReplyAccessControlHandler extends EntityAccessControlHandler implemen
     /** @var \Drupal\thunder_forum_reply\ForumReplyInterface $entity */
 
     $account = $this->prepareUser($account);
+    $langcode = $entity->language()->getId();
+
+    // Cache hit, no work necessary.
+    if (($access = $this->getCache($entity->uuid(), $operation, $langcode, $account)) !== NULL) {
+      return $return_as_object ? $access : $access->isAllowed();
+    }
 
     $access = AccessResult::neutral();
 
@@ -68,7 +75,7 @@ class ForumReplyAccessControlHandler extends EntityAccessControlHandler implemen
     $parent = $entity->hasParentReply() ? $entity->getParentReply() : NULL;
 
     // Perform parent entity access checks.
-    $access = $access->orIf($this->parentEntityAccessChecks($field_name, $account, $node, $parent));
+    $access = $access->orIf($this->parentEntityAccessChecks($field_name, $account, $entity, $node, $parent));
 
     // Take parent access checks into account.
     if (!$access->isForbidden()) {
@@ -79,6 +86,9 @@ class ForumReplyAccessControlHandler extends EntityAccessControlHandler implemen
     $access
       // Add forum reply entity to cache dependencies.
       ->addCacheableDependency($entity);
+
+    // Save to cache.
+    $this->setCache($access, $entity->uuid(), $operation, $langcode, $account);
 
     return $return_as_object ? $access : $access->isAllowed();
   }
@@ -98,7 +108,7 @@ class ForumReplyAccessControlHandler extends EntityAccessControlHandler implemen
       $parent = $entity->hasParentReply() ? $entity->getParentReply() : NULL;
 
       // Perform parent entity access checks.
-      $access = $access->orIf($this->parentEntityAccessChecks($field_name, $account, $node, $parent));
+      $access = $access->orIf($this->parentEntityAccessChecks($field_name, $account, $entity, $node, $parent));
 
       // Determine forum reply mode (open/closed/hidden).
       $mode = (int) $node->get($field_name)->status;
@@ -158,8 +168,15 @@ class ForumReplyAccessControlHandler extends EntityAccessControlHandler implemen
       /** @var \Drupal\thunder_forum_reply\ForumReplyInterface $parent */
       $parent = !empty($context['pfrid']) ? $this->forumReplyStorage->load($context['pfrid']) : NULL;
 
+      // Create dummy forum reply object.
+      $entity = ForumReply::create([
+        'field_name' => $field_name,
+        'node' => $node ? $node->id() : NULL,
+        'pfrid' => $parent ? $parent->id() : NULL,
+      ]);
+
       // Perform parent entity access checks.
-      $access = $access->orIf($this->parentEntityAccessChecks($field_name, $account, $node, $parent));
+      $access = $access->orIf($this->parentEntityAccessChecks($field_name, $account, $entity, $node, $parent));
 
       if (!$access->isForbidden()) {
         // User is allowed to create forum replies and forum replies are not
@@ -203,6 +220,8 @@ class ForumReplyAccessControlHandler extends EntityAccessControlHandler implemen
    *   The field_name to which the forum reply belongs.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The account to use for access checks.
+   * @param \Drupal\thunder_forum_reply\ForumReplyInterface $entity
+   *   The actual forum reply entity that is being checked.
    * @param \Drupal\node\NodeInterface|null $node
    *   The forum node to which the forum reply belongs.
    * @param \Drupal\thunder_forum_reply\ForumReplyInterface|null $parent
@@ -211,7 +230,7 @@ class ForumReplyAccessControlHandler extends EntityAccessControlHandler implemen
    * @return \Drupal\Core\Access\AccessResult
    *   The access result.
    */
-  protected function parentEntityAccessChecks($field_name, AccountInterface $account, NodeInterface $node = NULL, ForumReplyInterface $parent = NULL) {
+  protected function parentEntityAccessChecks($field_name, AccountInterface $account, ForumReplyInterface $entity, NodeInterface $node = NULL, ForumReplyInterface $parent = NULL) {
     $access = AccessResult::neutral();
 
     // Invalid forum node context.
@@ -235,9 +254,30 @@ class ForumReplyAccessControlHandler extends EntityAccessControlHandler implemen
         $access = AccessResult::forbidden('Parent forum reply belongs to other forum node');
       }
 
-      // No parent forum reply 'view' access.
-      elseif (!$parent->access('view', $account)) {
-        $access = AccessResult::forbidden('No view access for parent forum reply');
+      else {
+        $scanned_parents =& drupal_static(get_class($this) . '::' . __METHOD__ . '::scanned_parents', []);
+        $parent_to_check = clone $parent;
+
+        // Traverse up the reply hierarchy to find the first parent reply that
+        // does not reflect the current forum reply entity's publishing status
+        // (which is the only change to take into account when dealing with view
+        // access checking). The result is statically cached for all forum
+        // replies on the way up, so no parent has to be determined twice.
+        if (!isset($scanned_parents[$entity->getParentReplyId()])) {
+          $parent_ids = [$parent_to_check->id()];
+          while ($parent_to_check->hasParentReply() && $parent_to_check->isPublished() === $entity->isPublished()) {
+            $parent_to_check = $parent_to_check->getParentReply();
+            $parent_ids[] = $parent_to_check->id();
+          }
+
+          foreach ($parent_ids as $parent_id) {
+            $scanned_parents[$parent_id] = $parent_to_check;
+          }
+        }
+
+        if (!$scanned_parents[$entity->getParentReplyId()]->access('view', $account)) {
+          $access = AccessResult::forbidden('No view access for parent forum reply');
+        }
       }
     }
 

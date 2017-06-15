@@ -15,7 +15,7 @@ interface PrivateMessageHelperInterface {
    * @param \Drupal\Core\Session\AccountInterface $recipient
    *   The recipient user object.
    * @param \Drupal\Core\Session\AccountInterface|null $sender
-   *   The sender user object.
+   *   The sender user object (defaults to the current user).
    *
    * @return bool
    *   Whether the sender may write a private message to the recipient.
