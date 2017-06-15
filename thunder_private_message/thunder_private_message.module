@@ -216,19 +216,30 @@ function thunder_private_message_form_message_thunder_private_message_form_alter
  *   Returns whether the user has access to the inbox.
  */
 function thunder_private_message_list_access(AccountInterface $account) {
-  // Load the request user object.
-  $uid = \Drupal::routeMatch()->getParameter('user');
-  if ($uid instanceof AccountInterface) {
-    $uid = $uid->id();
+  // User is administrator?
+  if ($account->hasPermission('bypass thunder_private_message access')) {
+    return AccessResult::allowed()
+      ->cachePerPermissions();
   }
 
-  // Check if the current user owns the inbox.
-  if (!empty($uid) && $account->id() == $uid) {
-    return AccessResult::allowedIfHasPermission($account, 'view thunder_private_message message');
+  $access = AccessResult::allowedIfHasPermission($account, 'view thunder_private_message message');
+
+  $route_match = \Drupal::routeMatch();
+
+  // Check explicit inbox/outbox route access (if user is on one of the routes).
+  if (strpos($route_match->getRouteName(), 'view.private_messages.') === 0) {
+    // Load the request user object.
+    $uid = \Drupal::routeMatch()->getParameter('user');
+    if ($uid instanceof AccountInterface) {
+      $uid = $uid->id();
+    }
+
+    $access->orIf(AccessResult::allowedIf(!empty($uid) && $account->id() == $uid))
+      ->cachePerUser()
+      ->addCacheContexts(['route.name']);
   }
 
-  // Allow if the user has the bypass permission.
-  return AccessResult::allowedIfHasPermission($account, 'bypass thunder_private_message access');
+  return $access;
 }
 
 /**
