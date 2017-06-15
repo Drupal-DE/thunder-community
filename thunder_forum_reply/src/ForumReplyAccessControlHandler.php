@@ -60,6 +60,12 @@ class ForumReplyAccessControlHandler extends EntityAccessControlHandler implemen
     /** @var \Drupal\thunder_forum_reply\ForumReplyInterface $entity */
 
     $account = $this->prepareUser($account);
+    $langcode = $entity->language()->getId();
+
+    // Cache hit, no work necessary.
+    if (($return = $this->getCache($entity->uuid(), $operation, $langcode, $account)) !== NULL) {
+      return $return_as_object ? $return : $return->isAllowed();
+    }
 
     $access = AccessResult::neutral();
 
@@ -79,6 +85,9 @@ class ForumReplyAccessControlHandler extends EntityAccessControlHandler implemen
     $access
       // Add forum reply entity to cache dependencies.
       ->addCacheableDependency($entity);
+
+    // Save to cache.
+    $this->setCache($return, $entity->uuid(), $operation, $langcode, $account);
 
     return $return_as_object ? $access : $access->isAllowed();
   }
