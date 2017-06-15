@@ -10,6 +10,22 @@ use Drupal\Core\Session\AccountInterface;
 interface PrivateMessageHelperInterface {
 
   /**
+   * Return number of unread messages for a user.
+   *
+   * This returns the number of messages matching the following criteria:
+   *   - User is recipient of message.
+   *   - User has not flagged message as deleted.
+   *   - User has not read message yet.
+   *
+   * @param \Drupal\Core\Session\AccountInterface|null $recipient
+   *   The recipient user object (defaults to the current user).
+   *
+   * @return bool
+   *   The number of unread messages.
+   */
+  public function getUnreadCount(AccountInterface $recipient = NULL);
+
+  /**
    * Whether one user can write a private message to another user.
    *
    * @param \Drupal\Core\Session\AccountInterface $recipient
