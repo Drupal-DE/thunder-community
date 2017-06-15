@@ -4,5 +4,6 @@ core: 8.x
 type: module
 dependencies:
   - drupal:views
+  - flag:flag
   - message_ui:message_ui
 package: Thunder Community
