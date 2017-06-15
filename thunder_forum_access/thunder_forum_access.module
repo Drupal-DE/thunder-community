@@ -127,7 +127,7 @@ function thunder_forum_access_thunder_forum_access_records_change(array $tids) {
 }
 
 /**
- * Implements hook_query_alter().
+ * Implements hook_query_TAG_alter().
  */
 function thunder_forum_access_query_taxonomy_term_access_alter(AlterableInterface $query) {
   /* @var $query \Drupal\Core\Database\Query\SelectInterface */
@@ -181,6 +181,55 @@ function thunder_forum_access_query_taxonomy_term_access_alter(AlterableInterfac
   $query->condition($or);
 
   $query->distinct();
+}
+
+/**
+ * Implements hook_query_TAG_alter().
+ */
+function thunder_forum_access_query_node_access_alter(AlterableInterface $query) {
+  if (!$query->hasTag('views_forum_topics')) {
+    return;
+  }
+  $account = \Drupal::currentUser();
+  if ($account->hasPermission('administer forums')) {
+    // No need to add additional checks.
+    return;
+  }
+
+  $table = array_filter($query->getTables(), function ($data) {
+    return !empty($data['table']) && 'taxonomy_term_field_data' === $data['table'];
+  });
+  if (empty($table)) {
+    // Something really strange is happening.
+    return;
+  }
+  $table = reset($table);
+
+  // Add custom tag.
+  $query->addTag('thunder_forum_topic_access');
+
+  // Ensure to have only terms controlled by thunder_forum_access.
+  $query->leftJoin('thunder_forum_access', 'tfa', "tfa.tid = {$table['alias']}.tid");
+  // Join to permission table (for anonymous and authenticated users).
+  $query_args = [
+    ':entity_type' => 'taxonomy_term',
+    ':permission' => 'view',
+    ':role' => $account->isAnonymous() ? 'anonymous' : 'authenticated',
+    ':uid' => $account->id(),
+  ];
+  $query->leftJoin('thunder_forum_access_permission', 'tfp1', "(tfp1.tid = {$table['alias']}.tid) AND (tfp1.target_entity_type_id = :entity_type) AND (tfp1.permission = :permission) AND (tfp1.role = :role)", $query_args);
+  // Join to collect members/moderators.
+  $query->leftJoin('thunder_forum_access_user', 'tfu', "tfu.tid = {$table['alias']}.tid");
+  // Join to permission table for members/moderators.
+  $query->leftJoin('thunder_forum_access_permission', 'tfp2', "(tfp2.tid = {$table['alias']}.tid) AND (tfp2.target_entity_type_id = :entity_type) AND (tfp2.permission = :permission) AND (tfp2.role = tfu.role) AND (tfu.uid = :uid)", $query_args);
+  // Exclude items without view permission.
+  $or = $query->orConditionGroup();
+  $or->isNull('tfa.tid');
+  $or_null = $query->orConditionGroup();
+  $or_null->isNotNull('tfp1.tid');
+  $or_null->isNotNull('tfp2.tid');
+  $or->condition($or_null);
+  $query->condition($or);
 }
 
 /**
