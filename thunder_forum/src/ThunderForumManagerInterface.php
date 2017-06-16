@@ -124,6 +124,8 @@ interface ThunderForumManagerInterface extends ForumManagerInterface {
    *
    * @param \Drupal\node\NodeInterface $node
    *   A forum node.
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   A user object.
    *
    * @return bool
    *   Boolean indicating whether the given forum node has new/unread replies.
