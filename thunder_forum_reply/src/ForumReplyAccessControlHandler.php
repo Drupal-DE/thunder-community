@@ -2,12 +2,14 @@
 
 namespace Drupal\thunder_forum_reply;
 
+use Drupal\Component\Serialization\SerializationInterface;
 use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Entity\EntityHandlerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\node\NodeInterface;
@@ -15,6 +17,7 @@ use Drupal\node\NodeStorageInterface;
 use Drupal\thunder_forum_reply\Entity\ForumReply;
 use Drupal\thunder_forum_reply\Plugin\Field\FieldType\ForumReplyItemInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Defines the access control handler for the forum reply entity type.
@@ -38,6 +41,13 @@ class ForumReplyAccessControlHandler extends EntityAccessControlHandler implemen
   protected $nodeStorage;
 
   /**
+   * The serialization class to use.
+   *
+   * @var \Drupal\Component\Serialization\SerializationInterface
+   */
+  protected $serializer;
+
+  /**
    * Constructs a new ForumReplyAccessControlHandler.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
@@ -47,11 +57,12 @@ class ForumReplyAccessControlHandler extends EntityAccessControlHandler implemen
    * @param \Drupal\node\NodeStorageInterface $node_storage
    *   The node storage.
    */
-  public function __construct(EntityTypeInterface $entity_type, ForumReplyStorageInterface $forum_reply_storage, NodeStorageInterface $node_storage) {
+  public function __construct(EntityTypeInterface $entity_type, ForumReplyStorageInterface $forum_reply_storage, NodeStorageInterface $node_storage, SerializationInterface $serializer) {
     parent::__construct($entity_type);
 
     $this->forumReplyStorage = $forum_reply_storage;
     $this->nodeStorage = $node_storage;
+    $this->serializer = $serializer;
   }
 
   /**
@@ -210,6 +221,56 @@ class ForumReplyAccessControlHandler extends EntityAccessControlHandler implemen
   }
 
   /**
+   * {@inheritdoc}
+   *
+   * @todo Remove this implementation when https://www.drupal.org/node/2886800
+   * is fixed.
+   *
+   * This is a verbatim copy of EntityAccessControlHandler::createAccess() to
+   * extend the static cache ID with all values from the $context array.
+   */
+  public function createAccess($entity_bundle = NULL, AccountInterface $account = NULL, array $context = [], $return_as_object = FALSE) {
+    $account = $this->prepareUser($account);
+    $context += [
+      'entity_type_id' => $this->entityTypeId,
+      'langcode' => LanguageInterface::LANGCODE_DEFAULT,
+    ];
+
+    // Prepare context array for serialization.
+    ksort($context);
+
+    $cid = ($entity_bundle ? 'create:' . $entity_bundle : 'create') . md5($this->serializer->encode($context));
+    if (($access = $this->getCache($cid, 'create', $context['langcode'], $account)) !== NULL) {
+      // Cache hit, no work necessary.
+      return $return_as_object ? $access : $access->isAllowed();
+    }
+
+    // Invoke hook_entity_create_access() and hook_ENTITY_TYPE_create_access().
+    // Hook results take precedence over overridden implementations of
+    // EntityAccessControlHandler::checkCreateAccess(). Entities that have
+    // checks that need to be done before the hook is invoked should do so by
+    // overriding this method.
+
+    // We grant access to the entity if both of these conditions are met:
+    // - No modules say to deny access.
+    // - At least one module says to grant access.
+    $access = array_merge(
+      $this->moduleHandler()->invokeAll('entity_create_access', [$account, $context, $entity_bundle]),
+      $this->moduleHandler()->invokeAll($this->entityTypeId . '_create_access', [$account, $context, $entity_bundle])
+    );
+
+    $return = $this->processAccessHookResults($access);
+
+    // Also execute the default access check except when the access result is
+    // already forbidden, as in that case, it can not be anything else.
+    if (!$return->isForbidden()) {
+      $return = $return->orIf($this->checkCreateAccess($account, $context, $entity_bundle));
+    }
+    $result = $this->setCache($return, $cid, 'create', $context['langcode'], $account);
+    return $return_as_object ? $result : $result->isAllowed();
+  }
+
+  /**
    * Perform parent entity access checks.
    *
    * This method performs access checks against a forum reply's parent entities:
@@ -308,7 +369,8 @@ class ForumReplyAccessControlHandler extends EntityAccessControlHandler implemen
     return new static(
       $entity_type,
       $entity_type_manager->getStorage('thunder_forum_reply'),
-      $entity_type_manager->getStorage('node')
+      $entity_type_manager->getStorage('node'),
+      $container->get('serialization.phpserialize')
     );
   }
 
