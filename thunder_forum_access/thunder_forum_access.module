@@ -127,7 +127,7 @@ function thunder_forum_access_thunder_forum_access_records_change(array $tids) {
 }
 
 /**
- * Implements hook_query_alter().
+ * Implements hook_query_TAG_alter().
  */
 function thunder_forum_access_query_taxonomy_term_access_alter(AlterableInterface $query) {
   /* @var $query \Drupal\Core\Database\Query\SelectInterface */
@@ -157,8 +157,6 @@ function thunder_forum_access_query_taxonomy_term_access_alter(AlterableInterfac
   // Add custom tag.
   $query->addTag('thunder_forum_access');
 
-  // Ensure to have only terms controlled by thunder_forum_access.
-  $query->leftJoin('thunder_forum_access', 'tfa', "tfa.tid = {$table['alias']}.tid");
   // Join to permission table (for anonymous and authenticated users).
   $query_args = [
     ':entity_type' => 'taxonomy_term',
@@ -166,11 +164,7 @@ function thunder_forum_access_query_taxonomy_term_access_alter(AlterableInterfac
     ':role' => $account->isAnonymous() ? 'anonymous' : 'authenticated',
     ':uid' => $account->id(),
   ];
-  $query->leftJoin('thunder_forum_access_permission', 'tfp1', "(tfp1.tid = {$table['alias']}.tid) AND (tfp1.target_entity_type_id = :entity_type) AND (tfp1.permission = :permission) AND (tfp1.role = :role)", $query_args);
-  // Join to collect members/moderators.
-  $query->leftJoin('thunder_forum_access_user', 'tfu', "tfu.tid = {$table['alias']}.tid");
-  // Join to permission table for members/moderators.
-  $query->leftJoin('thunder_forum_access_permission', 'tfp2', "(tfp2.tid = {$table['alias']}.tid) AND (tfp2.target_entity_type_id = :entity_type) AND (tfp2.permission = :permission) AND (tfp2.role = tfu.role) AND (tfu.uid = :uid)", $query_args);
+  _thunder_forum_access_alter_query_access($query, $table['alias'], 'tid', $query_args);
   // Exclude items without view permission.
   $or = $query->orConditionGroup();
   $or->isNull('tfa.tid');
@@ -179,8 +173,134 @@ function thunder_forum_access_query_taxonomy_term_access_alter(AlterableInterfac
   $or_null->isNotNull('tfp2.tid');
   $or->condition($or_null);
   $query->condition($or);
-
   $query->distinct();
+}
+
+/**
+ * Implements hook_query_TAG_alter().
+ */
+function thunder_forum_access_query_node_access_alter(AlterableInterface $query) {
+  if (!$query->hasTag('views_forum_topics')) {
+    return;
+  }
+  $account = \Drupal::currentUser();
+  if ($account->hasPermission('administer forums')) {
+    // No need to add additional checks.
+    return;
+  }
+
+  $table = array_filter($query->getTables(), function ($data) {
+    return !empty($data['table']) && 'taxonomy_term_field_data' === $data['table'];
+  });
+  if (empty($table)) {
+    // Something really strange is happening.
+    return;
+  }
+  $table = reset($table);
+
+  // Add custom tag.
+  $query->addTag('thunder_forum_topic_access');
+
+  // Join to permission table (for anonymous and authenticated users).
+  $query_args = [
+    ':entity_type' => 'taxonomy_term',
+    ':permission' => 'view',
+    ':role' => $account->isAnonymous() ? 'anonymous' : 'authenticated',
+    ':uid' => $account->id(),
+  ];
+  _thunder_forum_access_alter_query_access($query, $table['alias'], 'tid', $query_args);
+  // Exclude items without view permission.
+  $or = $query->orConditionGroup();
+  $or->isNull('tfa.tid');
+  $or_null = $query->orConditionGroup();
+  $or_null->isNotNull('tfp1.tid');
+  $or_null->isNotNull('tfp2.tid');
+  $or->condition($or_null);
+  $query->condition($or);
+}
+
+/**
+ * Implements hook_query_alter().
+ */
+function thunder_forum_access_query_alter(AlterableInterface $query) {
+  // This is necessary because hook_query_TAG_alter() isn't called on pager
+  // queries!
+  if (!$query->hasTag('thunder_forum_reply_access')) {
+    return;
+  }
+  $account = \Drupal::currentUser();
+  if ($account->hasPermission('administer forums')) {
+    // No need to add additional checks.
+    return;
+  }
+
+  $table = array_filter($query->getTables(), function ($data) {
+    return !empty($data['table']) && 'thunder_forum_reply_field_data' === $data['table'];
+  });
+  if (empty($table)) {
+    // Something really strange is happening.
+    return;
+  }
+  $table = reset($table);
+
+  /* @var $entity Drupal\node\NodeInterface */
+  if (($base_table = $query->getMetaData('base_table')) === NULL || ($entity = $query->getMetaData('entity')) === NULL) {
+    return;
+  }
+  if (('thunder_forum_reply' !== $base_table) || ('forum' !== $entity->getType())) {
+    return;
+  }
+
+  // Join to forum index.
+  $query->join('forum_index', 'fi', 'fi.nid = fr.nid');
+
+  // Join to permission table (for anonymous and authenticated users).
+  $query_args = [
+    ':entity_type' => 'taxonomy_term',
+    ':permission' => 'view',
+    ':role' => $account->isAnonymous() ? 'anonymous' : 'moderator',
+    ':uid' => $account->id(),
+  ];
+  _thunder_forum_access_alter_query_access($query, 'fi', 'tid', $query_args);
+  $properties = [
+    'field' => 'fr.status',
+    'operator' => '=',
+    'value' => 1,
+  ];
+  // Find key of original status-condition.
+  // @see ForumReplyStorage::queryConditionPublishingStatus().
+  if (($key = _thunder_forum_access_query_find_condition($query, $properties)) !== FALSE) {
+    $conditions = & $query->conditions();
+    // Remove duplicate (and failing) condition.
+    unset($conditions[$key]);
+  }
+
+  // Limit query to show/hide unpubished replies based on permission.
+  /* @var $view_own \Drupal\Core\Database\Query\ConditionInterface */
+  $view_own = $query->orConditionGroup()
+    ->condition('fr.uid', $account->id())
+    ->condition(1, intval($account->hasPermission('view own unpublished forum replies')));
+
+  $access = $query->orConditionGroup()
+    ->isNull('tfa.tid')
+    ->condition($query->andConditionGroup()->isNotNull('tfp1.tid')->isNotNull('tfp2.tid'));
+
+  /* @var $view \Drupal\Core\Database\Query\ConditionInterface */
+  $view = $query->orConditionGroup()
+    ->condition($view_own)
+    ->condition($access);
+
+  /* @var $view_unpublished \Drupal\Core\Database\Query\ConditionInterface */
+  $view_unpublished = $query->andConditionGroup()
+    ->condition('fr.status', 0)
+    ->condition($view);
+
+  /* @var $status \Drupal\Core\Database\Query\ConditionInterface */
+  $status = $query->orConditionGroup()
+    ->condition('fr.status', 1)
+    ->condition($view_unpublished);
+
+  $query->condition($status);
 }
 
 /**
@@ -206,13 +326,65 @@ function _thunder_forum_access_query_has_forum_condition(ConditionInterface $con
       if (!is_array($value)) {
         $value = [$value];
       }
-      return in_array($vid, $value);
+      if (in_array($vid, $value)) {
+        return TRUE;
+      }
     }
-    if ($c['field'] instanceof ConditionInterface) {
-      // Recurse items.
-      return _thunder_forum_access_query_has_forum_condition($c['field'], $alias, $vid);
+    if ($c['field'] instanceof ConditionInterface && _thunder_forum_access_query_has_forum_condition($c['field'], $alias, $vid)) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+/**
+ * Find a condition based on given properties.
+ *
+ * @param \Drupal\Core\Condition\ConditionInterface $condition
+ *   The condition to search in.
+ * @param array $properties
+ *   List of properties that needs to match.
+ *
+ * @return mixed
+ *   The condition key or FALSE if no condition with the given properties
+ *   exists.
+ */
+function _thunder_forum_access_query_find_condition(ConditionInterface $condition, array $properties = []) {
+  foreach ($condition->conditions() as $key => $c) {
+    if (is_scalar($c) || empty($c['field'])) {
+      continue;
+    }
+    // Compare properties.
+    if (is_array($c) && array_intersect($properties, $c) == $properties) {
+      return $key;
+    }
+    if ($c['field'] instanceof ConditionInterface && _thunder_forum_access_query_find_condition($c['field'], $properties) !== FALSE) {
+      return $key;
     }
   }
   // Fallback.
   return FALSE;
+}
+
+/**
+ * Add necessary joins to the given query to limit forum access.
+ *
+ * @param \Drupal\Core\Database\Query\AlterableInterface $query
+ *   The query to alter.
+ * @param string $table_alias
+ *   Table alias of base table.
+ * @param string $column
+ *   Column in base table to join with.
+ * @param array $query_args
+ *   Additional query arguments.
+ */
+function _thunder_forum_access_alter_query_access(AlterableInterface &$query, $table_alias, $column = 'tid', array $query_args = []) {
+  // Ensure to have only terms controlled by thunder_forum_access.
+  $query->leftJoin('thunder_forum_access', 'tfa', "tfa.tid = {$table_alias}.{$column}");
+  // Join to permission table.
+  $query->leftJoin('thunder_forum_access_permission', 'tfp1', "(tfp1.tid = {$table_alias}.{$column}) AND (tfp1.target_entity_type_id = :entity_type) AND (tfp1.permission = :permission) AND (tfp1.role = :role)", $query_args);
+  // Join to collect members/moderators.
+  $query->leftJoin('thunder_forum_access_user', 'tfu', "(tfu.tid = {$table_alias}.{$column}) AND (tfu.uid = :uid)", $query_args);
+  // Join to permission table for members/moderators.
+  $query->leftJoin('thunder_forum_access_permission', 'tfp2', "(tfp2.tid = {$table_alias}.{$column}) AND (tfp2.target_entity_type_id = :entity_type) AND (tfp2.permission = :permission) AND (tfp2.role = tfu.role)", $query_args);
 }
