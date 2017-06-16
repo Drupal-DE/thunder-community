@@ -1,7 +1,10 @@
 services:
   thunder_private_message.helper:
     class: Drupal\thunder_private_message\PrivateMessageHelper
-    arguments: ['@current_user']
+    arguments: ['@database', '@entity_type.manager', '@current_user']
+  thunder_private_message.lazy_builder:
+    class: Drupal\thunder_private_message\PrivateMessageLazyBuilder
+    arguments: ['@entity_type.manager', '@thunder_private_message.helper']
   thunder_private_message.message:
     class: Drupal\thunder_private_message\Breadcrumb\PrivateMessageBreadcrumbBuilder
     arguments: ['@config.factory', '@current_user']
