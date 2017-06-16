@@ -112,7 +112,7 @@ class ForumAccessRecordStorage implements ForumAccessRecordStorageInterface {
       $permissions = !empty($permissions[$tid]) ? $permissions[$tid] : [];
 
       // Create and populate forum access record.
-      $record = ($this->accessRecordCreate($tid))
+      $record = $this->accessRecordCreate($tid)
         ->setMemberUserIds($inherit_members, $members)
         ->setModeratorUserIds($inherit_moderators, $moderators)
         ->setPermissions($inherit_permissions, $permissions);
