@@ -352,4 +352,37 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
     ]);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function isHotTopic(NodeInterface $node) {
+    $hot_threshold = $this->configFactory->get('forum.settings')->get('topics.hot_threshold');
+
+    // Forum reply entity type is not used instead of comments?
+    if (!$this->moduleHandler->moduleExists('thunder_forum_reply')) {
+      $query = $this->connection->select('comment_entity_statistics', 'ces')
+          ->fields('ces', [
+          'comment_count',
+        ])
+        ->condition('ces.entity_id', $node->id())
+        ->condition('ces.entity_type', 'node')
+        ->condition('ces.field_name', 'comment_forum');
+
+      $comment_count = $query->execute()->fetchField();
+
+      return $comment_count > $hot_threshold;
+    }
+
+    $query = $this->connection->select('thunder_forum_reply_node_statistics', 'frns')
+      ->fields('frns', [
+        'reply_count',
+      ])
+      ->condition('frns.nid', $node->id())
+      ->condition('frns.field_name', 'forum_replies');
+
+    $reply_count = $query->execute()->fetchField();
+
+    return $reply_count > $hot_threshold;
+  }
+
 }

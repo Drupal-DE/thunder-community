@@ -106,4 +106,16 @@ interface ThunderForumManagerInterface extends ForumManagerInterface {
    */
   public function isForumTermForm($form_id);
 
+  /**
+   * Returns TRUE if the given forum node is hot.
+   *
+   * @param \Drupal\node\NodeInterface $node
+   *   A forum node.
+   *
+   * @return bool
+   *   Boolean indicating whether the given forum node is hot (has more replies
+   *   than the threshold to be considered "hot".
+   */
+  public function isHotTopic(NodeInterface $node);
+
 }
