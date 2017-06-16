@@ -109,6 +109,18 @@ function thunder_forum_form_taxonomy_term_form_alter(&$form, FormStateInterface 
 function thunder_forum_theme($existing, $type, $theme, $path) {
   $items = [];
 
+  // Forum icon.
+  $items['thunder_forum_icon'] = [
+    'variables' => [
+      'entity' => NULL,
+      'identifier' => NULL,
+      'locked' => NULL,
+      'hot' => NULL,
+      'new' => NULL,
+      'own' => NULL,
+    ],
+  ];
+
   // Last forum post.
   $items['thunder_forum_last_post'] = [
     'variables' => [
