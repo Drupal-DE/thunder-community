@@ -276,6 +276,9 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
     $topics = [];
     $first_new_found = FALSE;
 
+    /** @var \Drupal\thunder_forum_reply\ForumReplyManagerInterface $forum_reply_manager */
+    $forum_reply_manager = \Drupal::service('thunder_forum_reply.manager');
+
     foreach ($result as $topic) {
       if ($account->isAuthenticated()) {
         // A forum is new if the topic is new, or if there are new forum replies
@@ -285,8 +288,7 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
         }
         else {
           $history = $this->lastVisit($topic->id(), $account);
-          /** @var \Drupal\thunder_forum_reply\ForumReplyManagerInterface $forum_reply_manager */
-          $forum_reply_manager = \Drupal::service('thunder_forum_reply.manager');
+
           // This special variable handling of new_replies is needed, because
           // template_preprocess_forums() would throw an error otherwise due to
           // the missing forum comment field.
@@ -383,6 +385,27 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
     $reply_count = $query->execute()->fetchField();
 
     return $reply_count > $hot_threshold;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isTopicWithNewReplies(NodeInterface $node, AccountInterface $account) {
+    if ($account->isAnonymous()) {
+      return FALSE;
+    }
+
+    $history = $this->lastVisit($node->id(), $account);
+
+    // Forum reply entity type is not used instead of comments?
+    if (!$this->moduleHandler->moduleExists('thunder_forum_reply')) {
+      return $this->commentManager->getCountNewComments($node, 'comment_forum', $history) > 0;
+    }
+
+    /** @var \Drupal\thunder_forum_reply\ForumReplyManagerInterface $forum_reply_manager */
+    $forum_reply_manager = \Drupal::service('thunder_forum_reply.manager');
+
+    return $forum_reply_manager->getCountNewReplies($node, 'forum_replies', $history) > 0;
   }
 
 }

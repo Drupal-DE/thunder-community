@@ -2,6 +2,7 @@
 
 namespace Drupal\thunder_forum;
 
+use Drupal\Core\Session\AccountInterface;
 use Drupal\forum\ForumManagerInterface;
 use Drupal\node\NodeInterface;
 use Drupal\taxonomy\TermInterface;
@@ -117,5 +118,16 @@ interface ThunderForumManagerInterface extends ForumManagerInterface {
    *   than the threshold to be considered "hot".
    */
   public function isHotTopic(NodeInterface $node);
+
+  /**
+   * Returns TRUE if the given forum node has new/unread replies.
+   *
+   * @param \Drupal\node\NodeInterface $node
+   *   A forum node.
+   *
+   * @return bool
+   *   Boolean indicating whether the given forum node has new/unread replies.
+   */
+  public function isTopicWithNewReplies(NodeInterface $node, AccountInterface $account);
 
 }
