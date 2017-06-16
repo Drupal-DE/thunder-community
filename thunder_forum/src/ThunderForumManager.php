@@ -408,4 +408,20 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
     return $forum_reply_manager->getCountNewReplies($node, 'forum_replies', $history) > 0;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function isUnreadTopic(NodeInterface $node, AccountInterface $account) {
+    $query = $this->connection->select('node_field_data', 'n');
+    $query->leftJoin('history', 'h', 'n.nid = h.nid AND h.uid = :uid', [':uid' => $account->id()]);
+    $query->addExpression('COUNT(n.nid)', 'count');
+
+    return $query
+      ->condition('n.nid', $node->id())
+      ->condition('n.created', HISTORY_READ_LIMIT, '>')
+      ->isNull('h.nid')
+      ->execute()
+      ->fetchField() > 0;
+  }
+
 }

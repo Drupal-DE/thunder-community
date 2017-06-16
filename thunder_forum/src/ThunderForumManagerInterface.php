@@ -130,4 +130,18 @@ interface ThunderForumManagerInterface extends ForumManagerInterface {
    */
   public function isTopicWithNewReplies(NodeInterface $node, AccountInterface $account);
 
+  /**
+   * Returns TRUE if the given forum node was not read by the given user yet.
+   *
+   * @param \Drupal\node\NodeInterface $node
+   *   A forum node.
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   A user object.
+   *
+   * @return bool
+   *   Boolean indicating whether the given forum node was not read by the given
+   *   user yet.
+   */
+  public function isUnreadTopic(NodeInterface $node, AccountInterface $account);
+
 }
