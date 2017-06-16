@@ -12,3 +12,6 @@ services:
   thunder_forum.forum_helper:
     class: Drupal\thunder_forum\ThunderForumHelper
     arguments: ['@forum_manager']
+  thunder_forum.lazy_builder:
+    class: Drupal\thunder_forum\ThunderForumLazyBuilder
+    arguments: ['@entity_type.manager', '@module_handler']
