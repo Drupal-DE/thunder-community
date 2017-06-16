@@ -35,6 +35,10 @@ class PrivateMessageHelper implements PrivateMessageHelperInterface {
   /**
    * Constructs a new PrivateMessageHelper.
    *
+   * @param \Drupal\Core\Database\Connection $database
+   *   The active database connection.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
    */
@@ -87,7 +91,7 @@ class PrivateMessageHelper implements PrivateMessageHelperInterface {
     $query->leftJoin('flagging', 'f', 'r.entity_id = f.entity_id AND f.entity_type = :entity_type AND f.flag_id = :flag_id AND f.uid = :uid', [
       ':entity_type' => $entity_type->id(),
       ':flag_id' => $flag_id,
-      ':uid' => $recipient->id()
+      ':uid' => $recipient->id(),
     ]);
 
     // Add conditions to only get count for private messages where the
