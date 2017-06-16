@@ -9,7 +9,29 @@
  * Implements hook_views_data_alter().
  */
 function thunder_forum_views_data_alter(array &$data) {
+  if (isset($data['node_field_data'])) {
+    // Forum topic icon.
+    $data['node_field_data']['thunder_forum_icon'] = [
+      'title' => t('Forum content icon'),
+      'help' => t('The forum content icon.'),
+      'field' => [
+        'field' => 'nid',
+        'id' => 'thunder_forum_node_icon',
+      ],
+    ];
+  }
+
   if (isset($data['taxonomy_term_field_data'])) {
+    // Forum icon.
+    $data['taxonomy_term_field_data']['thunder_forum_icon'] = [
+      'title' => t('Forum icon'),
+      'help' => t('The forum icon.'),
+      'field' => [
+        'field' => 'tid',
+        'id' => 'thunder_forum_term_icon',
+      ],
+    ];
+
     // Forum statistics.
     $data['taxonomy_term_field_data']['thunder_forum_statistics'] = [
       'title' => t('Forum statistics'),
