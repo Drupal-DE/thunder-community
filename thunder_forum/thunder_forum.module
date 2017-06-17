@@ -8,7 +8,10 @@
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
+use Drupal\user\EntityOwnerInterface;
 use Drupal\user\Entity\User;
+use Drupal\thunder_forum_reply\Plugin\Field\FieldType\ForumReplyItemInterface;
 
 /**
  * Implements hook_entity_extra_field_info().
@@ -72,6 +75,57 @@ function thunder_forum_node_view(array &$build, EntityInterface $entity, EntityV
         ],
       ];
     }
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for forum icon.
+ *
+ * Default template: thunder-forum-icon.html.twig.
+ */
+function template_preprocess_thunder_forum_icon(&$variables) {
+  /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+  $entity = $variables['entity'];
+
+  $current_user = \Drupal::currentUser();
+
+  /** @var \Drupal\thunder_forum\ThunderForumManagerInterface $forum_manager */
+  $forum_manager = \Drupal::service('forum_manager');
+
+  switch ($entity->getEntityTypeId()) {
+    case 'node':
+      $variables['identifier'] = 'topic';
+
+      // Is hot topic?
+      $variables['hot'] = $forum_manager->isHotTopic($entity);
+
+      // Is locked?
+      if (\Drupal::moduleHandler()->moduleExists('thunder_forum_reply')) {
+        $variables['locked'] = !($entity->hasField('forum_replies') && (int) $entity->get('forum_replies')->status === ForumReplyItemInterface::OPEN);
+      }
+      else {
+        $variables['locked'] = !($entity->hasField('comment_forum') && (int) $entity->get('comment_forum')->status === CommentItemInterface::OPEN);
+      }
+
+      if ($current_user->isAuthenticated()) {
+        // Current user is author?
+        if ($entity instanceof EntityOwnerInterface) {
+          $variables['own'] = $current_user->id() === $entity->getOwnerId();
+        }
+
+        // Has new replies?
+        $variables['new'] = $forum_manager->isUnreadTopic($entity, $current_user) || $forum_manager->isTopicWithNewReplies($entity, $current_user);
+      }
+      break;
+
+    case 'taxonomy_term':
+      $variables['identifier'] = $forum_manager->isForumContainer($entity) ? 'container' : 'forum';
+
+      // Has new content?
+      if ($current_user->isAuthenticated()) {
+        $variables['new'] = $forum_manager->unreadTopics($entity->id(), $current_user->id());
+      }
+      break;
   }
 }
 
