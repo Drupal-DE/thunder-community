@@ -424,4 +424,39 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
       ->fetchField() > 0;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function unreadTopics($term, $uid) {
+    $vid = $this->configFactory->get('forum.settings')->get('vocabulary');
+
+    /** @var \Drupal\taxonomy\TermStorageInterface $term_storage */
+    $term_storage = $this->entityManager->getStorage('taxonomy_term');
+
+    $tids = [];
+    foreach ($term_storage->loadTree($vid, $term) as $item) {
+      $tids[$item->tid] = $item->tid;
+    }
+
+    if (empty($tids)) {
+      return parent::unreadTopics($term, $uid);
+    }
+
+    $query = $this->connection->select('node_field_data', 'n');
+    $query->join('forum', 'f', 'n.vid = f.vid AND f.tid IN (:tids[])', array(':tids[]' => $tids));
+    $query->leftJoin('history', 'h', 'n.nid = h.nid AND h.uid = :uid', array(':uid' => $uid));
+    $query->addExpression('COUNT(n.nid)', 'count');
+
+    return $query
+      ->condition('status', 1)
+      // @todo This should be actually filtering on the desired node status
+      //   field language and just fall back to the default language.
+      ->condition('n.default_langcode', 1)
+      ->condition('n.created', HISTORY_READ_LIMIT, '>')
+      ->isNull('h.nid')
+      ->addTag('node_access')
+      ->execute()
+      ->fetchField();
+  }
+
 }
