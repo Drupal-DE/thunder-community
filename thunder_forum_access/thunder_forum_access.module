@@ -115,8 +115,13 @@ function thunder_forum_access_user_delete(AccountInterface $entity) {
 /**
  * Implements hook_thunder_forum_access_records_change().
  */
-function thunder_forum_access_thunder_forum_access_records_change(array $tids) {
+function thunder_forum_access_thunder_forum_access_records_change(array $tids, $parent_tid) {
   $tags = [];
+
+  // Include parent term ID in affected taxonomy term ID list.
+  if ($parent_tid) {
+    $tids[] = $parent_tid;
+  }
 
   // Build list of cache tags for affected forum taxonomy terms.
   foreach ($tids as $tid) {
