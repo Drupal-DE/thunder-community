@@ -11,6 +11,7 @@ use Drupal\Core\Database\Query\ConditionInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\node\NodeInterface;
 use Drupal\taxonomy\TermInterface;
 
 /**
@@ -244,7 +245,7 @@ function thunder_forum_access_query_alter(AlterableInterface $query) {
   $table = reset($table);
 
   /* @var $entity Drupal\node\NodeInterface */
-  if (($base_table = $query->getMetaData('base_table')) === NULL || ($entity = $query->getMetaData('entity')) === NULL) {
+  if (($base_table = $query->getMetaData('base_table')) === NULL || ($entity = $query->getMetaData('entity')) === NULL || !($entity instanceof NodeInterface)) {
     return;
   }
   if (('thunder_forum_reply' !== $base_table) || ('forum' !== $entity->getType())) {
