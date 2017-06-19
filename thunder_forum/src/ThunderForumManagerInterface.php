@@ -57,7 +57,7 @@ interface ThunderForumManagerInterface extends ForumManagerInterface {
    * @param int $tid
    *   The forum ID to fetch the parent for.
    *
-   * @return \Drupal\taxonomy\TermInterface[]|null
+   * @return \Drupal\taxonomy\TermInterface|null
    *   The parent forum taxonomy term on success, otherwise NULL.
    */
   public function getParent($tid);
