@@ -363,7 +363,7 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
     // Forum reply entity type is not used instead of comments?
     if (!$this->moduleHandler->moduleExists('thunder_forum_reply')) {
       $query = $this->connection->select('comment_entity_statistics', 'ces')
-          ->fields('ces', [
+        ->fields('ces', [
           'comment_count',
         ])
         ->condition('ces.entity_id', $node->id())
@@ -443,8 +443,8 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
     }
 
     $query = $this->connection->select('node_field_data', 'n');
-    $query->join('forum', 'f', 'n.vid = f.vid AND f.tid IN (:tids[])', array(':tids[]' => $tids));
-    $query->leftJoin('history', 'h', 'n.nid = h.nid AND h.uid = :uid', array(':uid' => $uid));
+    $query->join('forum', 'f', 'n.vid = f.vid AND f.tid IN (:tids[])', [':tids[]' => $tids]);
+    $query->leftJoin('history', 'h', 'n.nid = h.nid AND h.uid = :uid', [':uid' => $uid]);
     $query->addExpression('COUNT(n.nid)', 'count');
 
     return $query

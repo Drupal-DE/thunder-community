@@ -17,7 +17,6 @@ use Drupal\node\NodeStorageInterface;
 use Drupal\thunder_forum_reply\Entity\ForumReply;
 use Drupal\thunder_forum_reply\Plugin\Field\FieldType\ForumReplyItemInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Defines the access control handler for the forum reply entity type.
@@ -56,6 +55,8 @@ class ForumReplyAccessControlHandler extends EntityAccessControlHandler implemen
    *   The forum reply storage.
    * @param \Drupal\node\NodeStorageInterface $node_storage
    *   The node storage.
+   * @param \Drupal\Component\Serialization\SerializationInterface $serializer
+   *   The serialization class to use.
    */
   public function __construct(EntityTypeInterface $entity_type, ForumReplyStorageInterface $forum_reply_storage, NodeStorageInterface $node_storage, SerializationInterface $serializer) {
     parent::__construct($entity_type);
@@ -250,13 +251,20 @@ class ForumReplyAccessControlHandler extends EntityAccessControlHandler implemen
     // EntityAccessControlHandler::checkCreateAccess(). Entities that have
     // checks that need to be done before the hook is invoked should do so by
     // overriding this method.
-
     // We grant access to the entity if both of these conditions are met:
     // - No modules say to deny access.
     // - At least one module says to grant access.
     $access = array_merge(
-      $this->moduleHandler()->invokeAll('entity_create_access', [$account, $context, $entity_bundle]),
-      $this->moduleHandler()->invokeAll($this->entityTypeId . '_create_access', [$account, $context, $entity_bundle])
+      $this->moduleHandler()->invokeAll('entity_create_access', [
+        $account,
+        $context,
+        $entity_bundle,
+      ]),
+      $this->moduleHandler()->invokeAll($this->entityTypeId . '_create_access', [
+        $account,
+        $context,
+        $entity_bundle,
+      ])
     );
 
     $return = $this->processAccessHookResults($access);

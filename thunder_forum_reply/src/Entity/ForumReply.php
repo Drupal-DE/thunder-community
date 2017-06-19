@@ -281,7 +281,7 @@ class ForumReply extends ContentEntityBase implements ForumReplyInterface {
     if (($node = $this->getRepliedNode())) {
       $max_age = Cache::mergeMaxAges($max_age, $node->getCacheMaxAge());
     }
-    
+
     return $max_age;
   }
 
@@ -293,9 +293,9 @@ class ForumReply extends ContentEntityBase implements ForumReplyInterface {
 
     // Merge replied node cache tags (if any).
     if (($node = $this->getRepliedNode())) {
-     $tags = Cache::mergeTags($tags, $node->getCacheTags());
+      $tags = Cache::mergeTags($tags, $node->getCacheTags());
     }
-    
+
     return $tags;
   }
 

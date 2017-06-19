@@ -43,7 +43,7 @@ class ThunderForumLazyBuilder implements ThunderForumLazyBuilderInterface {
       '#cache' => [
         'contexts' => ['user'],
         'max-age' => 0,
-      ]
+      ],
     ];
 
     // Add entity to cache metadata.

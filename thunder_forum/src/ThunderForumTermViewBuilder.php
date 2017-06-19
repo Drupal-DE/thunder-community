@@ -15,6 +15,9 @@ class ThunderForumTermViewBuilder extends TermViewBuilder {
   /**
    * Build the default links for a forum term.
    *
+   * No default links are added so far, but modules may add links via
+   * hook_thunder_forum_term_links_alter().
+   *
    * @param \Drupal\taxonomy\TermInterface $entity
    *   The forum term object.
    * @param string $view_mode
@@ -28,9 +31,6 @@ class ThunderForumTermViewBuilder extends TermViewBuilder {
    */
   protected static function buildLinks(TermInterface $entity, $view_mode, $location = NULL) {
     $links = [];
-
-    // No default links are added so far, but modules may add links via
-    // hook_thunder_forum_term_links_alter().
 
     return [
       '#theme' => 'links__thunder_forum_term' . (!empty($location) ? '__' . $location : ''),
