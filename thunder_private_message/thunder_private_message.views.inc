@@ -77,5 +77,17 @@ function thunder_private_message_views_data() {
     ],
   ];
 
+  $data['users_field_data']['pm_send'] = [
+    'real field' => 'uid',
+    'title' => t('Send private message'),
+    'help' => t('Create a link to send a private message to a user.'),
+    'field' => [
+      'id' => 'tpm_send_message',
+      'additional fields' => [
+        'tpm_allow_messages' => 'tpm_allow_messages',
+      ],
+    ],
+  ];
+
   return $data;
 }
