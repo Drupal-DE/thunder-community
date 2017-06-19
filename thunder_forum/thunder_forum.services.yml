@@ -1,6 +1,6 @@
 services:
   cache_context.thunder_forum_node_link_location:
-    class: Drupal\thunder_forum\Cache\NodeLinkLocationCacheContext
+    class: Drupal\thunder_forum\Cache\ForumNodeLinkLocationCacheContext
     tags:
       - { name: cache.context }
   path_processor.thunder_forum:
