@@ -260,6 +260,48 @@ class ForumReply extends ContentEntityBase implements ForumReplyInterface {
   /**
    * {@inheritdoc}
    */
+  public function getCacheContexts() {
+    $contexts = parent::getCacheContexts();
+
+    // Merge replied node cache contexts (if any).
+    if (($node = $this->getRepliedNode())) {
+      $contexts = Cache::mergeContexts($contexts, $node->getCacheContexts());
+    }
+
+    return $contexts;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheMaxAge() {
+    $max_age = parent::getCacheMaxAge();
+
+    // Merge replied node cache max-age (if any).
+    if (($node = $this->getRepliedNode())) {
+      $max_age = Cache::mergeMaxAges($max_age, $node->getCacheMaxAge());
+    }
+
+    return $max_age;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags() {
+    $tags = parent::getCacheTags();
+
+    // Merge replied node cache tags (if any).
+    if (($node = $this->getRepliedNode())) {
+      $tags = Cache::mergeTags($tags, $node->getCacheTags());
+    }
+
+    return $tags;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getChangedTime() {
     return $this->get('changed')->value;
   }

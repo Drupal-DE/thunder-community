@@ -238,7 +238,7 @@ class ForumAccessRecordStorage implements ForumAccessRecordStorageInterface {
       if (!in_array(FALSE, $results, TRUE)) {
         // Inform other modules about forum access record changes.
         if ($tids_updated) {
-          $this->moduleHandler->invokeAll('thunder_forum_access_records_change', [$tids_updated]);
+          $this->moduleHandler->invokeAll('thunder_forum_access_records_change', [$tids_updated, $record->getParentTermId()]);
         }
 
         return TRUE;

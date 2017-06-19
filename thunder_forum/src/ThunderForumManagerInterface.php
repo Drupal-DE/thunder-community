@@ -2,6 +2,7 @@
 
 namespace Drupal\thunder_forum;
 
+use Drupal\Core\Session\AccountInterface;
 use Drupal\forum\ForumManagerInterface;
 use Drupal\node\NodeInterface;
 use Drupal\taxonomy\TermInterface;
@@ -56,7 +57,7 @@ interface ThunderForumManagerInterface extends ForumManagerInterface {
    * @param int $tid
    *   The forum ID to fetch the parent for.
    *
-   * @return \Drupal\taxonomy\TermInterface[]|null
+   * @return \Drupal\taxonomy\TermInterface|null
    *   The parent forum taxonomy term on success, otherwise NULL.
    */
   public function getParent($tid);
@@ -105,5 +106,44 @@ interface ThunderForumManagerInterface extends ForumManagerInterface {
    *   form.
    */
   public function isForumTermForm($form_id);
+
+  /**
+   * Returns TRUE if the given forum node is hot.
+   *
+   * @param \Drupal\node\NodeInterface $node
+   *   A forum node.
+   *
+   * @return bool
+   *   Boolean indicating whether the given forum node is hot (has more replies
+   *   than the threshold to be considered "hot".
+   */
+  public function isHotTopic(NodeInterface $node);
+
+  /**
+   * Returns TRUE if the given forum node has new/unread replies.
+   *
+   * @param \Drupal\node\NodeInterface $node
+   *   A forum node.
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   A user object.
+   *
+   * @return bool
+   *   Boolean indicating whether the given forum node has new/unread replies.
+   */
+  public function isTopicWithNewReplies(NodeInterface $node, AccountInterface $account);
+
+  /**
+   * Returns TRUE if the given forum node was not read by the given user yet.
+   *
+   * @param \Drupal\node\NodeInterface $node
+   *   A forum node.
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   A user object.
+   *
+   * @return bool
+   *   Boolean indicating whether the given forum node was not read by the given
+   *   user yet.
+   */
+  public function isUnreadTopic(NodeInterface $node, AccountInterface $account);
 
 }

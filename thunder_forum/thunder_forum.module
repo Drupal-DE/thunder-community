@@ -8,7 +8,10 @@
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
+use Drupal\user\EntityOwnerInterface;
 use Drupal\user\Entity\User;
+use Drupal\thunder_forum_reply\Plugin\Field\FieldType\ForumReplyItemInterface;
 
 /**
  * Implements hook_entity_extra_field_info().
@@ -28,6 +31,32 @@ function thunder_forum_entity_extra_field_info() {
   $info['node']['forum']['display']['thunder_forum_links_footer'] = [
     'label' => t('Links (Footer)'),
     'description' => t('Node links for forum topic footer.'),
+    'weight' => 0,
+    'visible' => FALSE,
+  ];
+
+  $vid_forums = \Drupal::config('forum.settings')->get('vocabulary');
+
+  // Forum term links.
+  $info['taxonomy_term'][$vid_forums]['display']['thunder_forum_links'] = [
+    'label' => t('Links'),
+    'description' => t('Term links for forum.'),
+    'weight' => 0,
+    'visible' => FALSE,
+  ];
+
+  // Forum term links (header).
+  $info['taxonomy_term'][$vid_forums]['display']['thunder_forum_links_header'] = [
+    'label' => t('Links (Header)'),
+    'description' => t('Term links for forum header.'),
+    'weight' => 0,
+    'visible' => FALSE,
+  ];
+
+  // Forum term links (footer).
+  $info['taxonomy_term'][$vid_forums]['display']['thunder_forum_links_footer'] = [
+    'label' => t('Links (Footer)'),
+    'description' => t('Term links for forum footer.'),
     'weight' => 0,
     'visible' => FALSE,
   ];
@@ -57,7 +86,7 @@ function thunder_forum_node_view(array &$build, EntityInterface $entity, EntityV
       ];
     }
 
-    if ($display->getComponent('thunder_forum_links_header')) {
+    if ($display->getComponent('thunder_forum_links_footer')) {
       // Build special links array for forum topic footer (if needed).
       $build['thunder_forum_links_footer'] = [
         '#lazy_builder' => [
@@ -72,6 +101,109 @@ function thunder_forum_node_view(array &$build, EntityInterface $entity, EntityV
         ],
       ];
     }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view() for taxonomy term entities.
+ */
+function thunder_forum_taxonomy_term_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
+  // Forum topic.
+  if ($entity->bundle() === \Drupal::config('forum.settings')->get('vocabulary')) {
+    // Build links array for forum term (if needed).
+    if ($display->getComponent('thunder_forum_links')) {
+      $build['thunder_forum_links'] = [
+        '#lazy_builder' => [
+          '\Drupal\thunder_forum\ThunderForumTermViewBuilder::renderLinks',
+          [
+            $entity->id(),
+            $view_mode,
+            $entity->language()->getId(),
+          ],
+        ],
+      ];
+    }
+
+    // Build special links array for forum term header (if needed).
+    if ($display->getComponent('thunder_forum_links_header')) {
+      $build['thunder_forum_links_header'] = [
+        '#lazy_builder' => [
+          '\Drupal\thunder_forum\ThunderForumTermViewBuilder::renderLinks',
+          [
+            $entity->id(),
+            $view_mode,
+            $entity->language()->getId(),
+            'header',
+          ],
+        ],
+      ];
+    }
+
+    if ($display->getComponent('thunder_forum_links_footer')) {
+      // Build special links array for forum term footer (if needed).
+      $build['thunder_forum_links_footer'] = [
+        '#lazy_builder' => [
+          '\Drupal\thunder_forum\ThunderForumTermViewBuilder::renderLinks',
+          [
+            $entity->id(),
+            $view_mode,
+            $entity->language()->getId(),
+            'footer',
+          ],
+        ],
+      ];
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for forum icon.
+ *
+ * Default template: thunder-forum-icon.html.twig.
+ */
+function template_preprocess_thunder_forum_icon(&$variables) {
+  /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+  $entity = $variables['entity'];
+
+  $current_user = \Drupal::currentUser();
+
+  /** @var \Drupal\thunder_forum\ThunderForumManagerInterface $forum_manager */
+  $forum_manager = \Drupal::service('forum_manager');
+
+  switch ($entity->getEntityTypeId()) {
+    case 'node':
+      $variables['identifier'] = 'topic';
+
+      // Is hot topic?
+      $variables['hot'] = $forum_manager->isHotTopic($entity);
+
+      // Is locked?
+      if (\Drupal::moduleHandler()->moduleExists('thunder_forum_reply')) {
+        $variables['locked'] = !($entity->hasField('forum_replies') && (int) $entity->get('forum_replies')->status === ForumReplyItemInterface::OPEN);
+      }
+      else {
+        $variables['locked'] = !($entity->hasField('comment_forum') && (int) $entity->get('comment_forum')->status === CommentItemInterface::OPEN);
+      }
+
+      if ($current_user->isAuthenticated()) {
+        // Current user is author?
+        if ($entity instanceof EntityOwnerInterface) {
+          $variables['own'] = $current_user->id() === $entity->getOwnerId();
+        }
+
+        // Has new replies?
+        $variables['new'] = $forum_manager->isUnreadTopic($entity, $current_user) || $forum_manager->isTopicWithNewReplies($entity, $current_user);
+      }
+      break;
+
+    case 'taxonomy_term':
+      $variables['identifier'] = $forum_manager->isForumContainer($entity) ? 'container' : 'forum';
+
+      // Has new content?
+      if ($current_user->isAuthenticated()) {
+        $variables['new'] = $forum_manager->unreadTopics($entity->id(), $current_user->id());
+      }
+      break;
   }
 }
 
@@ -108,6 +240,18 @@ function thunder_forum_form_taxonomy_term_form_alter(&$form, FormStateInterface 
  */
 function thunder_forum_theme($existing, $type, $theme, $path) {
   $items = [];
+
+  // Forum icon.
+  $items['thunder_forum_icon'] = [
+    'variables' => [
+      'entity' => NULL,
+      'identifier' => NULL,
+      'locked' => NULL,
+      'hot' => NULL,
+      'new' => NULL,
+      'own' => NULL,
+    ],
+  ];
 
   // Last forum post.
   $items['thunder_forum_last_post'] = [

@@ -6,7 +6,7 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CalculatedCacheContextInterface;
 
 /**
- * Defines the NodeLinkLocationCacheContext service.
+ * Defines the ForumNodeLinkLocationCacheContext service.
  *
  * This context caches node links per location.
  *
@@ -16,7 +16,7 @@ use Drupal\Core\Cache\Context\CalculatedCacheContextInterface;
  * e.g.'thunder_forum_node_link_location:foo' (to vary by the 'foo' forum node
  * link location argument).
  */
-class NodeLinkLocationCacheContext implements CalculatedCacheContextInterface {
+class ForumNodeLinkLocationCacheContext implements CalculatedCacheContextInterface {
 
   /**
    * {@inheritdoc}
@@ -36,7 +36,7 @@ class NodeLinkLocationCacheContext implements CalculatedCacheContextInterface {
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t('Node links location');
+    return t('Forum node links location');
   }
 
 }

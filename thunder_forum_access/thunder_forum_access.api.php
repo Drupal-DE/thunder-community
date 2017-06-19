@@ -17,11 +17,18 @@ use Drupal\Core\Cache\Cache;
  *
  * @param int[] $tids
  *   An array of taxonomy term IDs for all affected forum taxonomy terms.
+ * @param int $parent_tid
+ *   An optional parent term ID of the top-most updated forum taxonomy term.
  *
  * @ingroup thunder_forum_access
  */
-function hook_thunder_forum_access_records_change(array $tids) {
+function hook_thunder_forum_access_records_change(array $tids, $parent_tid) {
   $tags = [];
+
+  // Include parent term ID in affected taxonomy term ID list.
+  if ($parent_tid) {
+    $tids[] = $parent_tid;
+  }
 
   // Build list of cache tags for affected forum taxonomy terms.
   foreach ($tids as $tid) {

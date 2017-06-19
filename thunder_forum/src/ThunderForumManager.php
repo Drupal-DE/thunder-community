@@ -276,6 +276,9 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
     $topics = [];
     $first_new_found = FALSE;
 
+    /** @var \Drupal\thunder_forum_reply\ForumReplyManagerInterface $forum_reply_manager */
+    $forum_reply_manager = \Drupal::service('thunder_forum_reply.manager');
+
     foreach ($result as $topic) {
       if ($account->isAuthenticated()) {
         // A forum is new if the topic is new, or if there are new forum replies
@@ -285,8 +288,7 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
         }
         else {
           $history = $this->lastVisit($topic->id(), $account);
-          /** @var \Drupal\thunder_forum_reply\ForumReplyManagerInterface $forum_reply_manager */
-          $forum_reply_manager = \Drupal::service('thunder_forum_reply.manager');
+
           // This special variable handling of new_replies is needed, because
           // template_preprocess_forums() would throw an error otherwise due to
           // the missing forum comment field.
@@ -350,6 +352,111 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
       'taxonomy_term_forums_forum_form',
       'taxonomy_term_forums_container_form',
     ]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isHotTopic(NodeInterface $node) {
+    $hot_threshold = $this->configFactory->get('forum.settings')->get('topics.hot_threshold');
+
+    // Forum reply entity type is not used instead of comments?
+    if (!$this->moduleHandler->moduleExists('thunder_forum_reply')) {
+      $query = $this->connection->select('comment_entity_statistics', 'ces')
+        ->fields('ces', [
+          'comment_count',
+        ])
+        ->condition('ces.entity_id', $node->id())
+        ->condition('ces.entity_type', 'node')
+        ->condition('ces.field_name', 'comment_forum');
+
+      $comment_count = $query->execute()->fetchField();
+
+      return $comment_count > $hot_threshold;
+    }
+
+    $query = $this->connection->select('thunder_forum_reply_node_statistics', 'frns')
+      ->fields('frns', [
+        'reply_count',
+      ])
+      ->condition('frns.nid', $node->id())
+      ->condition('frns.field_name', 'forum_replies');
+
+    $reply_count = $query->execute()->fetchField();
+
+    return $reply_count > $hot_threshold;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isTopicWithNewReplies(NodeInterface $node, AccountInterface $account) {
+    if ($account->isAnonymous()) {
+      return FALSE;
+    }
+
+    $history = $this->lastVisit($node->id(), $account);
+
+    // Forum reply entity type is not used instead of comments?
+    if (!$this->moduleHandler->moduleExists('thunder_forum_reply')) {
+      return $this->commentManager->getCountNewComments($node, 'comment_forum', $history) > 0;
+    }
+
+    /** @var \Drupal\thunder_forum_reply\ForumReplyManagerInterface $forum_reply_manager */
+    $forum_reply_manager = \Drupal::service('thunder_forum_reply.manager');
+
+    return $forum_reply_manager->getCountNewReplies($node, 'forum_replies', $history) > 0;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isUnreadTopic(NodeInterface $node, AccountInterface $account) {
+    $query = $this->connection->select('node_field_data', 'n');
+    $query->leftJoin('history', 'h', 'n.nid = h.nid AND h.uid = :uid', [':uid' => $account->id()]);
+    $query->addExpression('COUNT(n.nid)', 'count');
+
+    return $query
+      ->condition('n.nid', $node->id())
+      ->condition('n.created', HISTORY_READ_LIMIT, '>')
+      ->isNull('h.nid')
+      ->execute()
+      ->fetchField() > 0;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function unreadTopics($term, $uid) {
+    $vid = $this->configFactory->get('forum.settings')->get('vocabulary');
+
+    /** @var \Drupal\taxonomy\TermStorageInterface $term_storage */
+    $term_storage = $this->entityManager->getStorage('taxonomy_term');
+
+    $tids = [];
+    foreach ($term_storage->loadTree($vid, $term) as $item) {
+      $tids[$item->tid] = $item->tid;
+    }
+
+    if (empty($tids)) {
+      return parent::unreadTopics($term, $uid);
+    }
+
+    $query = $this->connection->select('node_field_data', 'n');
+    $query->join('forum', 'f', 'n.vid = f.vid AND f.tid IN (:tids[])', [':tids[]' => $tids]);
+    $query->leftJoin('history', 'h', 'n.nid = h.nid AND h.uid = :uid', [':uid' => $uid]);
+    $query->addExpression('COUNT(n.nid)', 'count');
+
+    return $query
+      ->condition('status', 1)
+      // @todo This should be actually filtering on the desired node status
+      //   field language and just fall back to the default language.
+      ->condition('n.default_langcode', 1)
+      ->condition('n.created', HISTORY_READ_LIMIT, '>')
+      ->isNull('h.nid')
+      ->addTag('node_access')
+      ->execute()
+      ->fetchField();
   }
 
 }
