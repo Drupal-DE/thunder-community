@@ -60,7 +60,7 @@ function thunder_forum_node_view(array &$build, EntityInterface $entity, EntityV
       ];
     }
 
-    if ($display->getComponent('thunder_forum_links_header')) {
+    if ($display->getComponent('thunder_forum_links_footer')) {
       // Build special links array for forum topic footer (if needed).
       $build['thunder_forum_links_footer'] = [
         '#lazy_builder' => [
