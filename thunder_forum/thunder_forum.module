@@ -35,6 +35,32 @@ function thunder_forum_entity_extra_field_info() {
     'visible' => FALSE,
   ];
 
+  $vid_forums = \Drupal::config('forum.settings')->get('vocabulary');
+
+  // Forum term links.
+  $info['taxonomy_term'][$vid_forums]['display']['thunder_forum_links'] = [
+    'label' => t('Links'),
+    'description' => t('Term links for forum.'),
+    'weight' => 0,
+    'visible' => FALSE,
+  ];
+
+  // Forum term links (header).
+  $info['taxonomy_term'][$vid_forums]['display']['thunder_forum_links_header'] = [
+    'label' => t('Links (Header)'),
+    'description' => t('Term links for forum header.'),
+    'weight' => 0,
+    'visible' => FALSE,
+  ];
+
+  // Forum term links (footer).
+  $info['taxonomy_term'][$vid_forums]['display']['thunder_forum_links_footer'] = [
+    'label' => t('Links (Footer)'),
+    'description' => t('Term links for forum footer.'),
+    'weight' => 0,
+    'visible' => FALSE,
+  ];
+
   return $info;
 }
 
@@ -70,6 +96,58 @@ function thunder_forum_node_view(array &$build, EntityInterface $entity, EntityV
             $view_mode,
             $entity->language()->getId(),
             !empty($entity->in_preview),
+            'footer',
+          ],
+        ],
+      ];
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view() for taxonomy term entities.
+ */
+function thunder_forum_taxonomy_term_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
+  // Forum topic.
+  if ($entity->bundle() === \Drupal::config('forum.settings')->get('vocabulary')) {
+    // Build links array for forum term (if needed).
+    if ($display->getComponent('thunder_forum_links')) {
+      $build['thunder_forum_links'] = [
+        '#lazy_builder' => [
+          '\Drupal\thunder_forum\ThunderForumTermViewBuilder::renderLinks',
+          [
+            $entity->id(),
+            $view_mode,
+            $entity->language()->getId(),
+          ],
+        ],
+      ];
+    }
+
+    // Build special links array for forum term header (if needed).
+    if ($display->getComponent('thunder_forum_links_header')) {
+      $build['thunder_forum_links_header'] = [
+        '#lazy_builder' => [
+          '\Drupal\thunder_forum\ThunderForumTermViewBuilder::renderLinks',
+          [
+            $entity->id(),
+            $view_mode,
+            $entity->language()->getId(),
+            'header',
+          ],
+        ],
+      ];
+    }
+
+    if ($display->getComponent('thunder_forum_links_footer')) {
+      // Build special links array for forum term footer (if needed).
+      $build['thunder_forum_links_footer'] = [
+        '#lazy_builder' => [
+          '\Drupal\thunder_forum\ThunderForumTermViewBuilder::renderLinks',
+          [
+            $entity->id(),
+            $view_mode,
+            $entity->language()->getId(),
             'footer',
           ],
         ],

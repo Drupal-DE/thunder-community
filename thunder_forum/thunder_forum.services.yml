@@ -3,6 +3,10 @@ services:
     class: Drupal\thunder_forum\Cache\ForumNodeLinkLocationCacheContext
     tags:
       - { name: cache.context }
+  cache_context.thunder_forum_term_link_location:
+    class: Drupal\thunder_forum\Cache\ForumTermLinkLocationCacheContext
+    tags:
+      - { name: cache.context }
   path_processor.thunder_forum:
     class: Drupal\thunder_forum\PathProcessor\PathProcessorForum
     tags:
