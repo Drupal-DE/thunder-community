@@ -87,29 +87,59 @@ class ForumReplyManager implements ForumReplyManagerInterface {
    * {@inheritdoc}
    */
   public function getCountNewReplies(NodeInterface $node, $field_name = NULL, $timestamp = 0) {
-    // @todo Replace module handler with optional history service injection
-    //   after https://www.drupal.org/node/2081585.
-    if ($this->currentUser->isAuthenticated() && $this->moduleHandler->moduleExists('history')) {
-      // Retrieve the timestamp at which the current user last viewed this
-      // forum node.
-      if (!$timestamp) {
-        $timestamp = history_read($node->id());
+    // Only perform this check for authenticated users.
+    if ($this->currentUser->isAuthenticated()) {
+      // Check forum reply history for number of unread replies (if module is
+      // enabled) while ignoring optional passed in timestamp.
+      if ($this->moduleHandler->moduleExists('thunder_forum_reply_history')) {
+        $query = $this->connection->select('thunder_forum_reply_field_data', 'fr');
+        $query->leftJoin('thunder_forum_reply_history', 'h', 'fr.frid = h.frid AND h.uid = :uid', [':uid' => $this->currentUser->id()]);
+        $query->addExpression('COUNT(fr.frid)', 'count');
+        $query->addTag('entity_access')
+          ->addTag('thunder_forum_reply_access')
+          ->addMetaData('base_table', 'thunder_forum_reply')
+          ->addMetaData('entity', $node);
+
+        if ($field_name) {
+          // Limit to a particular field.
+          $query->condition('fr.field_name', $field_name);
+          $query->addMetaData('field_name', $field_name);
+        }
+
+        $count = $query
+          ->condition('fr.nid', $node->id())
+          ->condition('fr.created', HISTORY_READ_LIMIT, '>')
+          ->isNull('h.frid')
+          ->execute()
+          ->fetchField();
+
+        return $count > 0;
       }
 
-      $timestamp = ($timestamp > HISTORY_READ_LIMIT ? $timestamp : HISTORY_READ_LIMIT);
+      // @todo Replace module handler with optional history service injection
+      //   after https://www.drupal.org/node/2081585.
+      elseif ($this->moduleHandler->moduleExists('history')) {
+        // Retrieve the timestamp at which the current user last viewed this
+        // forum node.
+        if (!$timestamp) {
+          $timestamp = history_read($node->id());
+        }
 
-      // Use the timestamp to retrieve the number of new forum replies.
-      $query = $this->queryFactory->get('thunder_forum_reply')
-        ->condition('nid', $node->id())
-        ->condition('created', $timestamp, '>')
-        ->condition('status', ForumReplyInterface::PUBLISHED);
+        $timestamp = ($timestamp > HISTORY_READ_LIMIT ? $timestamp : HISTORY_READ_LIMIT);
 
-      if ($field_name) {
-        // Limit to a particular field.
-        $query->condition('field_name', $field_name);
+        // Use the timestamp to retrieve the number of new forum replies.
+        $query = $this->queryFactory->get('thunder_forum_reply')
+          ->condition('nid', $node->id())
+          ->condition('created', $timestamp, '>')
+          ->condition('status', ForumReplyInterface::PUBLISHED);
+
+        if ($field_name) {
+          // Limit to a particular field.
+          $query->condition('field_name', $field_name);
+        }
+
+        return $query->count()->execute();
       }
-
-      return $query->count()->execute();
     }
 
     return FALSE;
