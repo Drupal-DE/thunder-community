@@ -196,6 +196,14 @@ function thunder_forum_reply_cron() {
 function thunder_forum_reply_entity_extra_field_info() {
   $info = [];
 
+  // Forum reply icon.
+  $info['thunder_forum_reply']['thunder_forum_reply']['display']['icon'] = [
+    'label' => t('Icon'),
+    'description' => t('Forum reply icon'),
+    'weight' => 100,
+    'visible' => FALSE,
+  ];
+
   // Forum reply links.
   $info['thunder_forum_reply']['thunder_forum_reply']['display']['links'] = [
     'label' => t('Links'),

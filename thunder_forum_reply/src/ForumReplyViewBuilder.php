@@ -81,6 +81,19 @@ class ForumReplyViewBuilder extends EntityViewBuilder {
       $build[$id]['#entity'] = $entity;
       $build[$id]['#theme'] = 'thunder_forum_reply__' . $entity->getFieldName() . '__' . $replied_node->bundle();
 
+      // Icon.
+      if ($display->getComponent('icon')) {
+        $build[$id]['icon'] = [
+          '#lazy_builder' => [
+            'thunder_forum_reply.lazy_builders:renderIcon',
+            [
+              $entity->id(),
+            ],
+          ],
+          '#create_placeholder' => TRUE,
+        ];
+      }
+
       // Links.
       if ($display->getComponent('links')) {
         $build[$id]['links'] = [
