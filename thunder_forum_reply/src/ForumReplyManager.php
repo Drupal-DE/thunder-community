@@ -73,6 +73,7 @@ class ForumReplyManager implements ForumReplyManagerInterface {
    * @param \Drupal\Core\Entity\Query\QueryFactory $query_factory
    *   The entity query factory.
    * @param \Drupal\thunder_forum\ThunderForumManagerInterface $forum_manager
+   *   The forum manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler service.
    * @param \Drupal\Core\Session\AccountInterface $current_user
@@ -105,11 +106,9 @@ class ForumReplyManager implements ForumReplyManagerInterface {
       switch ($entity->getEntityTypeId()) {
         case 'node':
           return $this->getCountNewRepliesForNode($entity, $field_name, $timestamp);
-          break;
 
         case 'taxonomy_term':
           return $this->getCountNewRepliesForTerm($entity, $field_name, $timestamp);
-          break;
       }
     }
 
