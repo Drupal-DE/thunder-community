@@ -458,6 +458,7 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
       return parent::unreadTopics($term, $uid);
     }
 
+    $tids[$term] = $term;
     $query = $this->connection->select('node_field_data', 'n');
     $query->join('forum', 'f', 'n.vid = f.vid AND f.tid IN (:tids[])', [':tids[]' => $tids]);
     $query->leftJoin('history', 'h', 'n.nid = h.nid AND h.uid = :uid', [':uid' => $uid]);
