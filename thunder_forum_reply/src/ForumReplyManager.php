@@ -131,11 +131,16 @@ class ForumReplyManager implements ForumReplyManagerInterface {
         $query = $this->queryFactory->get('thunder_forum_reply')
           ->condition('nid', $node->id())
           ->condition('created', $timestamp, '>')
-          ->condition('status', ForumReplyInterface::PUBLISHED);
+          ->condition('status', ForumReplyInterface::PUBLISHED)
+          ->addTag('entity_access')
+          ->addTag('thunder_forum_reply_access')
+          ->addMetaData('base_table', 'thunder_forum_reply')
+          ->addMetaData('entity', $node);
 
         if ($field_name) {
           // Limit to a particular field.
           $query->condition('field_name', $field_name);
+          $query->addMetaData('field_name', $field_name);
         }
 
         return $query->count()->execute();
