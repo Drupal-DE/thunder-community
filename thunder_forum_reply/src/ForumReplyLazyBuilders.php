@@ -106,6 +106,35 @@ class ForumReplyLazyBuilders implements ForumReplyLazyBuildersInterface {
   /**
    * {@inheritdoc}
    */
+  public function renderIcon($frid) {
+    /** @var \Drupal\thunder_forum_reply\ForumReplyInterface $entity */
+    $entity = $this->entityTypeManager
+      ->getStorage('thunder_forum_reply')
+      ->load($frid);
+
+    // Build forum icon.
+    $build = [
+      '#theme' => 'thunder_forum_reply_icon',
+      '#entity' => $entity,
+      '#cache' => [
+        'contexts' => ['user'],
+        'max-age' => 0,
+      ],
+    ];
+
+    // Add entity to cache metadata.
+    if ($entity) {
+      CacheableMetadata::createFromRenderArray($build)
+        ->addCacheableDependency($entity)
+        ->applyTo($build);
+    }
+
+    return $build;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function renderLinks($reply_entity_id, $view_mode, $langcode, $is_in_preview, $location = NULL) {
     $links = [
       '#theme' => 'links__thunder_forum_reply' . (!empty($location) ? '__' . $location : ''),

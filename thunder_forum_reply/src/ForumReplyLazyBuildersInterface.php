@@ -21,6 +21,17 @@ interface ForumReplyLazyBuildersInterface {
   public function renderForm($nid, $field_name);
 
   /**
+   * Lazy builder callback; render icon.
+   *
+   * @param int $frid
+   *   The forum reply ID.
+   *
+   * @return array
+   *   A renderable array containing icon.
+   */
+  public function renderIcon($frid);
+
+  /**
    * Lazy builder callback; builds a forum reply's links.
    *
    * @param string $reply_entity_id
