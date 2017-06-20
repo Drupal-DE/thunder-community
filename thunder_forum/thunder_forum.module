@@ -222,7 +222,13 @@ function template_preprocess_thunder_forum_icon(&$variables) {
 
       // Has new content?
       if ($current_user->isAuthenticated()) {
-        $variables['new'] = $forum_manager->unreadTopics($entity->id(), $current_user->id());
+        $variables['new'] = $forum_manager->unreadTopics($entity->id(), $current_user->id()) > 0;
+
+        // Only perform this check if no unread topics are present (because this
+        // might be a little expensive).
+        if (!$variables['new']) {
+          $variables['new'] = $forum_manager->isForumWithNewReplies($entity, $current_user);
+        }
       }
       break;
   }
