@@ -14,7 +14,7 @@ use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
 
 /**
- * Defines a service for forum teply #lazy_builder callbacks.
+ * Defines a service for forum reply #lazy_builder callbacks.
  */
 class ForumReplyLazyBuilders {
 
