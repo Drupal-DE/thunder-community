@@ -1,0 +1,14 @@
+thunder_forum_reply_history.get_last_view:
+  path: '/forum/reply/history/get-read-timestamps'
+  defaults:
+    _controller: '\Drupal\thunder_forum_reply_history\Controller\HistoryController::getReadTimestamps'
+  requirements:
+    _permission: 'access forum replies'
+
+thunder_forum_reply_history.read:
+  path: '/forum/reply/history/{thunder_forum_reply}/read'
+  defaults:
+    _controller: '\Drupal\thunder_forum_reply_history\Controller\HistoryController::read'
+  requirements:
+    _entity_access: 'thunder_forum_reply.view'
+    thunder_forum_reply: \d+

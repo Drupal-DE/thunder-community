@@ -1,0 +1,178 @@
+<?php
+
+/**
+ * @file
+ * Records which users have read which forum reply.
+ */
+
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Session\AccountInterface;
+
+/**
+ * Retrieves the timestamp for the current user's last view of a forum reply.
+ *
+ * @param int $frid
+ *   A forum reply ID.
+ *
+ * @return int
+ *   If a forum reply has been previously viewed by the user, the timestamp in
+ *   seconds of when the last view occurred; otherwise, zero.
+ */
+function thunder_forum_reply_history_read($frid) {
+  $history = thunder_forum_reply_history_read_multiple([$frid]);
+  return $history[$frid];
+}
+
+/**
+ * Retrieves the last viewed timestamp for each of the passed forum reply IDs.
+ *
+ * @param array $frids
+ *   An array of forum reply IDs.
+ *
+ * @return array
+ *   Array of timestamps keyed by forum reply ID. If a forum reply has been
+ *   previously viewed by the user, the timestamp in seconds of when the last
+ *   view occurred; otherwise, zero.
+ */
+function thunder_forum_reply_history_read_multiple(array $frids = []) {
+  $history = &drupal_static(__FUNCTION__, []);
+
+  $return = [];
+
+  $items_to_read = [];
+  foreach ($frids as $frid) {
+    if (isset($history[$frid])) {
+      $return[$frid] = $history[$frid];
+    }
+    else {
+      // Initialize value if current user has not viewed the forum reply.
+      $items_to_read[$frid] = 0;
+    }
+  }
+
+  if (empty($items_to_read)) {
+    return $return;
+  }
+
+  $result = db_query('SELECT frid, timestamp FROM {thunder_forum_reply_history} WHERE uid = :uid AND frid IN ( :frids[] )', [
+    ':uid' => \Drupal::currentUser()->id(),
+    ':frids[]' => array_keys($items_to_read),
+  ]);
+
+  foreach ($result as $row) {
+    $items_to_read[$row->frid] = (int) $row->timestamp;
+  }
+
+  $history += $items_to_read;
+
+  return $return + $items_to_read;
+}
+
+/**
+ * Updates 'last viewed' timestamp of the specified entity for the current user.
+ *
+ * @param int $frid
+ *   The forum reply ID that has been read.
+ * @param \Drupal\Core\Session\AccountInterface $account
+ *   (optional) The user account to update the forum reply history for. Defaults
+ *   to the current user.
+ */
+function thunder_forum_reply_history_write($frid, AccountInterface $account = NULL) {
+  if (!isset($account)) {
+    $account = \Drupal::currentUser();
+  }
+
+  if ($account->isAuthenticated()) {
+    db_merge('thunder_forum_reply_history')
+      ->keys([
+        'uid' => $account->id(),
+        'frid' => $frid,
+      ])
+      ->fields(['timestamp' => \REQUEST_TIME])
+      ->execute();
+    // Update static cache.
+    $history = &drupal_static('thunder_forum_reply_history_read_multiple', []);
+    $history[$frid] = \REQUEST_TIME;
+  }
+}
+
+/**
+ * Implements hook_cron().
+ */
+function thunder_forum_reply_history_cron() {
+  db_delete('thunder_forum_reply_history')
+    ->condition('timestamp', \HISTORY_READ_LIMIT, '<')
+    ->execute();
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view_alter() for forum reply entities.
+ */
+function thunder_forum_reply_history_thunder_forum_reply_view_alter(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display) {
+  // Update the thunder_forum_reply_history table, stating that this user viewed
+  // this forum reply.
+  // @todo: make displays configurable.
+  if (!in_array($display->getOriginalMode(), ['default', 'full'])) {
+    return;
+  }
+
+  $build['#cache']['contexts'][] = 'user.roles:authenticated';
+
+  if (!\Drupal::currentUser()->isAuthenticated()) {
+    return;
+  }
+
+  // When the window's "load" event is triggered, mark the forum reply as read.
+  // This still allows for Drupal behaviors (which are triggered on the
+  // "DOMContentReady" event) to add "new" and "updated" indicators.
+  $build['#attached']['library'][] = 'thunder_forum_reply_history/mark-as-read';
+  $build['#attached']['drupalSettings']['thunder_forum_reply_history']['itemsToMarkAsRead'][$entity->id()] = TRUE;
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete() for forum reply entities.
+ */
+function thunder_forum_reply_history_thunder_forum_reply_delete(EntityInterface $entity) {
+  db_delete('thunder_forum_reply_history')
+    ->condition('frid', $entity->id())
+    ->execute();
+}
+
+/**
+ * Implements hook_user_cancel().
+ */
+function thunder_forum_reply_history_user_cancel($edit, $account, $method) {
+  switch ($method) {
+    case 'user_cancel_reassign':
+      db_delete('thunder_forum_reply_history')
+        ->condition('uid', $account->id())
+        ->execute();
+      break;
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete() for user entities.
+ */
+function thunder_forum_reply_history_user_delete($account) {
+  db_delete('thunder_forum_reply_history')
+    ->condition('uid', $account->id())
+    ->execute();
+}
+
+/**
+ * Creates #lazy_builder callback for the last read timestamp for a forum reply.
+ *
+ * @param int $frid
+ *   The forum reply ID for which to attach the last read timestamp.
+ *
+ * @return array
+ *   A renderable array containing the last read timestamp.
+ */
+function thunder_forum_reply_history_attach_timestamp($frid) {
+  $element = [];
+  $element['#attached']['drupalSettings']['thunder_forum_reply_history']['lastReadTimestamps'][$frid] = (int) thunder_forum_reply_history_read($frid);
+
+  return $element;
+}
