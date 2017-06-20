@@ -13,6 +13,16 @@ use Drupal\taxonomy\TermInterface;
 interface ThunderForumManagerInterface extends ForumManagerInterface {
 
   /**
+   * Return term IDs of all forum term children.
+   *
+   * @param $tid
+   *   A forum term ID.
+   * @return array
+   *   An array of forum term IDs.
+   */
+  public function getChildTermIds($tid);
+
+  /**
    * Provides statistics for a forum.
    *
    * @param int $tid

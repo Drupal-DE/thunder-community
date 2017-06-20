@@ -50,6 +50,30 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
   /**
    * {@inheritdoc}
    */
+  public function getChildTermIds($tid) {
+    $cache =& drupal_static(get_class($this) . '::' . __METHOD__, []);
+
+    // Return statically cached result (if any).
+    if (isset($cache[$tid])) {
+      return $cache[$tid];
+    }
+
+    $vid = $this->configFactory->get('forum.settings')->get('vocabulary');
+
+    /** @var \Drupal\taxonomy\TermStorageInterface $term_storage */
+    $term_storage = $this->entityManager->getStorage('taxonomy_term');
+
+    $cache[$tid] = [];
+    foreach ($term_storage->loadTree($vid, $tid) as $item) {
+      $cache[$tid][$item->tid] = $item->tid;
+    }
+
+    return $cache[$tid];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getForumStatistics($tid) {
     // Forum reply entity type is not used instead of comments?
     if (!$this->moduleHandler->moduleExists('thunder_forum_reply')) {
@@ -428,15 +452,7 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
    * {@inheritdoc}
    */
   public function unreadTopics($term, $uid) {
-    $vid = $this->configFactory->get('forum.settings')->get('vocabulary');
-
-    /** @var \Drupal\taxonomy\TermStorageInterface $term_storage */
-    $term_storage = $this->entityManager->getStorage('taxonomy_term');
-
-    $tids = [];
-    foreach ($term_storage->loadTree($vid, $term) as $item) {
-      $tids[$item->tid] = $item->tid;
-    }
+    $tids = $this->getChildTermIds($term);
 
     if (empty($tids)) {
       return parent::unreadTopics($term, $uid);
