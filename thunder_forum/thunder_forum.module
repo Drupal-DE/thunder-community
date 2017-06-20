@@ -19,6 +19,14 @@ use Drupal\thunder_forum_reply\Plugin\Field\FieldType\ForumReplyItemInterface;
 function thunder_forum_entity_extra_field_info() {
   $info = [];
 
+  // Forum node icon.
+  $info['node']['forum']['display']['icon'] = [
+    'label' => t('Icon'),
+    'description' => t('Forum topic icon.'),
+    'weight' => 0,
+    'visible' => FALSE,
+  ];
+
   // Forum node links (header).
   $info['node']['forum']['display']['thunder_forum_links_header'] = [
     'label' => t('Links (Header)'),
@@ -70,6 +78,19 @@ function thunder_forum_entity_extra_field_info() {
 function thunder_forum_node_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
   // Forum topic.
   if ($entity->bundle() === 'forum') {
+    // Build icon (if needed).
+    if ($display->getComponent('icon')) {
+      $build['icon'] = [
+        '#lazy_builder' => [
+          'thunder_forum.lazy_builder:renderIcon',
+          [
+            $entity->getEntityTypeId(),
+            $entity->id(),
+          ],
+        ],
+      ];
+    }
+
     // Build special links array for forum topic header (if needed).
     if ($display->getComponent('thunder_forum_links_header')) {
       $build['thunder_forum_links_header'] = [
