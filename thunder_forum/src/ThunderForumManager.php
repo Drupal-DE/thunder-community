@@ -381,6 +381,20 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
   /**
    * {@inheritdoc}
    */
+  public function isForumWithNewReplies(TermInterface $term, AccountInterface $account) {
+    if (!$this->moduleHandler->moduleExists('thunder_forum_reply')) {
+      return FALSE;
+    }
+
+    /** @var \Drupal\thunder_forum_reply\ForumReplyManagerInterface $forum_reply_manager */
+    $forum_reply_manager = \Drupal::service('thunder_forum_reply.manager');
+
+    return $forum_reply_manager->getCountNewReplies($term, 'forum_replies') > 0;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isHotTopic(NodeInterface $node) {
     $hot_threshold = $this->configFactory->get('forum.settings')->get('topics.hot_threshold');
 
