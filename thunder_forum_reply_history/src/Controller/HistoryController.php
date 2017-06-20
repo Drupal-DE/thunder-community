@@ -28,7 +28,7 @@ class HistoryController extends ControllerBase {
       throw new AccessDeniedHttpException();
     }
 
-    $frids = $request->request->get('ids');
+    $frids = $request->request->get('thunder_forum_reply_ids');
     if (!isset($frids)) {
       throw new NotFoundHttpException();
     }
