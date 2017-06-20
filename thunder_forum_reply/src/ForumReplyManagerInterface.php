@@ -2,6 +2,7 @@
 
 namespace Drupal\thunder_forum_reply;
 
+use Drupal\Core\Session\AccountInterface;
 use Drupal\node\NodeInterface;
 
 /**
@@ -40,5 +41,19 @@ interface ForumReplyManagerInterface {
    *   authenticated.
    */
   public function getCountNewReplies(NodeInterface $node, $field_name = NULL, $timestamp = 0);
+
+  /**
+   * Returns TRUE if the given forum node reply not read by the given user yet.
+   *
+   * @param \Drupal\thunder_forum_reply\ForumReplyInterface $reply
+   *   A forum reply.
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   A user object.
+   *
+   * @return bool
+   *   Boolean indicating whether the given forum reply was not read by the
+   *   given user yet.
+   */
+  public function isUnreadReply(ForumReplyInterface $reply, AccountInterface $account);
 
 }

@@ -2,6 +2,7 @@
 
 namespace Drupal\thunder_forum_reply;
 
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -15,6 +16,13 @@ use Drupal\node\NodeInterface;
 class ForumReplyManager implements ForumReplyManagerInterface {
 
   use StringTranslationTrait;
+
+  /**
+   * The current database connection.
+   *
+   * @var \Drupal\Core\Database\Connection
+   */
+  protected $connection;
 
   /**
    * The current user.
@@ -49,6 +57,8 @@ class ForumReplyManager implements ForumReplyManagerInterface {
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager service.
+   * @param \Drupal\Core\Database\Connection $connection
+   *   The current database connection.
    * @param \Drupal\Core\Entity\Query\QueryFactory $query_factory
    *   The entity query factory.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
@@ -56,7 +66,8 @@ class ForumReplyManager implements ForumReplyManagerInterface {
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
    */
-  public function __construct(EntityManagerInterface $entity_manager, QueryFactory $query_factory, ModuleHandlerInterface $module_handler, AccountInterface $current_user) {
+  public function __construct(EntityManagerInterface $entity_manager, Connection $connection, QueryFactory $query_factory, ModuleHandlerInterface $module_handler, AccountInterface $current_user) {
+    $this->connection = $connection;
     $this->currentUser = $current_user;
     $this->entityManager = $entity_manager;
     $this->moduleHandler = $module_handler;
@@ -99,6 +110,26 @@ class ForumReplyManager implements ForumReplyManagerInterface {
       }
 
       return $query->count()->execute();
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isUnreadReply(ForumReplyInterface $reply, AccountInterface $account) {
+    if ($this->moduleHandler->moduleExists('thunder_forum_reply_history') && $this->currentUser->isAuthenticated()) {
+      $query = $this->connection->select('thunder_forum_reply_field_data', 'fr');
+      $query->leftJoin('thunder_forum_reply_history', 'h', 'fr.frid = h.frid AND h.uid = :uid', [':uid' => $account->id()]);
+      $query->addExpression('COUNT(fr.frid)', 'count');
+
+      return $query
+        ->condition('fr.frid', $reply->id())
+        ->condition('fr.created', HISTORY_READ_LIMIT, '>')
+        ->isNull('h.frid')
+        ->execute()
+        ->fetchField() > 0;
     }
 
     return FALSE;
