@@ -487,4 +487,3 @@ function _thunder_forum_access_array_intersect_recursive(array $array1, array $a
   }
   return $result;
 }
-
