@@ -1,0 +1,4 @@
+entity.user.thunder_forum_subscription:
+  route_name: entity.user.thunder_forum_subscription
+  base_route: entity.user.canonical
+  title: Forum subscriptions
