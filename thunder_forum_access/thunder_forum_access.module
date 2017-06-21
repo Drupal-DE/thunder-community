@@ -421,7 +421,7 @@ function _thunder_forum_access_query_find_condition(ConditionInterface $conditio
       continue;
     }
     // Compare properties.
-    if (is_array($c) && array_intersect($properties, $c) == $properties) {
+    if (is_array($c) && _thunder_forum_access_array_intersect_recursive($properties, $c) == $properties) {
       return $key;
     }
     if ($c['field'] instanceof ConditionInterface && _thunder_forum_access_query_find_condition($c['field'], $properties) !== FALSE) {
@@ -454,3 +454,37 @@ function _thunder_forum_access_alter_query_access(AlterableInterface &$query, $t
   // Join to permission table for members/moderators.
   $query->leftJoin('thunder_forum_access_permission', 'tfp2', "(tfp2.tid = {$table_alias}.{$column}) AND (tfp2.target_entity_type_id = :entity_type) AND (tfp2.permission = :permission) AND (tfp2.role = tfu.role)", $query_args);
 }
+
+/**
+ * Helper function to intersect multi-dimensional arrays.
+ *
+ * @param array $array1
+ *   First input.
+ * @param array $array2
+ *   Second input.
+ *
+ * @see http://php.net/manual/en/function.array-intersect.php
+ *
+ * @return array
+ *   Intersection of both arrays.
+ */
+function _thunder_forum_access_array_intersect_recursive(array $array1, array $array2) {
+  $result = [];
+  foreach ($array1 as $key => $value) {
+    if (!isset($array2[$key])) {
+      continue;
+    }
+    if (is_array($value) && is_array($array2[$key])) {
+      if ($sub_result = _thunder_forum_access_array_intersect_recursive($value, $array2[$key])) {
+        $result[$key] = $sub_result;
+      }
+    }
+    else {
+      if ($value === $array2[$key]) {
+        $result[$key] = $value;
+      }
+    }
+  }
+  return $result;
+}
+
