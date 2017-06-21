@@ -14,9 +14,9 @@ use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
 
 /**
- * Defines a service for forum teply #lazy_builder callbacks.
+ * Defines a service for forum reply #lazy_builder callbacks.
  */
-class ForumReplyLazyBuilders {
+class ForumReplyLazyBuilders implements ForumReplyLazyBuildersInterface {
 
   use StringTranslationTrait;
 
@@ -88,15 +88,7 @@ class ForumReplyLazyBuilders {
   }
 
   /**
-   * Lazy builder callback; builds the forum reply form.
-   *
-   * @param int $nid
-   *   The replied forum node ID.
-   * @param string $field_name
-   *   The forum reply field name.
-   *
-   * @return array
-   *   A renderable array containing the forum reply form.
+   * {@inheritdoc}
    */
   public function renderForm($nid, $field_name) {
     $values = [
@@ -112,22 +104,36 @@ class ForumReplyLazyBuilders {
   }
 
   /**
-   * Lazy builder callback; builds a forum reply's links.
-   *
-   * @param string $reply_entity_id
-   *   The forum reply entity ID.
-   * @param string $view_mode
-   *   The view mode in which the forum reply entity is being viewed.
-   * @param string $langcode
-   *   The language in which the forum reply entity is being viewed.
-   * @param bool $is_in_preview
-   *   Whether the forum reply entity is currently being previewed.
-   * @param string|null $location
-   *   An optional links location (e.g. to split up forum reply links to several
-   *   link lists).
-   *
-   * @return array
-   *   A renderable array representing the forum reply links.
+   * {@inheritdoc}
+   */
+  public function renderIcon($frid) {
+    /** @var \Drupal\thunder_forum_reply\ForumReplyInterface $entity */
+    $entity = $this->entityTypeManager
+      ->getStorage('thunder_forum_reply')
+      ->load($frid);
+
+    // Build forum icon.
+    $build = [
+      '#theme' => 'thunder_forum_reply_icon',
+      '#entity' => $entity,
+      '#cache' => [
+        'contexts' => ['user'],
+        'max-age' => 0,
+      ],
+    ];
+
+    // Add entity to cache metadata.
+    if ($entity) {
+      CacheableMetadata::createFromRenderArray($build)
+        ->addCacheableDependency($entity)
+        ->applyTo($build);
+    }
+
+    return $build;
+  }
+
+  /**
+   * {@inheritdoc}
    */
   public function renderLinks($reply_entity_id, $view_mode, $langcode, $is_in_preview, $location = NULL) {
     $links = [

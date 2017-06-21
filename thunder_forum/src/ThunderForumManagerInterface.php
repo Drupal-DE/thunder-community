@@ -13,6 +13,17 @@ use Drupal\taxonomy\TermInterface;
 interface ThunderForumManagerInterface extends ForumManagerInterface {
 
   /**
+   * Return term IDs of all forum term children.
+   *
+   * @param int $tid
+   *   A forum term ID.
+   *
+   * @return array
+   *   An array of forum term IDs.
+   */
+  public function getChildTermIds($tid);
+
+  /**
    * Provides statistics for a forum.
    *
    * @param int $tid
@@ -106,6 +117,20 @@ interface ThunderForumManagerInterface extends ForumManagerInterface {
    *   form.
    */
   public function isForumTermForm($form_id);
+
+  /**
+   * Returns TRUE if any node below the given forum term has new/unread replies.
+   *
+   * @param \Drupal\taxonomy\TermInterface $term
+   *   A forum term.
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   A user object.
+   *
+   * @return bool
+   *   Boolean indicating whether any node below the given forum term has
+   *   new/unread replies.
+   */
+  public function isForumWithNewReplies(TermInterface $term, AccountInterface $account);
 
   /**
    * Returns TRUE if the given forum node is hot.

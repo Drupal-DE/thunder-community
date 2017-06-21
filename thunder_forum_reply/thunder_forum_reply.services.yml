@@ -11,7 +11,7 @@ services:
     arguments: ['@current_user', '@thunder_forum_reply.manager', '@module_handler', '@entity.manager']
   thunder_forum_reply.manager:
     class: Drupal\thunder_forum_reply\ForumReplyManager
-    arguments: ['@entity.manager', '@entity.query', '@module_handler', '@current_user']
+    arguments: ['@entity.manager', '@database', '@entity.query', '@forum_manager', '@module_handler', '@current_user']
   thunder_forum_reply.statistics:
     class: Drupal\thunder_forum_reply\ForumReplyStatistics
     arguments: ['@database', '@current_user', '@entity_type.manager', '@state']

@@ -22,6 +22,27 @@ use Drupal\thunder_forum_reply\Plugin\Field\FieldType\ForumReplyItemInterface;
 use Drupal\user\Entity\Role;
 
 /**
+ * Implements hook_preprocess_HOOK() for forum icon.
+ *
+ * Default template: thunder-forum-reply-icon.html.twig.
+ */
+function template_preprocess_thunder_forum_reply_icon(&$variables) {
+  /** @var \Drupal\thunder_forum_reply\ForumReplyInterface $entity */
+  $entity = $variables['entity'];
+
+  /** @var \Drupal\thunder_forum_reply\ForumReplyManagerInterface $forum_reply_manager */
+  $forum_reply_manager = \Drupal::service('thunder_forum_reply.manager');
+
+  $current_user = \Drupal::currentUser();
+
+  // Current user is owner?
+  $variables['own'] = $current_user->id() === $entity->getOwnerId();
+
+  // Not new by default. thunder_forum_reply_history module performs this check.
+  $variables['new'] = $forum_reply_manager->isUnreadReply($entity, $current_user);
+}
+
+/**
  * Implements hook_preprocess_HOOK() for forum reply templates.
  */
 function template_preprocess_thunder_forum_reply(array &$variables) {
@@ -175,10 +196,18 @@ function thunder_forum_reply_cron() {
 function thunder_forum_reply_entity_extra_field_info() {
   $info = [];
 
+  // Forum reply icon.
+  $info['thunder_forum_reply']['thunder_forum_reply']['display']['icon'] = [
+    'label' => t('Icon'),
+    'description' => t('Forum reply icon.'),
+    'weight' => 100,
+    'visible' => FALSE,
+  ];
+
   // Forum reply links.
   $info['thunder_forum_reply']['thunder_forum_reply']['display']['links'] = [
     'label' => t('Links'),
-    'description' => t('Forum reply operation links'),
+    'description' => t('Forum reply operation links.'),
     'weight' => 100,
     'visible' => TRUE,
   ];
@@ -635,6 +664,16 @@ function thunder_forum_reply_theme($existing, $type, $theme, $path) {
   // Forum reply.
   $items['thunder_forum_reply'] = [
     'render element' => 'elements',
+  ];
+
+  // Forum reply icon.
+  $items['thunder_forum_reply_icon'] = [
+    'variables' => [
+      'entity' => NULL,
+      'identifier' => NULL,
+      'new' => NULL,
+      'own' => NULL,
+    ],
   ];
 
   // Forum reply field.

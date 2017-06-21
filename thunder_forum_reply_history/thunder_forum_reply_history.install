@@ -1,0 +1,42 @@
+<?php
+
+/**
+ * @file
+ * Installation functions for Thunder Forum Reply History module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function thunder_forum_reply_history_schema() {
+  $schema['thunder_forum_reply_history'] = [
+    'description' => 'A record of which {users} have read which {thunder_forum_reply}s.',
+    'fields' => [
+      'uid' => [
+        'description' => 'The {users}.uid that read the {thunder_forum_reply} frid.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'frid' => [
+        'description' => 'The {thunder_forum_reply}.frid that was read.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'timestamp' => [
+        'description' => 'The Unix timestamp at which the read occurred.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['uid', 'frid'],
+    'indexes' => [
+      'frid' => ['frid'],
+    ],
+  ];
+
+  return $schema;
+}

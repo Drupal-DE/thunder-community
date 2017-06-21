@@ -50,6 +50,30 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
   /**
    * {@inheritdoc}
    */
+  public function getChildTermIds($tid) {
+    $cache =& drupal_static(get_class($this) . '::' . __METHOD__, []);
+
+    // Return statically cached result (if any).
+    if (isset($cache[$tid])) {
+      return $cache[$tid];
+    }
+
+    $vid = $this->configFactory->get('forum.settings')->get('vocabulary');
+
+    /** @var \Drupal\taxonomy\TermStorageInterface $term_storage */
+    $term_storage = $this->entityManager->getStorage('taxonomy_term');
+
+    $cache[$tid] = [];
+    foreach ($term_storage->loadTree($vid, $tid) as $item) {
+      $cache[$tid][$item->tid] = $item->tid;
+    }
+
+    return $cache[$tid];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getForumStatistics($tid) {
     // Forum reply entity type is not used instead of comments?
     if (!$this->moduleHandler->moduleExists('thunder_forum_reply')) {
@@ -357,6 +381,20 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
   /**
    * {@inheritdoc}
    */
+  public function isForumWithNewReplies(TermInterface $term, AccountInterface $account) {
+    if (!$this->moduleHandler->moduleExists('thunder_forum_reply')) {
+      return FALSE;
+    }
+
+    /** @var \Drupal\thunder_forum_reply\ForumReplyManagerInterface $forum_reply_manager */
+    $forum_reply_manager = \Drupal::service('thunder_forum_reply.manager');
+
+    return $forum_reply_manager->getCountNewReplies($term, 'forum_replies') > 0;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isHotTopic(NodeInterface $node) {
     $hot_threshold = $this->configFactory->get('forum.settings')->get('topics.hot_threshold');
 
@@ -428,20 +466,13 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
    * {@inheritdoc}
    */
   public function unreadTopics($term, $uid) {
-    $vid = $this->configFactory->get('forum.settings')->get('vocabulary');
-
-    /** @var \Drupal\taxonomy\TermStorageInterface $term_storage */
-    $term_storage = $this->entityManager->getStorage('taxonomy_term');
-
-    $tids = [];
-    foreach ($term_storage->loadTree($vid, $term) as $item) {
-      $tids[$item->tid] = $item->tid;
-    }
+    $tids = $this->getChildTermIds($term);
 
     if (empty($tids)) {
       return parent::unreadTopics($term, $uid);
     }
 
+    $tids[$term] = $term;
     $query = $this->connection->select('node_field_data', 'n');
     $query->join('forum', 'f', 'n.vid = f.vid AND f.tid IN (:tids[])', [':tids[]' => $tids]);
     $query->leftJoin('history', 'h', 'n.nid = h.nid AND h.uid = :uid', [':uid' => $uid]);

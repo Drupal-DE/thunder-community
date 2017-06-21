@@ -2,7 +2,8 @@
 
 namespace Drupal\thunder_forum_reply;
 
-use Drupal\node\NodeInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Session\AccountInterface;
 
 /**
  * Forum reply manager contains common functions to manage forum reply fields.
@@ -24,10 +25,12 @@ interface ForumReplyManagerInterface {
   public function getFields();
 
   /**
-   * Returns number of new forum replies on a given forum node for a user.
+   * Returns number of new forum replies on a given forum entity for a user.
    *
-   * @param \Drupal\node\NodeInterface $node
-   *   The forum node to which the forum replies are attached to.
+   * Forum terms or forum nodes are allowed to get the count for.
+   *
+   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   *   The forum entity to get the new replies count for.
    * @param string $field_name
    *   (optional) The field_name to count forum replies for. Defaults to any
    *   field.
@@ -36,9 +39,23 @@ interface ForumReplyManagerInterface {
    *   entity.
    *
    * @return int|false
-   *   The number of new forum replies or FALSE if the user is not
-   *   authenticated.
+   *   The number of new forum replies. FALSE is returned if the user is not
+   *   authenticated or the passed entity is no supported forum entity type.
    */
-  public function getCountNewReplies(NodeInterface $node, $field_name = NULL, $timestamp = 0);
+  public function getCountNewReplies(ContentEntityInterface $entity, $field_name = NULL, $timestamp = 0);
+
+  /**
+   * Returns TRUE if the given forum node reply not read by the given user yet.
+   *
+   * @param \Drupal\thunder_forum_reply\ForumReplyInterface $reply
+   *   A forum reply.
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   A user object.
+   *
+   * @return bool
+   *   Boolean indicating whether the given forum reply was not read by the
+   *   given user yet.
+   */
+  public function isUnreadReply(ForumReplyInterface $reply, AccountInterface $account);
 
 }
