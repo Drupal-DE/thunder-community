@@ -9,11 +9,11 @@ use Drupal\user\Plugin\EntityReferenceSelection\UserSelection;
  * Provides specific access control for the user entity type.
  *
  * @EntityReferenceSelection(
- *   id = "thunder_private_message_user",
+ *   id = "thunder_private_message:user",
  *   label = @Translation("Private message: user selection"),
  *   entity_types = {"user"},
- *   group = "thunder_community",
- *   weight = 2
+ *   group = "thunder_private_message",
+ *   weight = 0
  * )
  */
 class PrivateMessageUserSelection extends UserSelection {
