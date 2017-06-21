@@ -1,0 +1,8 @@
+entity.user.thunder_forum_subscription:
+  path: '/user/{user}/forum/subscriptions'
+  defaults:
+    _title: 'Forum subscriptions'
+    _controller: '\Drupal\thunder_forum_subscription\Controller\ForumSubscriptionController::forumSubscriptionsPerUser'
+  requirements:
+    _custom_access: '\Drupal\thunder_forum_subscription\Controller\ForumSubscriptionController::forumSubscriptionsPerUserAccess'
+    user: \d+

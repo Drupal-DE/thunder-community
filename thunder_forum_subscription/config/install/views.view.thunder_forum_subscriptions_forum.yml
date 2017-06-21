@@ -4,7 +4,6 @@ dependencies:
   config:
     - flag.flag.thunder_forum_subscription_forum
     - taxonomy.vocabulary.forums
-    - views.view.thunder_forum_subscriptions_topic
   enforced:
     module:
       - thunder_forum_subscription
@@ -150,7 +149,7 @@ display:
           element_class: ''
           element_label_type: ''
           element_label_class: ''
-          element_label_colon: true
+          element_label_colon: false
           element_wrapper_type: ''
           element_wrapper_class: ''
           element_default_classes: true
@@ -216,7 +215,7 @@ display:
           element_class: ''
           element_label_type: ''
           element_label_class: ''
-          element_label_colon: true
+          element_label_colon: false
           element_wrapper_type: ''
           element_wrapper_class: ''
           element_default_classes: true
@@ -287,7 +286,7 @@ display:
           element_class: ''
           element_label_type: ''
           element_label_class: ''
-          element_label_colon: true
+          element_label_colon: false
           element_wrapper_type: ''
           element_wrapper_class: ''
           element_default_classes: true
@@ -344,7 +343,7 @@ display:
           element_class: ''
           element_label_type: ''
           element_label_class: ''
-          element_label_colon: true
+          element_label_colon: false
           element_wrapper_type: ''
           element_wrapper_class: ''
           element_default_classes: true
@@ -366,18 +365,7 @@ display:
           plugin_id: bundle
       sorts: {  }
       header: {  }
-      footer:
-        view:
-          id: view
-          table: views
-          field: view
-          relationship: none
-          group_type: group
-          admin_label: ''
-          empty: true
-          view_to_insert: 'thunder_forum_subscriptions_topic:default'
-          inherit_arguments: true
-          plugin_id: view
+      footer: {  }
       empty:
         area:
           id: area
@@ -402,7 +390,7 @@ display:
           admin_label: Flags
           required: true
           flag: thunder_forum_subscription_forum
-          user_scope: current
+          user_scope: any
           entity_type: taxonomy_term
           plugin_id: flag_relationship
         reverse__node__taxonomy_forums:
@@ -423,7 +411,7 @@ display:
           relationship: flag_relationship
           group_type: group
           admin_label: ''
-          default_action: default
+          default_action: 'not found'
           exception:
             value: all
             title_enable: false
@@ -447,9 +435,9 @@ display:
             type: 'entity:user'
             fail: 'not found'
           validate_options:
-            access: true
             operation: update
             multiple: 0
+            access: false
             restrict_roles: false
             roles: {  }
           break_phrase: false
@@ -468,14 +456,17 @@ display:
         - url
         - user
       tags: {  }
-  forum_subscriptions:
-    display_plugin: page
-    id: forum_subscriptions
-    display_title: Page
+  block:
+    display_plugin: block
+    id: block
+    display_title: Block
     position: 1
     display_options:
       display_extenders: {  }
-      path: forum/subscriptions
+      block_description: 'Forum subscriptions'
+      block_category: Forum
+      allow:
+        items_per_page: false
     cache_metadata:
       max-age: 0
       contexts:
