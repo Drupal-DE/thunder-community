@@ -6,3 +6,5 @@ dependencies:
   - drupal:forum
   - thunder_forum:thunder_forum
 package: Thunder Community
+interface translation project: thunder_forum_reply
+interface translation server pattern: modules/thunder-community/thunder_forum_reply/translations/%project.%language.po
