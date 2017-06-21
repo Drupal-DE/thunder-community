@@ -12,7 +12,7 @@ use Drupal\user\Plugin\EntityReferenceSelection\UserSelection;
  *   id = "thunder_private_message_user",
  *   label = @Translation("Private message: user selection"),
  *   entity_types = {"user"},
- *   group = "default",
+ *   group = "thunder_community",
  *   weight = 2
  * )
  */
