@@ -8,5 +8,3 @@ dependencies:
   - message_history:message_history
   - message_ui:message_ui
 package: Thunder Community
-interface translation project: thunder_private_message
-interface translation server pattern: modules/thunder-community/thunder_private_message/translations/%project.%language.po
