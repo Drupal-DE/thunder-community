@@ -47,4 +47,19 @@ function thunder_private_message_uninstall() {
     }
     $field_storage_definition_listener->onFieldStorageDefinitionDelete($definitions[$field_name]);
   }
+
+  // Remove module-defined configs.
+  $factory = \Drupal::service('config.factory');
+
+  $factory
+    ->getEditable('flag.flag.message_deleted')
+    ->delete();
+
+  $factory
+    ->getEditable('message.template.thunder_private_message')
+    ->delete();
+
+  $factory
+    ->getEditable('views.view.private_messages')
+    ->delete();
 }
