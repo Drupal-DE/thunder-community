@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: THUNDER FORUM\n"
-"POT-Creation-Date: 2017-016-21 16:50+0000\n"
+"POT-Creation-Date: 2017-06-21 16:50+0000\n"
 "PO-Revision-Date: 2017-06-21 16:50+0200\n"
 "Language-Team: German\n"
 "MIME-Version: 1.0\n"
