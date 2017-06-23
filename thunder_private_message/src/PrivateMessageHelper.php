@@ -5,6 +5,7 @@ namespace Drupal\thunder_private_message;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\message\MessageInterface;
 
 /**
  * Provides private message helper service.
@@ -51,6 +52,41 @@ class PrivateMessageHelper implements PrivateMessageHelperInterface {
   /**
    * {@inheritdoc}
    */
+  public function getMessageBody(MessageInterface $message) {
+    if ($message->hasField('tpm_message') && !$message->get('tpm_message')->isEmpty()) {
+      return $message->get('tpm_message')->first()->value;
+    }
+
+    return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getMessageRecipient(MessageInterface $message) {
+    if ($message->hasField('tpm_recipient') && isset($message->get('tpm_recipient')->entity)) {
+      $recipient = $message->get('tpm_recipient')->first()->entity;
+
+      return $recipient->isAuthenticated() ? $recipient : NULL;
+    }
+
+    return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getMessageSubject(MessageInterface $message) {
+    if ($message->hasField('tpm_title') && !$message->get('tpm_title')->isEmpty()) {
+      return $message->get('tpm_title')->first()->value;
+    }
+
+    return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getUnreadCount(AccountInterface $recipient = NULL) {
     $cache =& drupal_static(get_class($this) . '::' . __METHOD__, []);
     $recipient = isset($recipient) ? $recipient : $this->currentUser;
@@ -63,7 +99,7 @@ class PrivateMessageHelper implements PrivateMessageHelperInterface {
     $entity_type = $this->entityTypeManager->getDefinition('message');
     $field_name = 'tpm_recipient';
     $bundle = 'thunder_private_message';
-    $flag_id = 'message_deleted';
+    $flag_id = 'thunder_private_message_deleted';
 
     /** @var \Drupal\Core\Entity\Sql\SqlEntityStorageInterface $storage */
     $storage = $this->entityTypeManager
@@ -113,18 +149,53 @@ class PrivateMessageHelper implements PrivateMessageHelperInterface {
   public function userCanWriteMessageToOtherUser(AccountInterface $recipient, AccountInterface $sender = NULL) {
     $sender = isset($sender) ? $sender : $this->currentUser;
 
+    // Users try to write message to themselves?
+    if ($sender->id() === $recipient->id()) {
+      return FALSE;
+    }
+
     // Is administrator?
-    if ($sender->hasPermission('bypass thunder_private_message access') || $sender->hasPermission('administer thunder_private_message')) {
+    elseif ($this->userIsAllowedToBypassAccessChecks($sender)) {
       return TRUE;
     }
 
     // User is allowed to write private messages?
-    elseif ($sender->hasPermission('create thunder_private_message message')) {
+    elseif ($sender->hasPermission('create any message template') || $sender->hasPermission('create thunder_private_message message')) {
       // Recipient allows private messages?
-      return !$recipient->hasField('tpm_allow_messages') || !$recipient->tpm_allow_messages->isEmpty() || $recipient->tpm_allow_messages->value;
+      return !$recipient->hasField('tpm_allow_messages') || !empty($recipient->tpm_allow_messages->value);
     }
 
     return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function userIsAllowedToBypassAccessChecks(AccountInterface $account) {
+    // @todo Fix 'adminster messages' permission string when fixed in message
+    // module.
+    return $account->hasPermission('adminster messages')
+      || $account->hasPermission('bypass message access control')
+      || $account->hasPermission('bypass thunder_private_message access')
+      || $account->hasPermission('administer thunder_private_message');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function userIsRecipient(AccountInterface $user, MessageInterface $message) {
+    if (($recipient = $this->getMessageRecipient($message))) {
+      return $recipient->id() === $user->id();
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function userIsSender(AccountInterface $user, MessageInterface $message) {
+    return $message->getOwnerId() === $user->id();
   }
 
 }

@@ -52,7 +52,7 @@ function thunder_private_message_uninstall() {
   $factory = \Drupal::service('config.factory');
 
   $factory
-    ->getEditable('flag.flag.message_deleted')
+    ->getEditable('flag.flag.thunder_private_message_deleted')
     ->delete();
 
   $factory
@@ -60,6 +60,6 @@ function thunder_private_message_uninstall() {
     ->delete();
 
   $factory
-    ->getEditable('views.view.private_messages')
+    ->getEditable('views.view.thunder_private_messages')
     ->delete();
 }

@@ -1,3 +1,4 @@
+langcode: en
 status: true
 dependencies: {  }
 template: thunder_private_message

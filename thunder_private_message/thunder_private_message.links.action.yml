@@ -1,16 +1,14 @@
 thunder_private_message.add:
   route_name: thunder_private_message.add
-  route_parameters:
-    message_template: 'thunder_private_message'
-  title: 'Write message'
+  title: 'Create message'
+  class: \Drupal\thunder_private_message\Plugin\Menu\LocalAction\CreatePrivateMessageLocalAction
   appears_on:
-    - view.private_messages.inbox
-    - view.private_messages.outbox
+    - entity.user.thunder_private_message.inbox
+    - entity.user.thunder_private_message.outbox
 
 thunder_private_message.reply:
-  route_name: entity.message.pmreply
-  route_parameters:
-    message_template: 'thunder_private_message'
-  title: 'Reply'
+  route_name: thunder_private_message.add
+  title: 'Create reply'
+  class: \Drupal\thunder_private_message\Plugin\Menu\LocalAction\ReplyToPrivateMessageLocalAction
   appears_on:
-    - entity.message.canonical
+    - entity.message.canonical.thunder_private_message.inbox
