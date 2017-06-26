@@ -2,15 +2,12 @@
 
 namespace Drupal\thunder_private_message;
 
-use Drupal\Core\Link;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\Url;
 use Drupal\flag\Event\FlagEvents;
 use Drupal\flag\Event\FlaggingEvent;
 use Drupal\flag\FlagLinkBuilder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use function drupal_set_message;
 
 /**
  * Event subscriber for flags provided by "Thunder Private Message".
@@ -20,6 +17,13 @@ class FlagSubscriber implements EventSubscriberInterface {
   use StringTranslationTrait;
 
   /**
+   * The current user account.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
+  protected $currentUser;
+
+  /**
    * The flag service.
    *
    * @var \Drupal\flag\FlagLinkBuilder
@@ -27,23 +31,16 @@ class FlagSubscriber implements EventSubscriberInterface {
   protected $linkBuilder;
 
   /**
-   * The current user account.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $account;
-
-  /**
    * Constructs a new FlagSubscriber.
    *
    * @param \Drupal\flag\FlagLinkBuilder $link_builder
    *   Flag link builder to use.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user account.
    */
-  public function __construct(FlagLinkBuilder $link_builder, AccountInterface $account) {
+  public function __construct(FlagLinkBuilder $link_builder, AccountInterface $current_user) {
     $this->linkBuilder = $link_builder;
-    $this->account = $account;
+    $this->currentUser = $current_user;
   }
 
   /**
@@ -51,7 +48,9 @@ class FlagSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
     $events = [];
+
     $events[FlagEvents::ENTITY_FLAGGED][] = ['messageUndo', -100];
+
     return $events;
   }
 
@@ -64,22 +63,21 @@ class FlagSubscriber implements EventSubscriberInterface {
   public function messageUndo(FlaggingEvent $event) {
     /* @var $flagging \Drupal\flag\FlaggingInterface */
     $flagging = $event->getFlagging();
+
     /* @var $flag \Drupal\flag\FlagInterface */
     $flag = $flagging->getFlag();
+
+    /** @var \Drupal\message\MessageInterface $entity */
     $entity = $flagging->getFlaggable();
 
-    // Unfortunately we have to build the ink by ourself.
-    $destination = new Url('view.private_messages.inbox', ['user' => $this->account->id()]);
-    $action = $flag->isFlagged($entity) ? 'unflag' : 'flag';
-    $url = $flag->getLinkTypePlugin()->getUrl($action, $flag, $entity);
-    $url->setOption('query', ['destination' => $destination->getInternalPath()]);
-    $title = $action === 'unflag' ? $flag->getUnflagShortText() : $flag->getFlagShortText();
-
-    $message_params = [
-      '@message' => $flag->getFlagMessage(),
-      '@undo' => Link::fromTextAndUrl($title, $url)->toString(),
-    ];
-    drupal_set_message($this->t('@message @undo', $message_params));
+    if ($flag->isFlagged($entity, $this->currentUser)) {
+      // @todo Does not work currently due to wrong CSRF token which blocks
+      // access to unflag route.
+      drupal_set_message($this->t('@message @undo', [
+        '@message' => $flag->getFlagMessage(),
+        '@undo' => $flag->getLinkTypePlugin()->getAsLink($flag, $entity)->toString(),
+      ]), 'status', TRUE);
+    }
   }
 
 }

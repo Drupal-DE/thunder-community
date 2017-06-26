@@ -1,3 +1,14 @@
-entity.message.private_messages:
-  deriver: 'Drupal\thunder_private_message\Plugin\Derivative\PrivateMessageDeriver'
-  weight: 25
+entity.user.thunder_private_message:
+  route_name: entity.user.thunder_private_message.inbox
+  base_route: entity.user.canonical
+  title: Private messages
+
+entity.user.thunder_private_message.inbox:
+  route_name: entity.user.thunder_private_message.inbox
+  parent_id: entity.user.thunder_private_message
+  title: Inbox
+
+entity.user.thunder_private_message.outbox:
+  route_name: entity.user.thunder_private_message.outbox
+  parent_id: entity.user.thunder_private_message
+  title: Outbox

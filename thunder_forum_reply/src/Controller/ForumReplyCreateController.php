@@ -126,7 +126,7 @@ class ForumReplyCreateController extends ControllerBase {
    *   those cases, $pfrid is the parent forum replie's ID. Defaults to NULL.
    *
    * @return \Drupal\Core\Access\AccessResultInterface
-   *   An access result
+   *   An access result.
    *
    * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
    */

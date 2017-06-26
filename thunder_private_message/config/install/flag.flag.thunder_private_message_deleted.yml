@@ -1,16 +1,17 @@
+langcode: en
 status: true
 dependencies: {  }
-id: message_deleted
-label: 'Message: deleted'
+id: thunder_private_message_deleted
+label: 'Deleted private message'
 bundles:
   - thunder_private_message
 entity_type: message
 global: false
 weight: 0
-flag_short: 'delete message'
+flag_short: Delete
 flag_long: ''
 flag_message: 'The message has been deleted.'
-unflag_short: 'Undo message deletion.'
+unflag_short: Restore
 unflag_long: ''
 unflag_message: 'The message has been restored.'
 unflag_denied_text: ''

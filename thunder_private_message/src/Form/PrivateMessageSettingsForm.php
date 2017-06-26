@@ -9,7 +9,7 @@ use Drupal\user\RoleInterface;
 /**
  * Configure private message settings.
  */
-class MessageSettingsForm extends ConfigFormBase {
+class PrivateMessageSettingsForm extends ConfigFormBase {
 
   /**
    * {@inheritdoc}
@@ -40,7 +40,7 @@ class MessageSettingsForm extends ConfigFormBase {
     $form['recipients']['roles'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Roles'),
-      '#description' => $this->t('Limit the list of available recipients to selected roles.'),
+      '#description' => $this->t('Limit the list of available recipients to selected roles. If none are selected, all are allowed.'),
       '#default_value' => $config->get('recipients.roles') ?: [],
       '#options' => $roles,
     ];
