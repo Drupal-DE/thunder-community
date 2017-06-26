@@ -1,0 +1,9 @@
+# Schema for the configuration files of the Thunder Notify module.
+
+thunder_notify.source.*:
+  type: config_object
+  label: 'Notification source'
+  mapping:
+    message:
+      type: text
+      label: 'Message to send in a notification'

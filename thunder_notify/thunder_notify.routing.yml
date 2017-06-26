@@ -1,0 +1,10 @@
+thunder_notify.cron:
+  path: '/thunder_notify/cron/{cron_key}'
+  defaults:
+    _controller: '\Drupal\thunder_notify\Controller\CronController::notify'
+    _description: 'Run the notification cron process'
+    _title: 'Thunder Notify cron'
+  options:
+    no_cache: TRUE
+  requirements:
+    _custom_access: '\Drupal\thunder_notify\Controller\CronController::access'

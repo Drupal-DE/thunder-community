@@ -1,0 +1,7 @@
+services:
+  thunder_notify.notification.manager:
+    class: Drupal\thunder_notify\NotificationManager
+  thunder_notify.notification.manager.source:
+    class: Drupal\thunder_notify\NotificationSourceManager
+  thunder_notify.notification.manager.type:
+    class: Drupal\thunder_notify\NotificationTypeManager

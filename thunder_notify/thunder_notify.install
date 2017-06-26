@@ -1,0 +1,58 @@
+<?php
+
+/**
+ * @file
+ * Install and update functions for "Thunder Notify" module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function thunder_forum_access_schema() {
+  $schema = [];
+
+  // Notifications.
+  $schema['thunder_notify'] = [
+    'description' => 'Records pending notifications.',
+    'fields' => [
+      'nid' => [
+        'description' => 'The primary identifier for a notification.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'uid' => [
+        'description' => 'The {users}.uid of the notification.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'source' => [
+        'description' => 'The notification source plugin name.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'data' => [
+        'description' => 'The arbitrary data for the notification.',
+        'type' => 'blob',
+        'not null' => FALSE,
+        'size' => 'big',
+        'serialize' => TRUE,
+      ],
+    ],
+    'primary key' => [
+      'nid',
+    ],
+    'unique keys' => [
+      'uid_source' => ['uid', 'source'],
+    ],
+    'indexes' => [
+      'nid' => ['nid'],
+      'uid_source' => ['uid', 'source'],
+    ],
+  ];
+
+  return $schema;
+}

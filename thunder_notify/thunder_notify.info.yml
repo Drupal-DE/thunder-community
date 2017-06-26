@@ -1,0 +1,5 @@
+name: Thunder Notify
+description: Provides a generic notification mechanism.
+core: 8.x
+type: module
+package: Thunder Community
