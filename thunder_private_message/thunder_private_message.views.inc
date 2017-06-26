@@ -94,31 +94,32 @@ function thunder_private_message_views_data() {
  */
 function thunder_private_message_views_data_alter(array &$data) {
   /** @var \Drupal\flag\FlagInterface $flag */
-  $flag = \Drupal::service('flag')->getFlagById('thunder_private_message_deleted');
+  if (($flag = \Drupal::service('flag')->getFlagById('thunder_private_message_deleted'))) {
 
-  /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager */
-  $entity_type_manager = \Drupal::entityTypeManager();
+    /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager */
+    $entity_type_manager = \Drupal::entityTypeManager();
 
-  $entity_type_id = $flag->getFlaggableEntityTypeId();
+    $entity_type_id = $flag->getFlaggableEntityTypeId();
 
-  /** @var \Drupal\Core\Entity\EntityTypeInterface $entity_type */
-  $entity_type = $entity_type_manager->getDefinition($entity_type_id);
+    /** @var \Drupal\Core\Entity\EntityTypeInterface $entity_type */
+    $entity_type = $entity_type_manager->getDefinition($entity_type_id);
 
-  if ($entity_type->hasHandlerClass('views_data')) {
-    $base_table = $entity_type_manager->getHandler($entity_type_id, 'views_data')->getViewsTableForEntityType($entity_type);
+    if ($entity_type->hasHandlerClass('views_data')) {
+      $base_table = $entity_type_manager->getHandler($entity_type_id, 'views_data')->getViewsTableForEntityType($entity_type);
 
-    $data[$base_table]['thunder_private_message_flag_relationship'] = [
-      'title' => t('Deleted private message flag'),
-      'help' => t('Limit results to only those entities flagged as deleted private message (either by sender or recipient).'),
-      'relationship' => [
-        'group' => t('Flag'),
-        'label' => t('Deleted private message flag'),
-        'base' => 'flagging',
-        'base field' => 'entity_id',
-        'relationship field' => $entity_type->getKey('id'),
-        'id' => 'thunder_private_message_deleted_flag_relationship',
-        'flaggable' => $entity_type_id,
-      ],
-    ];
+      $data[$base_table]['thunder_private_message_flag_relationship'] = [
+        'title' => t('Deleted private message flag'),
+        'help' => t('Limit results to only those entities flagged as deleted private message (either by sender or recipient).'),
+        'relationship' => [
+          'group' => t('Flag'),
+          'label' => t('Deleted private message flag'),
+          'base' => 'flagging',
+          'base field' => 'entity_id',
+          'relationship field' => $entity_type->getKey('id'),
+          'id' => 'thunder_private_message_deleted_flag_relationship',
+          'flaggable' => $entity_type_id,
+        ],
+      ];
+    }
   }
 }
