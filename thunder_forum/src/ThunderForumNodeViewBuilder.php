@@ -61,6 +61,8 @@ class ThunderForumNodeViewBuilder extends NodeViewBuilder {
       CacheableMetadata::createFromRenderArray($links)
         ->addCacheTags($entity->getCacheTags())
         ->addCacheContexts($entity->getCacheContexts())
+        ->addCacheContexts(['user.permissions'])
+        ->addCacheContexts(['user.roles'])
         ->addCacheContexts(['thunder_forum_node_link_location' . (!empty($location) ? ':' . $location : '')])
         ->mergeCacheMaxAge($entity->getCacheMaxAge())
         ->applyTo($links);
