@@ -76,8 +76,11 @@ function thunder_forum_entity_extra_field_info() {
  * Implements hook_ENTITY_TYPE_view() for node entities.
  */
 function thunder_forum_node_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
+  /** @var \Drupal\thunder_forum\ThunderForumManagerInterface $forum_manager */
+  $forum_manager = \Drupal::service('forum_manager');
+
   // Forum topic.
-  if ($entity->bundle() === 'forum') {
+  if ($forum_manager->checkNodeType($entity)) {
     // Build icon (if needed).
     if ($display->getComponent('icon')) {
       $build['icon'] = [
@@ -295,6 +298,26 @@ function thunder_forum_theme($existing, $type, $theme, $path) {
     'variables' => [
       'topic_count' => 0,
       'reply_count' => 0,
+    ],
+  ];
+
+  // Forum user rank.
+  $items['thunder_forum_user_rank'] = [
+    'variables' => [
+      'context' => NULL,
+      'user_is_admin' => NULL,
+      'user_is_moderator' => NULL,
+      'statistics' => NULL,
+    ],
+  ];
+
+  // Forum user rank name.
+  $items['thunder_forum_user_rank_name'] = [
+    'variables' => [
+      'context' => NULL,
+      'user_is_admin' => NULL,
+      'user_is_moderator' => NULL,
+      'statistics' => NULL,
     ],
   ];
 

@@ -12,6 +12,7 @@ use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\forum\ForumManager;
 use Drupal\node\NodeInterface;
 use Drupal\taxonomy\TermInterface;
+use Drupal\thunder_forum_reply\ForumReplyInterface;
 
 /**
  * Provides thunder forum manager service.
@@ -69,6 +70,18 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
     }
 
     return $cache[$tid];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getForumNodeTypes() {
+    $node_types = [];
+    if (($field_storage_config = $this->entityManager->getStorage('field_storage_config')->load('node.taxonomy_forums'))) {
+      $node_types = $field_storage_config->getBundles();
+    }
+
+    return $node_types;
   }
 
   /**
@@ -352,6 +365,48 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
       'topics' => $topics,
       'header' => $header,
     ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getUserStatistics($uid) {
+    $cache =& drupal_static(get_class($this) . '::' . __METHOD__);
+
+    if (!isset($cache[$uid])) {
+      $cache[$uid] = (object) [
+        'reply_count' => 0,
+        'topic_count' => 0,
+        'sum_count' => 0,
+      ];
+
+      // Topic count.
+      if (($node_types = $this->getForumNodeTypes())) {
+        $cache[$uid]->topic_count = $this->entityManager
+          ->getStorage('node')
+          ->getQuery()
+          ->condition('type', $node_types, 'IN')
+          ->condition('uid', $uid)
+          ->condition('status', NODE_PUBLISHED)
+          ->count()->execute();
+      }
+
+      // Forum reply count.
+      if ($this->moduleHandler->moduleExists('thunder_forum_reply')) {
+        $cache[$uid]->reply_count = $this->entityManager
+          ->getStorage('thunder_forum_reply')
+          ->getQuery()
+          ->condition('uid', $uid)
+          ->condition('status', ForumReplyInterface::PUBLISHED)
+          ->condition('nid.entity.status', NODE_PUBLISHED)
+          ->count()->execute();
+      }
+
+      // Summed up post count.
+      $cache[$uid]->sum_count = $cache[$uid]->reply_count + $cache[$uid]->topic_count;
+    }
+
+    return $cache[$uid];
   }
 
   /**

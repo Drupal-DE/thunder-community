@@ -18,4 +18,4 @@ services:
     arguments: ['@forum_manager']
   thunder_forum.lazy_builder:
     class: Drupal\thunder_forum\ThunderForumLazyBuilder
-    arguments: ['@entity_type.manager', '@module_handler']
+    arguments: ['@entity_type.manager', '@forum_manager']

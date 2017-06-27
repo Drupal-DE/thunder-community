@@ -18,13 +18,23 @@ class ThunderForumLazyBuilder implements ThunderForumLazyBuilderInterface {
   protected $entityTypeManager;
 
   /**
+   * The forum manager.
+   *
+   * @var \Drupal\thunder_forum\ThunderForumManagerInterface
+   */
+  protected $forumManager;
+
+  /**
    * Constructs a new ThunderForumLazyBuilder object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
+   * @param \Drupal\thunder_forum\ThunderForumManagerInterface $forum_manager
+   *   The forum manager.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, ThunderForumManagerInterface $forum_manager) {
     $this->entityTypeManager = $entity_type_manager;
+    $this->forumManager = $forum_manager;
   }
 
   /**
@@ -52,6 +62,60 @@ class ThunderForumLazyBuilder implements ThunderForumLazyBuilderInterface {
         ->addCacheableDependency($entity)
         ->applyTo($build);
     }
+
+    return $build;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function renderUserPostCount($uid) {
+    $statistics = $this->forumManager->getUserStatistics($uid);
+    $count = 0;
+
+    if (isset($statistics->sum_count)) {
+      $count += $statistics->sum_count;
+    }
+
+    $build = [
+      '#markup' => $count,
+    ];
+
+    return $build;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function renderUserRank($uid, $nid = NULL) {
+    $build = [
+      '#theme' => 'thunder_forum_user_rank',
+      '#context' => [
+        'user' => $this->entityTypeManager->getStorage('user')->load($uid),
+        'node' => isset($nid) ? $this->entityTypeManager->getStorage('node')->load($nid) : NULL,
+      ],
+      '#user_is_admin' => FALSE,
+      '#user_is_moderator' => FALSE,
+      '#statistics' => $this->forumManager->getUserStatistics($uid),
+    ];
+
+    return $build;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function renderUserRankName($uid, $nid = NULL) {
+    $build = [
+      '#theme' => 'thunder_forum_user_rank_name',
+      '#context' => [
+        'user' => $this->entityTypeManager->getStorage('user')->load($uid),
+        'node' => isset($nid) ? $this->entityTypeManager->getStorage('node')->load($nid) : NULL,
+      ],
+      '#user_is_admin' => FALSE,
+      '#user_is_moderator' => FALSE,
+      '#statistics' => $this->forumManager->getUserStatistics($uid),
+    ];
 
     return $build;
   }

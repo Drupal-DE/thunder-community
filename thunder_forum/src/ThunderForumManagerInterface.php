@@ -24,6 +24,14 @@ interface ThunderForumManagerInterface extends ForumManagerInterface {
   public function getChildTermIds($tid);
 
   /**
+   * Return forum-specific node type names.
+   *
+   * @return array
+   *   An array of forum node type machine-names (forum node bundle names).
+   */
+  public function getForumNodeTypes();
+
+  /**
    * Provides statistics for a forum.
    *
    * @param int $tid
@@ -83,6 +91,21 @@ interface ThunderForumManagerInterface extends ForumManagerInterface {
    *   The parent forum taxonomy term ID on success, otherwise '0'.
    */
   public function getParentId($tid);
+
+  /**
+   * Provides statistics for a forum user.
+   *
+   * @param int $uid
+   *   The user ID.
+   *
+   * @return \stdClass
+   *   Statistics for the given user with the following items:
+   *     - reply_count: The number of published forum replies by the given user.
+   *     - sum_count: The total summed up number of published forum posts for
+   *       the given user.
+   *     - topic_count: The number of published forum topics by the given user.
+   */
+  public function getUserStatistics($uid);
 
   /**
    * Returns TRUE if the given taxonomy term is a forum container.
