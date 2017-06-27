@@ -188,10 +188,14 @@ class ForumReply extends ContentEntityBase implements ForumReplyInterface {
       ->setRevisionable(TRUE)
       ->setTranslatable(TRUE)
       ->setDefaultValue(TRUE)
+      ->setSettings([
+        'on_label' => t('Published'),
+        'off_label' => t('Not published'),
+      ])
       ->setDisplayOptions('form', [
         'type' => 'boolean_checkbox',
         'settings' => [
-          'display_label' => TRUE,
+          'display_label' => FALSE,
         ],
         'weight' => 15,
       ]);
