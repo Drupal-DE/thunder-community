@@ -76,8 +76,11 @@ function thunder_forum_entity_extra_field_info() {
  * Implements hook_ENTITY_TYPE_view() for node entities.
  */
 function thunder_forum_node_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
+  /** @var \Drupal\thunder_forum\ThunderForumManagerInterface $forum_manager */
+  $forum_manager = \Drupal::service('forum_manager');
+
   // Forum topic.
-  if ($entity->bundle() === 'forum') {
+  if ($forum_manager->checkNodeType($entity)) {
     // Build icon (if needed).
     if ($display->getComponent('icon')) {
       $build['icon'] = [
