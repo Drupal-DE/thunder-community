@@ -1,7 +1,7 @@
 thunder_notify.cron:
   path: '/thunder_notify/cron/{cron_key}'
   defaults:
-    _controller: '\Drupal\thunder_notify\Controller\CronController::notify'
+    _controller: '\Drupal\thunder_notify\Controller\CronController::sendNotifications'
     _description: 'Run the notification cron process'
     _title: 'Thunder Notify cron'
   options:

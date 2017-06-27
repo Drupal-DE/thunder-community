@@ -41,4 +41,20 @@ interface NotificationSourceInterface extends ContainerFactoryPluginInterface {
    */
   public function isValid();
 
+  /**
+   * Get the replacement token for the message.
+   *
+   * @return string
+   *   The plugins replacement token.
+   */
+  public function getToken();
+
+  /**
+   * Get a list of defined message tokens.
+   *
+   * @return array
+   *   List of message tokens with the token as key and the label as value.
+   */
+  public function getMessageTokens();
+
 }

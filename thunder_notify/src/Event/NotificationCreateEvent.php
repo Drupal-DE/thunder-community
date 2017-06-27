@@ -33,6 +33,7 @@ class NotificationCreateEvent extends Event {
    */
   public function __construct($source, array $data = []) {
     $this->source = $source;
+    $this->data = $data;
   }
 
   /**

@@ -8,7 +8,7 @@
 /**
  * Implements hook_schema().
  */
-function thunder_forum_access_schema() {
+function thunder_notify_schema() {
   $schema = [];
 
   // Notifications.
@@ -44,9 +44,6 @@ function thunder_forum_access_schema() {
     ],
     'primary key' => [
       'nid',
-    ],
-    'unique keys' => [
-      'uid_source' => ['uid', 'source'],
     ],
     'indexes' => [
       'nid' => ['nid'],

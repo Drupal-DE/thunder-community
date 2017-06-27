@@ -1,2 +1,11 @@
-message: 'There are new replies in the topics you have subscribed to.'
-language: en
+langcode: en
+dependencies:
+  enforced:
+    module:
+      - thunder_notify
+id: topic_subscription
+message: >
+  There are new replies in the topics you have subscribed to:
+
+
+  {topic-list}

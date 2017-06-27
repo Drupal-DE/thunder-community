@@ -1,16 +1,20 @@
 <?php
 
-namespace Drupal\thunder_forum_subscription;
+namespace Drupal\thunder_forum_subscription\Plugin\NotificationSource;
 
 use Drupal\thunder_notify\NotificationSourceBase;
 
 /**
  * Notification source for forum topic subscriptions.
  *
- * @NotificationSouce(
+ * @NotificationSource(
  *   id = "topic_subscription",
  *   label = @Translation("Topic subscription"),
- *   group = "thunder_forum_subscriptions"
+ *   token = "topic-subscriptions",
+ *   message_tokens = {
+ *     "topic-list": @Translation("List of topics with new replies.")
+ *   },
+ *   category = "thunder_forum_subscriptions"
  * )
  */
 class TopicSubscription extends NotificationSourceBase {
@@ -19,7 +23,24 @@ class TopicSubscription extends NotificationSourceBase {
    * {@inheritdoc}
    */
   public function isValid() {
-    parent::isValid();
+    // @todo: Check if the user still should receive a message.
+    return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildMessage() {
+    $message = parent::buildMessage();
+    if (strpos($message, '{topic-list}') === FALSE) {
+      return $message;
+    }
+
+    $topic_list = [];
+    foreach ($this->getData() as $entity_info) {
+      $topic_list[] = $entity_info['url'];
+    }
+    return strtr($message, ['{topic-list}' => ' - ' . implode("\n - ", $topic_list)]);
   }
 
 }

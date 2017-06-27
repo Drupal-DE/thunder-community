@@ -1,8 +1,9 @@
 <?php
 
-namespace Drupal\thunder_notify;
+namespace Drupal\thunder_notify\Plugin\NotificationType;
 
-use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\ImmutableConfig;
+use Drupal\thunder_notify\NotificationTypeBase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -13,7 +14,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @NotificationType(
  *   id = "logger",
- *   label = @Translation("Logger")
+ *   label = @Translation("Logger"),
+ *   message_tokens = {
+ *     "notifications": @Translation("Messages from notification sources")
+ *   }
  * )
  */
 class Logger extends NotificationTypeBase {
@@ -28,8 +32,8 @@ class Logger extends NotificationTypeBase {
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ConfigFactoryInterface $configFactory, LoggerInterface $logger) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $configFactory);
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, ImmutableConfig $config, LoggerInterface $logger) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $config);
     $this->logger = $logger;
   }
 
@@ -37,11 +41,11 @@ class Logger extends NotificationTypeBase {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    parent::create(
+    return new static(
       $configuration,
       $plugin_id,
       $plugin_definition,
-      \Drupal::configFactory(),
+      \Drupal::config("thunder_notify.type.{$plugin_id}"),
       \Drupal::logger('thunder_notify')
     );
   }
@@ -50,8 +54,9 @@ class Logger extends NotificationTypeBase {
    * {@inheritdoc}
    */
   protected function buildMessage() {
-    $output = [];
-    $output = $this->t('New notification for user @username', ['@username' => '']);
+    $message = parent::buildMessage();
+
+    $output = [$message];
 
     return implode("\n", $output);
   }
@@ -59,13 +64,18 @@ class Logger extends NotificationTypeBase {
   /**
    * {@inheritdoc}
    */
-  public function send() {
-    if (!$this->configFactory->get('thunder_notify.settings')->get('logger.enabled')) {
-      // Nothing to do here.
-      return TRUE;
-    }
+  public function send(array $messages, array $replacements = []) {
+    $log_message[] = '<pre>';
+    $log_message[] = $this->config->get('subject');
+    $log_message[] = '---';
+    $log_message[] = $this->buildMessage();
+    $log_message[] = '</pre>';
 
-    $this->logger->info($this->buildMessage());
+    $replacements += [
+      '{messages}' => implode("\n", $messages),
+    ];
+
+    $this->logger->info(strtr(implode("\n", $log_message), $replacements));
     return TRUE;
   }
 

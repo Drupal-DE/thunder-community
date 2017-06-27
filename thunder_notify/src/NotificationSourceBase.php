@@ -37,7 +37,7 @@ abstract class NotificationSourceBase extends PluginBase implements Notification
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static($configuration, $plugin_id, $plugin_definition, \Drupal::config("thunder.notify.source.{$plugin_id}"));
+    return new static($configuration, $plugin_id, $plugin_definition, \Drupal::config("thunder_notify.source.{$plugin_id}"));
   }
 
   /**
@@ -66,6 +66,20 @@ abstract class NotificationSourceBase extends PluginBase implements Notification
    */
   public function isValid() {
     return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getToken() {
+    return $this->pluginDefinition['token'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getMessageTokens() {
+    return isset($this->pluginDefinition['message_tokens']) ? $this->pluginDefinition['message_tokens'] : [];
   }
 
 }

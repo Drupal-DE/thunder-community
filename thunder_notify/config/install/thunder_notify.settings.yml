@@ -1,2 +1,3 @@
-logger:
-  enabled: true
+cron_access_key: i2mb4xKOzk0W8vEiw6nLsbni
+notification_types:
+  logger: true

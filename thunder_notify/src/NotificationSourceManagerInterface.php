@@ -8,11 +8,19 @@ namespace Drupal\thunder_notify;
 interface NotificationSourceManagerInterface {
 
   /**
-   * Save a single notification source.
+   * Get list of notification source plugin instances.
    *
-   * @param \Drupal\thunder_notify\NotificationSourceInterface $source
-   *   The notification source plugin.
+   * @return \Drupal\thunder_notify\NotificationSourceInterface[]
+   *   List of notification source plugins.
    */
-  public function save(NotificationSourceInterface $source);
+  public function getInstances();
+
+  /**
+   * Get grouped list of notification source plugin instances.
+   *
+   * @return \Drupal\thunder_notify\NotificationSourceInterface[]
+   *   Grouped list of notification source plugins.
+   */
+  public function getGroupedInstances();
 
 }

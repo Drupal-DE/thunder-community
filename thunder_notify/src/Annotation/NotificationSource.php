@@ -45,12 +45,12 @@ class NotificationSource extends Plugin {
   public $weight;
 
   /**
-   * The plugin group.
+   * The plugin category.
    *
    * Used to group sources within a single notification.
    *
    * @var string
    */
-  public $group = 'default';
+  public $category = 'default';
 
 }

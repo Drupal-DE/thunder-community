@@ -1,7 +1,20 @@
 services:
   thunder_notify.notification.manager:
     class: Drupal\thunder_notify\NotificationManager
+    arguments: ['@thunder_notify.notification.storage', '@thunder_notify.notification.manager.source', '@thunder_notify.notification.manager.type', '@config.factory', '@entity_type.manager']
   thunder_notify.notification.manager.source:
     class: Drupal\thunder_notify\NotificationSourceManager
+    arguments: ['@config.factory']
+    parent: default_plugin_manager
   thunder_notify.notification.manager.type:
     class: Drupal\thunder_notify\NotificationTypeManager
+    arguments: ['@config.factory']
+    parent: default_plugin_manager
+  thunder_notify.notification.storage:
+    class: Drupal\thunder_notify\NotificationStorage
+    arguments: ['@database']
+  thunder_notify.notification.event_subscriber:
+    class: Drupal\thunder_notify\EventSubscriber\NotificationSubscriber
+    arguments: ['@thunder_notify.notification.storage']
+    tags:
+      - { name: 'event_subscriber' }
