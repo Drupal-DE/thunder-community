@@ -24,6 +24,14 @@ interface ThunderForumManagerInterface extends ForumManagerInterface {
   public function getChildTermIds($tid);
 
   /**
+   * Return forum-specific node type names.
+   *
+   * @return array
+   *   An array of forum node type machine-names (forum node bundle names).
+   */
+  public function getForumNodeTypes();
+
+  /**
    * Provides statistics for a forum.
    *
    * @param int $tid

@@ -74,6 +74,18 @@ class ThunderForumManager extends ForumManager implements ThunderForumManagerInt
   /**
    * {@inheritdoc}
    */
+  public function getForumNodeTypes() {
+    $node_types = [];
+    if (($field_storage_config = $this->entityManager->getStorage('field_storage_config')->load('node.taxonomy_forums'))) {
+      $node_types = $field_storage_config->getBundles();
+    }
+
+    return $node_types;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getForumStatistics($tid) {
     // Forum reply entity type is not used instead of comments?
     if (!$this->moduleHandler->moduleExists('thunder_forum_reply')) {
