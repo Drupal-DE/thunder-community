@@ -193,6 +193,40 @@ function thunder_forum_access_preprocess_thunder_forum_icon(&$variables) {
 }
 
 /**
+ * Implements hook_preprocess_HOOK() for thunder-forum-user-rank.html.twig.
+ */
+function thunder_forum_access_preprocess_thunder_forum_user_rank(&$variables) {
+  /** @var \Drupal\node\NodeInterface|null $node */
+  $node = !empty($variables['context']['node']) ? $variables['context']['node'] : NULL;
+
+  /** @var \Drupal\Core\Session\AccountInterface|null $user */
+  $user = !empty($variables['context']['user']) ? $variables['context']['user'] : NULL;
+
+  if ($node && $user) {
+    /** @var \Drupal\thunder_forum\ThunderForumManagerInterface $forum_manager */
+    $forum_manager = \Drupal::service('forum_manager');
+
+    if ($term = $forum_manager->getForumTermByNode($node)) {
+      /** @var \Drupal\thunder_forum_access\Access\ForumAccessManagerInterface $forum_access_manager */
+      $forum_access_manager = \Drupal::service('thunder_forum_access.forum_access_manager');
+
+      // Account is forum administrator?
+      $variables['user_is_admin'] = $forum_access_manager->userIsForumAdmin($user);
+
+      // Account is forum moderator?
+      $variables['user_is_moderator'] = $forum_access_manager->userIsForumModerator($term->id(), $user);
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for thunder-forum-user-rank-name.html.twig.
+ */
+function thunder_forum_access_preprocess_thunder_forum_user_rank_name(&$variables) {
+  thunder_forum_access_preprocess_thunder_forum_user_rank($variables);
+}
+
+/**
  * Implements hook_query_TAG_alter().
  */
 function thunder_forum_access_query_taxonomy_term_access_alter(AlterableInterface $query) {
