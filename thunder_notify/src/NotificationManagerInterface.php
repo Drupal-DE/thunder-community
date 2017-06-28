@@ -2,16 +2,23 @@
 
 namespace Drupal\thunder_notify;
 
+use Drupal\Core\Entity\EntityInterface;
+
 /**
  * Interface for notification managers.
  */
 interface NotificationManagerInterface {
 
   /**
-   * Send all pending notifications.
+   * Collect notifications to send.
    *
    * Notifications with sources having the same category will be combined into
    * one message.
+   */
+  public function collect();
+
+  /**
+   * Send all pending notifications.
    */
   public function send();
 
@@ -30,5 +37,16 @@ interface NotificationManagerInterface {
    *   List of tokens to replace, keyed by token.
    */
   public function getGlobalTokens();
+
+  /**
+   * Get tokens for a specific user object.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $user
+   *   The user object.
+   *
+   * @return array
+   *   List of user tokens.
+   */
+  public function getUserTokens(EntityInterface $user);
 
 }

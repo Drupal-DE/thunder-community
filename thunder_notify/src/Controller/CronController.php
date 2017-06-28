@@ -49,6 +49,18 @@ class CronController extends ControllerBase {
   }
 
   /**
+   * Collect notifications to send.
+   *
+   * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   *   RedirectResponse.
+   */
+  public function collectNotifications() {
+    $this->notificationManager->collect();
+
+    return new Response('', 204);
+  }
+
+  /**
    * Send pending notifications.
    *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
