@@ -88,16 +88,37 @@ class ThunderForumLazyBuilder implements ThunderForumLazyBuilderInterface {
    * {@inheritdoc}
    */
   public function renderUserRank($uid, $nid = NULL) {
-    $build = [
-      '#theme' => 'thunder_forum_user_rank',
-      '#context' => [
-        'user' => $this->entityTypeManager->getStorage('user')->load($uid),
-        'node' => isset($nid) ? $this->entityTypeManager->getStorage('node')->load($nid) : NULL,
-      ],
-      '#user_is_admin' => FALSE,
-      '#user_is_moderator' => FALSE,
-      '#statistics' => $this->forumManager->getUserStatistics($uid),
-    ];
+    $build = [];
+    $user = $this->entityTypeManager->getStorage('user')->load($uid);
+    $node = isset($nid) ? $this->entityTypeManager->getStorage('node')->load($nid) : NULL;
+
+    if ($user) {
+      $build = [
+        '#theme' => 'thunder_forum_user_rank',
+        '#context' => [
+          'user' => $user,
+          'node' => $node,
+        ],
+        '#user_is_admin' => FALSE,
+        '#user_is_moderator' => FALSE,
+        '#statistics' => $this->forumManager->getUserStatistics($uid),
+        '#cache' => [
+          'max-age' => 30,
+        ],
+      ];
+
+      // Add user to cache metadata.
+      CacheableMetadata::createFromRenderArray($build)
+        ->addCacheableDependency($user)
+        ->applyTo($build);
+
+      // Add node to cache metadata (if any).
+      if ($node) {
+        CacheableMetadata::createFromRenderArray($build)
+          ->addCacheableDependency($node)
+          ->applyTo($build);
+      }
+    }
 
     return $build;
   }
@@ -106,16 +127,37 @@ class ThunderForumLazyBuilder implements ThunderForumLazyBuilderInterface {
    * {@inheritdoc}
    */
   public function renderUserRankName($uid, $nid = NULL) {
-    $build = [
-      '#theme' => 'thunder_forum_user_rank_name',
-      '#context' => [
-        'user' => $this->entityTypeManager->getStorage('user')->load($uid),
-        'node' => isset($nid) ? $this->entityTypeManager->getStorage('node')->load($nid) : NULL,
-      ],
-      '#user_is_admin' => FALSE,
-      '#user_is_moderator' => FALSE,
-      '#statistics' => $this->forumManager->getUserStatistics($uid),
-    ];
+    $build = [];
+    $user = $this->entityTypeManager->getStorage('user')->load($uid);
+    $node = isset($nid) ? $this->entityTypeManager->getStorage('node')->load($nid) : NULL;
+
+    if ($user) {
+      $build = [
+        '#theme' => 'thunder_forum_user_rank_name',
+        '#context' => [
+          'user' => $user,
+          'node' => $node,
+        ],
+        '#user_is_admin' => FALSE,
+        '#user_is_moderator' => FALSE,
+        '#statistics' => $this->forumManager->getUserStatistics($uid),
+        '#cache' => [
+          'max-age' => 30,
+        ],
+      ];
+
+      // Add user to cache metadata.
+      CacheableMetadata::createFromRenderArray($build)
+        ->addCacheableDependency($user)
+        ->applyTo($build);
+
+      // Add node to cache metadata (if any).
+      if ($node) {
+        CacheableMetadata::createFromRenderArray($build)
+          ->addCacheableDependency($node)
+          ->applyTo($build);
+      }
+    }
 
     return $build;
   }
