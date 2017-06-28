@@ -26,11 +26,11 @@ class CreatePrivateMessageBreadcrumbBuilder implements BreadcrumbBuilderInterfac
   /**
    * Constructs a new CreatePrivateMessageBreadcrumbBuilder.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user account.
    */
-  public function __construct(AccountInterface $account) {
-    $this->currentUser = $account;
+  public function __construct(AccountInterface $current_user) {
+    $this->currentUser = $current_user;
   }
 
   /**
