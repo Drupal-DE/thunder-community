@@ -122,8 +122,9 @@ class NotificationManager implements NotificationManagerInterface {
         $queue_item->messages = $messages;
         $this->queue->createItem($queue_item);
       }
+      // Delete notifications of the current user.
+      $this->storage->deleteByProperties(['uid' => $uid]);
     }
-    // @todo: Delete notifications sent to queue.
   }
 
   /**
