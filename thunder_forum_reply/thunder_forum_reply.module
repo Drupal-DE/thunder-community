@@ -670,7 +670,6 @@ function thunder_forum_reply_theme($existing, $type, $theme, $path) {
   $items['thunder_forum_reply_icon'] = [
     'variables' => [
       'entity' => NULL,
-      'identifier' => NULL,
       'new' => NULL,
       'own' => NULL,
     ],
