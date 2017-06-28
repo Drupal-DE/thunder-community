@@ -80,6 +80,7 @@ class PrivateMessageUserSelection extends UserSelection {
 
     // Set roles from config.
     $roles = $config->get('recipients.roles') ?: [];
+    unset($roles['authenticated']);
     if (!empty($roles)) {
       $handler_settings['filter']['role'] = array_keys(array_filter($roles));
     }
