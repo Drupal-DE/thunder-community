@@ -38,7 +38,7 @@ function template_preprocess_thunder_forum_reply_icon(&$variables) {
   // Current user is owner?
   $variables['own'] = $current_user->id() === $entity->getOwnerId();
 
-  // Not new by default. thunder_forum_reply_history module performs this check.
+  // Forum reply is unread?
   $variables['new'] = $forum_reply_manager->isUnreadReply($entity, $current_user);
 }
 

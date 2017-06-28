@@ -47,6 +47,9 @@ interface ForumReplyManagerInterface {
   /**
    * Returns TRUE if the given forum node reply not read by the given user yet.
    *
+   * Unless the 'thunder_forum_reply_history' module is enabled, this method
+   * returns always FALSE.
+   *
    * @param \Drupal\thunder_forum_reply\ForumReplyInterface $reply
    *   A forum reply.
    * @param \Drupal\Core\Session\AccountInterface $account
