@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * @file
+ * Main functions for "THunder Notify" module.
+ */
+
+use Drupal\Component\Utility\SafeMarkup;
+
+/**
+ * Implements hook_mail().
+ */
+function thunder_notify_mail($key, &$message, $params) {
+  switch ($key) {
+    case 'notification_email':
+      $message['subject'] = SafeMarkup::checkPlain($params['subject']);
+      $message['body'][] = SafeMarkup::checkPlain($params['message']);
+      break;
+  }
+}

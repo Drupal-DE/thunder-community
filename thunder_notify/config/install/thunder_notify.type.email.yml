@@ -1,0 +1,13 @@
+langcode: en
+id: email
+message: >
+  Hello "{user:name}",
+  you asked to be notified if something happend on "{site:name}".
+
+  Please go to {site:url} to see the changes.
+
+  {messages}
+  ---
+
+  {site:name}: {site:url}
+subject: 'Something happend on "{site:name}"'

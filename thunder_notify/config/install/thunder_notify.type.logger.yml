@@ -1,8 +1,4 @@
 langcode: en
-dependencies:
-  enforced:
-    module:
-      - thunder_notify
 id: logger
 message: >
   "{user:name}" received the following notification:

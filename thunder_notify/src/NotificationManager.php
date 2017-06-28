@@ -15,7 +15,7 @@ use Drupal\Core\Url;
 /**
  * Notification manager.
  */
-class NotificationManager implements \Drupal\thunder_notify\NotificationManagerInterface {
+class NotificationManager implements NotificationManagerInterface {
 
   use StringTranslationTrait;
 
@@ -138,7 +138,7 @@ class NotificationManager implements \Drupal\thunder_notify\NotificationManagerI
     // Limit worker to a fixed number of items.
     $limit = $config->get('queue.limit') ?: 100;
     $process = 0;
-    while ($item = $this->queue->claimItem() && ($process <= $limit)) {
+    while (($item = $this->queue->claimItem()) && ($process <= $limit)) {
       try {
         $process++;
         $queue_worker->processItem($item->data);
@@ -181,8 +181,8 @@ class NotificationManager implements \Drupal\thunder_notify\NotificationManagerI
     unset($tokens['pass']);
 
     return array_combine(array_map(function ($key) {
-        return "{user:{$key}}";
-      }, array_keys($tokens)), $tokens);
+      return "{user:{$key}}";
+    }, array_keys($tokens)), $tokens);
   }
 
   /**
