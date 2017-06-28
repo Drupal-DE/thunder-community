@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: THUNDER FORUM REPLY\n"
 "POT-Creation-Date: 2017-06-21 17:10+0000\n"
-"PO-Revision-Date: 2017-06-21 17:10+0200\n"
+"PO-Revision-Date: 2017-06-28 10:18+0200\n"
 "Language-Team: German\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -19,3 +19,12 @@ msgstr "Erstellt von @username am @datetime"
 
 msgid "In reply to @parent_title by @parent_username"
 msgstr "Antwort auf @parent_title von @parent_username"
+
+msgid "Any related responses to this forum reply will be lost. This action cannot be undone."
+msgstr "Jegliche zugehörige Antworten zu dieser Forenantwort werden ebenfalls gelöscht. Diese Aktion kann nicht rückgängig gemacht werden."
+
+msgid "The forum reply and all its related responses have been deleted."
+msgstr "Die Forenantwort und alle zugehörigen Antworten wurden gelöscht."
+
+msgid "Deleted forum reply @frid and its related responses."
+msgstr "Forenantwort @frid und alle zugehörigen Antworten wurden gelöscht."
