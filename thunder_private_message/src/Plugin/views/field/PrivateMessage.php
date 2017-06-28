@@ -147,33 +147,32 @@ class PrivateMessage extends FieldPluginBase {
     if (!empty($this->options['link_to_private_message']) && !empty($this->additional_fields['mid'])) {
       if ($data !== NULL && $data !== '') {
         // Prepare route name and parameters.
+        $route_name = 'entity.message.canonical.thunder_private_message';
         $route_parameters = [
           'message' => $message->id(),
         ];
 
         switch ($this->options['link_to_private_message']) {
           case 'inbox':
-            $route_name = 'entity.message.canonical.thunder_private_message.inbox';
-
             if (!($recipient = $this->privateMessageHelper->getMessageRecipient($message))) {
               return $data;
             }
 
+            $route_parameters['message_directory'] = 'inbox';
             $route_parameters['user'] = $recipient->id();
             break;
 
           case 'outbox':
-            $route_name = 'entity.message.canonical.thunder_private_message.outbox';
-
             if (!($sender = $message->getOwnerId())) {
               return $data;
             }
 
+            $route_parameters['message_directory'] = 'outbox';
             $route_parameters['user'] = $sender;
             break;
         }
 
-        if (!$route_name) {
+        if (!isset($route_parameters['message_directory'])) {
           return $data;
         }
 

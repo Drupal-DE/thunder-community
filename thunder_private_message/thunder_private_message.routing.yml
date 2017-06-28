@@ -24,22 +24,13 @@ thunder_private_message.add:
       recipient:
         type: entity:user
 
-entity.message.canonical.thunder_private_message.inbox:
-  path: '/user/{user}/private-messages/inbox/{message}'
+entity.message.canonical.thunder_private_message:
+  path: '/user/{user}/private-messages/{message_directory}/{message}'
   defaults:
     _controller: '\Drupal\thunder_private_message\Controller\PrivateMessageController::message'
     _title_callback: '\Drupal\thunder_private_message\Controller\PrivateMessageController::messageTitle'
-    message_directory: inbox
   requirements:
-    _custom_access: '\Drupal\thunder_private_message\Controller\PrivateMessageController::messageAccess'
-
-entity.message.canonical.thunder_private_message.outbox:
-  path: '/user/{user}/private-messages/outbox/{message}'
-  defaults:
-    _controller: '\Drupal\thunder_private_message\Controller\PrivateMessageController::message'
-    _title_callback: '\Drupal\thunder_private_message\Controller\PrivateMessageController::messageTitle'
-    message_directory: outbox
-  requirements:
+    message_directory: 'inbox|outbox'
     _custom_access: '\Drupal\thunder_private_message\Controller\PrivateMessageController::messageAccess'
 
 entity.user.thunder_private_message.inbox:

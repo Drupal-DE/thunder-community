@@ -10,9 +10,9 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
- * Breadcrumb builder for 'Create private message'.
+ * Breadcrumb builder for private messages in outbox.
  */
-class CreatePrivateMessageBreadcrumbBuilder implements BreadcrumbBuilderInterface {
+class OutboxBreadcrumbBuilder implements BreadcrumbBuilderInterface {
 
   use StringTranslationTrait;
 
@@ -24,7 +24,7 @@ class CreatePrivateMessageBreadcrumbBuilder implements BreadcrumbBuilderInterfac
   protected $currentUser;
 
   /**
-   * Constructs a new CreatePrivateMessageBreadcrumbBuilder.
+   * Constructs a new OutboxBreadcrumbBuilder.
    *
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user account.
@@ -37,7 +37,7 @@ class CreatePrivateMessageBreadcrumbBuilder implements BreadcrumbBuilderInterfac
    * {@inheritdoc}
    */
   public function applies(RouteMatchInterface $route_match) {
-    return 'thunder_private_message.add' === $route_match->getRouteName();
+    return ('entity.user.thunder_private_message.outbox' === $route_match->getRouteName());
   }
 
   /**

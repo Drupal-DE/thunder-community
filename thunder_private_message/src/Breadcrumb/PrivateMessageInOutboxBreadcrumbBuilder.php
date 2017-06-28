@@ -17,7 +17,7 @@ class PrivateMessageInOutboxBreadcrumbBuilder extends PrivateMessageBreadcrumbBu
     /* @var $message \Drupal\message\MessageInterface */
     $message = $route_match->getParameter('message');
 
-    return ('entity.message.canonical.thunder_private_message.outbox' === $route_match->getRouteName()) && !empty($message) && ('thunder_private_message' === $message->bundle());
+    return ('entity.message.canonical.thunder_private_message' === $route_match->getRouteName() && 'outbox' === $route_match->getParameter('message_directory')) && !empty($message) && ('thunder_private_message' === $message->bundle());
   }
 
   /**
