@@ -120,12 +120,24 @@ class PrivateMessageActionLink extends Reload {
 
       // Current user is sender?
       if ($this->privateMessageHelper->userIsSender($this->currentUser, $message)) {
-        $route_name = $back_to_message_page ? 'entity.message.canonical.thunder_private_message.outbox' : 'entity.user.thunder_private_message.outbox';
+        if ($back_to_message_page) {
+          $route_name = 'entity.message.canonical.thunder_private_message';
+          $route_parameters['message_directory'] = 'outbox';
+        }
+        else {
+          $route_name = 'entity.user.thunder_private_message.outbox';
+        }
       }
 
       // Current user is recipient?
       elseif ($this->privateMessageHelper->userIsRecipient($this->currentUser, $message)) {
-        $route_name = $back_to_message_page ? 'entity.message.canonical.thunder_private_message.inbox' : 'entity.user.thunder_private_message.inbox';
+        if ($back_to_message_page) {
+          $route_name = 'entity.message.canonical.thunder_private_message';
+          $route_parameters['message_directory'] = 'inbox';
+        }
+        else {
+          $route_name = 'entity.user.thunder_private_message.inbox';
+        }
       }
 
       if ($route_name) {

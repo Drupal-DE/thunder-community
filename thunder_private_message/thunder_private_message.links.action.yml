@@ -11,4 +11,4 @@ thunder_private_message.reply:
   title: 'Create reply'
   class: \Drupal\thunder_private_message\Plugin\Menu\LocalAction\ReplyToPrivateMessageLocalAction
   appears_on:
-    - entity.message.canonical.thunder_private_message.inbox
+    - entity.message.canonical.thunder_private_message
