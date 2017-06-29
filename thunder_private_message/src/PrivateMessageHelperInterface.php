@@ -60,6 +60,20 @@ interface PrivateMessageHelperInterface {
   public function getUnreadCount(AccountInterface $recipient = NULL);
 
   /**
+   * Returns TRUE if the given message is not read by the given user yet.
+   *
+   * @param \Drupal\message\MessageInterface $message
+   *   A message.
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   A user object.
+   *
+   * @return bool
+   *   Boolean indicating whether the given message was not read by the given
+   *   user yet.
+   */
+  public function isUnreadMessage(MessageInterface $message, AccountInterface $account);
+
+  /**
    * Whether one user can write a private message to another user.
    *
    * @param \Drupal\Core\Session\AccountInterface $recipient

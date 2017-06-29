@@ -8,6 +8,17 @@ namespace Drupal\thunder_private_message;
 interface PrivateMessageLazyBuilderInterface {
 
   /**
+   * Lazy builder callback; render icon.
+   *
+   * @param int $mid
+   *   The message ID.
+   *
+   * @return array
+   *   A renderable array containing the icon.
+   */
+  public function renderIcon($mid);
+
+  /**
    * Lazy builder callback; render number of unread messages of a user.
    *
    * @param int $uid

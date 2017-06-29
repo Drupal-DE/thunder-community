@@ -27,7 +27,7 @@ interface ForumReplyLazyBuildersInterface {
    *   The forum reply ID.
    *
    * @return array
-   *   A renderable array containing icon.
+   *   A renderable array containing the icon.
    */
   public function renderIcon($frid);
 

@@ -45,7 +45,10 @@ interface ForumReplyManagerInterface {
   public function getCountNewReplies(ContentEntityInterface $entity, $field_name = NULL, $timestamp = 0);
 
   /**
-   * Returns TRUE if the given forum node reply not read by the given user yet.
+   * Returns TRUE if the given forum reply is not read by the given user yet.
+   *
+   * Unless the 'thunder_forum_reply_history' module is enabled, this method
+   * returns always FALSE.
    *
    * @param \Drupal\thunder_forum_reply\ForumReplyInterface $reply
    *   A forum reply.
