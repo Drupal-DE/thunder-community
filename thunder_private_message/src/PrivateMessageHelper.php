@@ -146,6 +146,26 @@ class PrivateMessageHelper implements PrivateMessageHelperInterface {
   /**
    * {@inheritdoc}
    */
+  public function isUnreadMessage(MessageInterface $message, AccountInterface $account) {
+    if ($this->userIsRecipient($account, $message)) {
+      $query = $this->database->select('message_field_data', 'm');
+      $query->leftJoin('message_history', 'h', 'm.mid = h.mid AND h.uid = :uid', [':uid' => $account->id()]);
+      $query->addExpression('COUNT(m.mid)', 'count');
+
+      return $query
+        ->condition('m.mid', $message->id())
+        ->condition('m.created', HISTORY_READ_LIMIT, '>')
+        ->isNull('h.mid')
+        ->execute()
+        ->fetchField() > 0;
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function userCanWriteMessageToOtherUser(AccountInterface $recipient, AccountInterface $sender = NULL) {
     $sender = isset($sender) ? $sender : $this->currentUser;
 
