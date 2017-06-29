@@ -1,0 +1,8 @@
+langcode: en
+dependencies:
+  enforced:
+    module:
+      - thunder_notify
+id: private_message
+message: >
+  {message-list}

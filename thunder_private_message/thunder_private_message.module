@@ -16,6 +16,8 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\flag\FlagInterface;
 use Drupal\message\MessageInterface;
+use Drupal\thunder_notify\Event\NotificationCreateEvent;
+use Drupal\thunder_notify\Event\NotificationEvents;
 use Drupal\thunder_private_message\FieldDefinition;
 
 /**
@@ -422,4 +424,28 @@ function thunder_private_message_theme($existing, $type, $theme, $path) {
   ];
 
   return $items;
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ */
+function thunder_private_message_message_insert(EntityInterface $entity) {
+  /* @var $entity \Drupal\message\MessageInterface */
+  if (!\Drupal::moduleHandler()->moduleExists('thunder_notify') || ('thunder_private_message' !== $entity->bundle())) {
+    return;
+  }
+
+  /* @var $event_dispatcher \Symfony\Component\EventDispatcher\EventDispatcherInterface */
+  $event_dispatcher = \Drupal::service('event_dispatcher');
+  /* @var $message_helper \Drupal\thunder_private_message\PrivateMessageHelperInterface */
+  $message_helper = \Drupal::service('thunder_private_message.helper');
+  $data = [
+    'entity' => $entity,
+    'users' => [
+      $message_helper->getMessageRecipient($entity)->id(),
+    ],
+  ];
+
+  $event = new NotificationCreateEvent('private_message', $data);
+  $event_dispatcher->dispatch(NotificationEvents::CREATE, $event);
 }

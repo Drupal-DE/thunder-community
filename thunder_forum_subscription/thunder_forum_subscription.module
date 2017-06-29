@@ -13,6 +13,7 @@ use Drupal\node\NodeInterface;
 use Drupal\taxonomy\TermInterface;
 use Drupal\thunder_notify\Event\NotificationCreateEvent;
 use Drupal\thunder_notify\Event\NotificationEvents;
+use Drupal\user\EntityOwnerInterface;
 
 /**
  * Implements hook_flag_action_access().
@@ -90,6 +91,12 @@ function thunder_forum_subscription_thunder_forum_reply_insert(EntityInterface $
     'entity' => $entity->getRepliedNode(),
     'users' => _thunder_forum_subscriptions_get_flaggings('thunder_forum_subscription_topic', $entity->getRepliedNodeId(), 'node'),
   ];
+  error_log(print_r($data['users'], TRUE));
+  if ($entity instanceof EntityOwnerInterface && ($entity->getOwnerId() === \Drupal::currentUser()->id())) {
+    // Do not notify on self-triggered updates.
+    unset($data['users'][$entity->getOwnerId()]);
+  }
+  error_log(print_r($data['users'], TRUE));
 
   $event = new NotificationCreateEvent('topic_subscription', $data);
   $event_dispatcher->dispatch(NotificationEvents::CREATE, $event);
@@ -119,6 +126,10 @@ function _thunder_forum_subscription_forum_notify_subscribers(EntityInterface $e
     'entity' => $forum_term,
     'users' => _thunder_forum_subscriptions_get_flaggings('thunder_forum_subscription_forum', $forum_term->id(), 'taxonomy_term'),
   ];
+  if ($entity instanceof EntityOwnerInterface && ($entity->getOwnerId() === \Drupal::currentUser()->id())) {
+    // Do not notify on self-triggered updates.
+    unset($data['users'][$entity->getOwnerId()]);
+  }
 
   $event = new NotificationCreateEvent('forum_subscription', $data);
   $event_dispatcher->dispatch(NotificationEvents::CREATE, $event);

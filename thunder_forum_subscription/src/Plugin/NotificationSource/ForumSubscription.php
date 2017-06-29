@@ -12,7 +12,7 @@ use Drupal\thunder_notify\NotificationSourceBase;
  *   label = @Translation("Forum subscription"),
  *   token = "forum-subscriptions",
  *   message_tokens = {
- *     "forum-list": @Translation("List of forums with new content.")
+ *     "forum-list": @Translation("List of forums with new content")
  *   },
  *   category = "thunder_forum_subscription"
  * )

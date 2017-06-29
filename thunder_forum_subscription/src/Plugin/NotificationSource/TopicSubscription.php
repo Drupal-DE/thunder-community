@@ -12,20 +12,12 @@ use Drupal\thunder_notify\NotificationSourceBase;
  *   label = @Translation("Topic subscription"),
  *   token = "topic-subscriptions",
  *   message_tokens = {
- *     "topic-list": @Translation("List of topics with new replies.")
+ *     "topic-list": @Translation("List of topics with new replies")
  *   },
  *   category = "thunder_forum_subscription"
  * )
  */
 class TopicSubscription extends NotificationSourceBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function isValid() {
-    // @todo: Check if the user still should receive a message.
-    return TRUE;
-  }
 
   /**
    * {@inheritdoc}

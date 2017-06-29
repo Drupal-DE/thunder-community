@@ -78,9 +78,12 @@ class NotificationStorage implements NotificationStorageInterface {
       'source' => $data['source'],
       'uid' => $data['uid'],
     ];
-    if (($existing = $this->loadByProperties($properties)) && !empty($existing['nid'])) {
-      // Merge existing data with new data while new data overrides existing.
-      $data['data'] = array_replace_recursive($existing['data'], $data['data']);
+    if (($existing = $this->loadByProperties($properties))) {
+      $existing = reset($existing);
+      if (!empty($existing['nid'])) {
+        // Merge existing data with new data while new data overrides existing.
+        $data['data'] = array_replace_recursive($existing['data'], $data['data']);
+      }
     }
     // Serialize data so it can be saved.
     $data['data'] = serialize($data['data']);
