@@ -122,4 +122,17 @@ function thunder_private_message_views_data_alter(array &$data) {
       ];
     }
   }
+
+  // Messages.
+  if (isset($data['message_field_data'])) {
+    // Private message icon.
+    $data['message_field_data']['thunder_private_message_icon'] = [
+      'title' => t('Private message icon'),
+      'help' => t('The private message icon.'),
+      'field' => [
+        'field' => 'mid',
+        'id' => 'thunder_private_message_icon',
+      ],
+    ];
+  }
 }
