@@ -5,7 +5,6 @@ namespace Drupal\thunder_forum_reply\Plugin\Field\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\thunder_forum_reply\Plugin\Field\FieldType\ForumReplyItemInterface;
 
 /**
@@ -20,8 +19,6 @@ use Drupal\thunder_forum_reply\Plugin\Field\FieldType\ForumReplyItemInterface;
  * )
  */
 class ForumReplyWidget extends WidgetBase {
-
-  use StringTranslationTrait;
 
   /**
    * {@inheritdoc}
