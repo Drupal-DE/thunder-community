@@ -2,6 +2,7 @@
 
 namespace Drupal\thunder_private_message;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
@@ -34,6 +35,35 @@ class PrivateMessageLazyBuilder implements PrivateMessageLazyBuilderInterface {
   public function __construct(EntityTypeManagerInterface $entity_type_manager, PrivateMessageHelperInterface $private_message_helper) {
     $this->entityTypeManager = $entity_type_manager;
     $this->privateMessageHelper = $private_message_helper;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function renderIcon($mid) {
+    /** @var \Drupal\message\MessageInterface $entity */
+    $entity = $this->entityTypeManager
+      ->getStorage('message')
+      ->load($mid);
+
+    // Build private message icon.
+    $build = [
+      '#theme' => 'thunder_private_message_icon',
+      '#entity' => $entity,
+      '#cache' => [
+        'contexts' => ['user'],
+        'max-age' => 0,
+      ],
+    ];
+
+    // Add entity to cache metadata.
+    if ($entity) {
+      CacheableMetadata::createFromRenderArray($build)
+        ->addCacheableDependency($entity)
+        ->applyTo($build);
+    }
+
+    return $build;
   }
 
   /**
