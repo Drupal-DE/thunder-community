@@ -1,0 +1,11 @@
+langcode: en
+dependencies:
+  enforced:
+    module:
+      - thunder_notify
+id: forum_subscription
+message: >
+  There is new content in forums you have subscribed to:
+
+
+  {forum-list}

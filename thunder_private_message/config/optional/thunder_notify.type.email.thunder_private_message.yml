@@ -1,0 +1,14 @@
+langcode: en
+id: email.thunder_private_message
+message: >
+  Hello "{user:name}",
+  there are new private messages waiting for you on "{site:name}".
+
+  {messages}
+
+  For a list of all messages go to {site:url}user/{user:uid}/private-messages.
+
+  ---
+
+  {site:name}: {site:url}
+subject: 'New private messages on "{site:name}"'

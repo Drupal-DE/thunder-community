@@ -11,6 +11,9 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\flag\FlagInterface;
 use Drupal\node\NodeInterface;
 use Drupal\taxonomy\TermInterface;
+use Drupal\thunder_notify\Event\NotificationCreateEvent;
+use Drupal\thunder_notify\Event\NotificationEvents;
+use Drupal\user\EntityOwnerInterface;
 
 /**
  * Implements hook_flag_action_access().
@@ -61,4 +64,98 @@ function thunder_forum_subscription_flag_action_access($action, FlagInterface $f
   }
 
   return AccessResult::neutral();
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ */
+function thunder_forum_subscription_node_insert(EntityInterface $entity) {
+  _thunder_forum_subscription_forum_notify_subscribers($entity);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ */
+function thunder_forum_subscription_thunder_forum_reply_insert(EntityInterface $entity) {
+  if (!\Drupal::moduleHandler()->moduleExists('thunder_notify')) {
+    return;
+  }
+  /* @var $entity \Drupal\thunder_forum_reply\Entity\ForumReply */
+
+  // Add notifications for subscribers of parent forum.
+  _thunder_forum_subscription_forum_notify_subscribers($entity->getRepliedNode());
+
+  /* @var $event_dispatcher \Symfony\Component\EventDispatcher\EventDispatcherInterface */
+  $event_dispatcher = \Drupal::service('event_dispatcher');
+  $data = [
+    'entity' => $entity->getRepliedNode(),
+    'users' => _thunder_forum_subscriptions_get_flaggings('thunder_forum_subscription_topic', $entity->getRepliedNodeId(), 'node'),
+  ];
+  error_log(print_r($data['users'], TRUE));
+  if ($entity instanceof EntityOwnerInterface && ($entity->getOwnerId() === \Drupal::currentUser()->id())) {
+    // Do not notify on self-triggered updates.
+    unset($data['users'][$entity->getOwnerId()]);
+  }
+  error_log(print_r($data['users'], TRUE));
+
+  $event = new NotificationCreateEvent('topic_subscription', $data);
+  $event_dispatcher->dispatch(NotificationEvents::CREATE, $event);
+}
+
+/**
+ * Helper function to notify subscribers of forum terms.
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *   A new forum topic node.
+ */
+function _thunder_forum_subscription_forum_notify_subscribers(EntityInterface $entity) {
+  if (!\Drupal::moduleHandler()->moduleExists('thunder_notify') || 'forum' !== $entity->bundle()) {
+    return;
+  }
+  if ($entity->get('taxonomy_forums')->isEmpty()) {
+    return;
+  }
+  /* @var $forum_term \Drupal\taxonomy\TermInterface */
+  if (($forum_term = $entity->get('taxonomy_forums')->first()->entity) === NULL) {
+    return;
+  }
+
+  /* @var $event_dispatcher \Symfony\Component\EventDispatcher\EventDispatcherInterface */
+  $event_dispatcher = \Drupal::service('event_dispatcher');
+  $data = [
+    'entity' => $forum_term,
+    'users' => _thunder_forum_subscriptions_get_flaggings('thunder_forum_subscription_forum', $forum_term->id(), 'taxonomy_term'),
+  ];
+  if ($entity instanceof EntityOwnerInterface && ($entity->getOwnerId() === \Drupal::currentUser()->id())) {
+    // Do not notify on self-triggered updates.
+    unset($data['users'][$entity->getOwnerId()]);
+  }
+
+  $event = new NotificationCreateEvent('forum_subscription', $data);
+  $event_dispatcher->dispatch(NotificationEvents::CREATE, $event);
+}
+
+/**
+ * Helper function to get a list of user IDs who flagged a specific entity.
+ *
+ * This function aims to have a much better performance than the flag API.
+ *
+ * @param string $flag_id
+ *   ID of flag to lookup.
+ * @param int $entity_id
+ *   ID of entity which has been flagged.
+ * @param string $entity_type
+ *   Entity type of entity.
+ *
+ * @return array
+ *   List of user IDs who flagged the entity.
+ */
+function _thunder_forum_subscriptions_get_flaggings($flag_id, $entity_id, $entity_type) {
+  $query = \Drupal::database()->select('flagging', 'f');
+  $query->fields('f', ['uid']);
+  $query->condition('flag_id', $flag_id)
+    ->condition('global', 0)
+    ->condition('entity_id', $entity_id)
+    ->condition('entity_type', $entity_type);
+  return $query->execute()->fetchAllKeyed(0, 0);
 }

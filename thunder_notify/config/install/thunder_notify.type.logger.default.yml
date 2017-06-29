@@ -1,0 +1,11 @@
+langcode: en
+id: logger.default
+message: >
+  "{user:name}" received the following notification:
+
+  {messages}
+
+  ==================================================
+
+  {site:name}: {site:url}
+subject: 'New notification for "{user:name}" ({user:uid})'
