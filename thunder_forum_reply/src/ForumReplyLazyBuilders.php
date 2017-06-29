@@ -107,10 +107,14 @@ class ForumReplyLazyBuilders implements ForumReplyLazyBuildersInterface {
    * {@inheritdoc}
    */
   public function renderIcon($frid) {
-    /** @var \Drupal\thunder_forum_reply\ForumReplyInterface $entity */
-    $entity = $this->entityTypeManager
-      ->getStorage('thunder_forum_reply')
-      ->load($frid);
+    /** @var \Drupal\thunder_forum_reply\ForumReplyInterface|null $entity */
+    $entity = NULL;
+
+    if ($frid) {
+      $entity = $this->entityTypeManager
+        ->getStorage('thunder_forum_reply')
+        ->load($frid);
+    }
 
     // Build forum icon.
     $build = [

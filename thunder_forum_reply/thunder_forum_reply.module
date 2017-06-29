@@ -35,11 +35,16 @@ function template_preprocess_thunder_forum_reply_icon(&$variables) {
 
   $current_user = \Drupal::currentUser();
 
-  // Current user is owner?
-  $variables['own'] = $current_user->id() === $entity->getOwnerId();
+  $variables['own'] = FALSE;
+  $variables['new'] = FALSE;
 
-  // Forum reply is unread?
-  $variables['new'] = $forum_reply_manager->isUnreadReply($entity, $current_user);
+  if ($entity) {
+    // Current user is owner?
+    $variables['own'] = $current_user->id() === $entity->getOwnerId();
+
+    // Forum reply is unread?
+    $variables['new'] = $forum_reply_manager->isUnreadReply($entity, $current_user);
+  }
 }
 
 /**
