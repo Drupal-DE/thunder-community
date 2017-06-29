@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Extension\Extension;
@@ -142,6 +143,23 @@ function thunder_private_message_entity_bundle_field_info(EntityTypeInterface $e
   }
 
   return $fields;
+}
+
+/**
+ * Implements hook_entity_extra_field_info().
+ */
+function thunder_private_message_entity_extra_field_info() {
+  $info = [];
+
+  // Private message icon.
+  $info['message']['thunder_private_message']['display']['icon'] = [
+    'label' => t('Icon'),
+    'description' => t('Private message icon.'),
+    'weight' => 100,
+    'visible' => FALSE,
+  ];
+
+  return $info;
 }
 
 /**
@@ -303,6 +321,26 @@ function thunder_private_message_message_access(EntityInterface $message, $opera
   }
 
   return $access;
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view() for message entities.
+ */
+function thunder_private_message_message_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
+  if ('thunder_private_message' === $entity->bundle()) {
+    // Icon.
+    if ($display->getComponent('icon')) {
+      $build['icon'] = [
+        '#lazy_builder' => [
+          'thunder_private_message.lazy_builder:renderIcon',
+          [
+            $entity->id(),
+          ],
+        ],
+        '#create_placeholder' => TRUE,
+      ];
+    }
+  }
 }
 
 /**
