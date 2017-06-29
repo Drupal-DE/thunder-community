@@ -1,5 +1,25 @@
 # Schema for the configuration files of the Thunder Notify module.
 
+thunder_notify.settings:
+  type: config_object
+  mapping:
+    cron_access_key:
+      type: string
+      label: 'Cron access key'
+    queue:
+      label: 'Queue'
+      type: mapping
+      mapping:
+        limit:
+          type: integer
+          label: 'Maximum number of items to process'
+    notification_types:
+      label: 'Notification types'
+      type: sequence
+      sequence:
+        type: string
+        label: 'Notification type'
+
 thunder_notify.source.*:
   type: config_object
   label: 'Notification source'

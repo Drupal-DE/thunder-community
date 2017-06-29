@@ -10,6 +10,11 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 interface NotificationTypeInterface extends ContainerFactoryPluginInterface {
 
   /**
+   * Get the label of the type.
+   */
+  public function getLabel();
+
+  /**
    * Set the category to use for the type.
    *
    * @param string $category

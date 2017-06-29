@@ -34,6 +34,13 @@ abstract class NotificationTypeBase extends PluginBase implements NotificationTy
   /**
    * {@inheritdoc}
    */
+  public function getLabel() {
+    return $this->pluginDefinition['label'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function setCategory($category) {
     $this->category = $category;
   }

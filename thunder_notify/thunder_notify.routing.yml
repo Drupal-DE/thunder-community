@@ -18,3 +18,10 @@ thunder_notify.cron.send:
     no_cache: TRUE
   requirements:
     _custom_access: '\Drupal\thunder_notify\Controller\CronController::access'
+thunder_notify.settings:
+  path: '/admin/config/services/thunder-notify/settings'
+  defaults:
+    _form: '\Drupal\thunder_notify\Form\SettingsForm'
+    _title: 'Thunder Notify'
+  requirements:
+    _permission: 'administer thunder_notify'

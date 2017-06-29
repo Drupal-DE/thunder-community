@@ -1,7 +1,5 @@
 cron_access_key: i2mb4xKOzk0W8vEiw6nLsbni
 queue:
-  # Process a maximum of 250 items with each run.
   limit: 250
 notification_types:
-  logger: true
-  email: true
+  logger: logger
