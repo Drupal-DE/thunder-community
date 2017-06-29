@@ -7,13 +7,15 @@ thunder_notify.source.*:
     message:
       type: text
       label: 'Message to send in a notification'
-thunder_notify.type.*:
+
+# thunder_notify.type.{type}.{category}:
+thunder_notify.type.*.*:
   type: config_object
-  label: 'Notification type'
+  label: 'Categorized notification type'
   mapping:
     subject:
       type: label
-      label: 'Notification subject'
+      label: 'Subject'
     message:
       type: text
-      label: 'Message to send in a notification'
+      label: 'Message'

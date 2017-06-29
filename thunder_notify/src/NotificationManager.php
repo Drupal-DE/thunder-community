@@ -115,9 +115,10 @@ class NotificationManager implements NotificationManagerInterface {
     /* @var $recipients \Drupal\Core\Entity\EntityInterface[] */
     $recipients = $this->userStorage->loadMultiple(array_keys($message_list));
     foreach ($message_list as $uid => $message_groups) {
-      foreach ($message_groups as $messages) {
-        // Save notification with all messages within this group to queue.
+      foreach ($message_groups as $category => $messages) {
+        // Save notification with all messages within this category to queue.
         $queue_item = new \stdClass();
+        $queue_item->category = $category;
         $queue_item->user = $recipients[$uid];
         $queue_item->messages = $messages;
         $this->queue->createItem($queue_item);

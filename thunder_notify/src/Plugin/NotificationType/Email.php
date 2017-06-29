@@ -2,7 +2,6 @@
 
 namespace Drupal\thunder_notify\Plugin\NotificationType;
 
-use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\Mail\MailManagerInterface;
 use Drupal\thunder_notify\NotificationTypeBase;
 use Egulias\EmailValidator\EmailValidatorInterface;
@@ -38,8 +37,8 @@ class Email extends NotificationTypeBase {
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ImmutableConfig $config, MailManagerInterface $mail_manager, EmailValidatorInterface $email_validator) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $config);
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, MailManagerInterface $mail_manager, EmailValidatorInterface $email_validator) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->mailManager = $mail_manager;
     $this->emailValidator = $email_validator;
   }
@@ -52,7 +51,6 @@ class Email extends NotificationTypeBase {
       $configuration,
       $plugin_id,
       $plugin_definition,
-      \Drupal::config("thunder_notify.type.{$plugin_id}"),
       $container->get('plugin.manager.mail'),
       $container->get('email.validator')
     );
@@ -68,7 +66,7 @@ class Email extends NotificationTypeBase {
     }
     // Build email params.
     $params = [
-      'subject' => $this->config->get('subject'),
+      'subject' => $this->buildSubject(),
       'message' => $this->buildMessage(),
     ];
     // Replace tokens in message.

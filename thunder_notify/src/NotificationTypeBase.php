@@ -2,9 +2,7 @@
 
 namespace Drupal\thunder_notify;
 
-use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\Plugin\PluginBase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Base notification type.
@@ -12,35 +10,59 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 abstract class NotificationTypeBase extends PluginBase implements NotificationTypeInterface {
 
   /**
+   * Category to use for the notification type.
+   *
+   * @var string
+   */
+  protected $category = 'default';
+
+  /**
    * The type config.
    *
-   * @var \Drupal\Core\Config\ImmutableConfig
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
-  protected $config;
+  protected $configFactory;
 
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ImmutableConfig $config) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->config = $config;
+    $this->configFactory = \Drupal::configFactory();
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static($configuration, $plugin_id, $plugin_definition, \Drupal::config("thunder_notify.type.{$plugin_id}"));
+  public function setCategory($category) {
+    $this->category = $category;
   }
 
   /**
-   * Build the message to send.
-   *
-   * @return string
-   *   The notification message.
+   * {@inheritdoc}
    */
-  protected function buildMessage() {
-    return $this->config->get('message');
+  public function getConfig() {
+    // Try loading the requested category configuration.
+    $config = $this->configFactory->get("thunder_notify.type.{$this->getPluginId()}.{$this->category}");
+    if ('default' !== $this->category && empty($config->getOriginal())) {
+      // Configuration for this category does not exists; use default.
+      return $this->configFactory->get("thunder_notify.type.{$this->getPluginId()}.default");
+    }
+    return $config;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildMessage() {
+    return $this->getConfig()->get('message');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildSubject() {
+    return $this->getConfig()->get('subject');
   }
 
   /**

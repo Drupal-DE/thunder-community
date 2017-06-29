@@ -1,5 +1,5 @@
 langcode: en
-id: logger
+id: logger.default
 message: >
   "{user:name}" received the following notification:
 

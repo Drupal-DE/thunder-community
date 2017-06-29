@@ -2,7 +2,6 @@
 
 namespace Drupal\thunder_notify\Plugin\NotificationType;
 
-use Drupal\Core\Config\ImmutableConfig;
 use Drupal\thunder_notify\NotificationTypeBase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -32,8 +31,8 @@ class Logger extends NotificationTypeBase {
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ImmutableConfig $config, LoggerInterface $logger) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $config);
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerInterface $logger) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->logger = $logger;
   }
 
@@ -45,7 +44,6 @@ class Logger extends NotificationTypeBase {
       $configuration,
       $plugin_id,
       $plugin_definition,
-      \Drupal::config("thunder_notify.type.{$plugin_id}"),
       \Drupal::logger('thunder_notify')
     );
   }
@@ -53,7 +51,7 @@ class Logger extends NotificationTypeBase {
   /**
    * {@inheritdoc}
    */
-  protected function buildMessage() {
+  public function buildMessage() {
     $message = parent::buildMessage();
 
     $output = [$message];
@@ -66,7 +64,7 @@ class Logger extends NotificationTypeBase {
    */
   public function send(array $messages, array $replacements = []) {
     $log_message[] = '<pre>';
-    $log_message[] = $this->config->get('subject');
+    $log_message[] = $this->buildSubject();
     $log_message[] = '---';
     $log_message[] = $this->buildMessage();
     $log_message[] = '</pre>';

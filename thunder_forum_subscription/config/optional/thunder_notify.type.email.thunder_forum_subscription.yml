@@ -1,0 +1,14 @@
+langcode: en
+id: email.thunder_forum_subscription
+message: >
+  Hello "{user:name}",
+  you asked to be notified if new content is published into one of the forums or
+  topics you have subscribed to.
+
+
+  {messages}
+
+  ---
+
+  {site:name}: {site:url}
+subject: 'New content on "{site:name}"'

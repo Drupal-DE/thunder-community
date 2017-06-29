@@ -14,7 +14,7 @@ use Drupal\thunder_notify\NotificationSourceBase;
  *   message_tokens = {
  *     "topic-list": @Translation("List of topics with new replies.")
  *   },
- *   category = "thunder_forum_subscriptions"
+ *   category = "thunder_forum_subscription"
  * )
  */
 class TopicSubscription extends NotificationSourceBase {

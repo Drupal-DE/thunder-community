@@ -1,5 +1,5 @@
 langcode: en
-id: email
+id: email.default
 message: >
   Hello "{user:name}",
   you asked to be notified if something happend on "{site:name}".

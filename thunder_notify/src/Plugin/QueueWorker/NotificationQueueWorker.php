@@ -68,6 +68,7 @@ class NotificationQueueWorker extends QueueWorkerBase implements ContainerFactor
     // Token replacements.
     $replacements = $this->notificationManager->getGlobalTokens() + $this->notificationManager->getUserTokens($data->user);
     foreach ($notification_types as $type) {
+      $type->setCategory($data->category);
       $type->send($data->messages, $replacements);
     }
   }
