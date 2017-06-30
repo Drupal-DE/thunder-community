@@ -19,6 +19,26 @@ interface PrivateMessageLazyBuilderInterface {
   public function renderIcon($mid);
 
   /**
+   * Lazy builder callback; builds a private message's links.
+   *
+   * @param string $message_entity_id
+   *   The message entity ID.
+   * @param string $view_mode
+   *   The view mode in which the message entity is being viewed.
+   * @param string $langcode
+   *   The language in which the message entity is being viewed.
+   * @param bool $is_in_preview
+   *   Whether the message entity is currently being previewed.
+   * @param string|null $location
+   *   An optional links location (e.g. to split up message links to several
+   *   link lists).
+   *
+   * @return array
+   *   A renderable array representing the message links.
+   */
+  public function renderLinks($message_entity_id, $view_mode, $langcode, $is_in_preview, $location = NULL);
+
+  /**
    * Lazy builder callback; render number of unread messages of a user.
    *
    * @param int $uid
