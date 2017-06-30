@@ -157,12 +157,10 @@ class ForumReplyLazyBuilders implements ForumReplyLazyBuildersInterface {
 
       // Set up cache metadata.
       CacheableMetadata::createFromRenderArray($links)
-        ->addCacheTags($reply->getCacheTags())
-        ->addCacheContexts($reply->getCacheContexts())
+        ->addCacheableDependency($reply)
         ->addCacheContexts(['user.permissions'])
         ->addCacheContexts(['user.roles'])
         ->addCacheContexts(['thunder_forum_reply_link_location' . (!empty($location) ? ':' . $location : '')])
-        ->mergeCacheMaxAge($reply->getCacheMaxAge())
         ->applyTo($links);
 
       // Allow other modules to alter the forum reply links.
