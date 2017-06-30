@@ -153,7 +153,7 @@ class ForumReplyLazyBuilders implements ForumReplyLazyBuildersInterface {
 
       $node = $reply->getRepliedNode();
 
-      $links['thunder_forum_reply'] = $this->buildLinks($reply, $node);
+      $links['thunder_forum_reply'] = $this->buildLinks($reply, $node, $location);
 
       // Set up cache metadata.
       CacheableMetadata::createFromRenderArray($links)
