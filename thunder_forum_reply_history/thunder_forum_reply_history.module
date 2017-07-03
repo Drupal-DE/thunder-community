@@ -176,3 +176,15 @@ function thunder_forum_reply_history_attach_timestamp($frid) {
 
   return $element;
 }
+
+/**
+ * Implements hook_ENTITY_TYPE_insert() for thunder_forum_reply entities.
+ */
+function thunder_forum_reply_history_thunder_forum_reply_insert(EntityInterface $entity) {
+  /* @var $entity Drupal\thunder_forum_reply\ForumReplyInterface */
+  if (\Drupal::currentUser()->id() !== $entity->getOwnerId()) {
+    return;
+  }
+  // Immediately mark as read for reply author.
+  thunder_forum_reply_history_write($entity->id());
+}
