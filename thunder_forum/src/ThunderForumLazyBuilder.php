@@ -42,9 +42,9 @@ class ThunderForumLazyBuilder implements ThunderForumLazyBuilderInterface {
    */
   public function renderIcon($entity_type_id, $entity_id) {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-    $entity = $this->entityTypeManager
+    $entity = $entity_id ? $this->entityTypeManager
       ->getStorage($entity_type_id)
-      ->load($entity_id);
+      ->load($entity_id) : NULL;
 
     // Build forum icon.
     $build = [
