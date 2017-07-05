@@ -29,6 +29,12 @@ services:
 #    arguments: ['@flag.link_builder', '@current_user']
 #    tags:
 #      - { name: event_subscriber }
+  path_processor.thunder_private_message:
+    class: Drupal\thunder_private_message\PathProcessor\PathProcessorPrivateMessage
+    arguments: ['@entity_type.manager', '@thunder_private_message.helper', '@current_user']
+    tags:
+      - { name: path_processor_inbound, priority: 200 }
+      - { name: path_processor_outbound, priority: 200 }
   thunder_private_message.helper:
     class: Drupal\thunder_private_message\PrivateMessageHelper
     arguments: ['@database', '@entity_type.manager', '@current_user']
