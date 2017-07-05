@@ -83,7 +83,7 @@ class ForumReplyForm extends ContentEntityForm {
       '#type' => 'link',
       '#title' => $this->t('Cancel'),
       '#url' => $reply->getRepliedNode()->toUrl(),
-      '#access' => $reply->inPreview ? TRUE : FALSE,
+      '#access' => $reply->inPreview || $reply->getShouldContainParentQuoteOnCreate() || !$reply->isNew() ? TRUE : FALSE,
       '#weight' => 200,
       '#attributes' => [
         'class' => ['button'],
