@@ -34,11 +34,10 @@ class PrivateMessageForm extends BaseMessageForm {
         ]);
       }
 
-      $link = Link::fromTextAndUrl($this->t('Cancel'), $url)->toString();
-
-      $actions['cancel'] = [
-        '#markup' => $link,
-      ];
+      // Build 'Cancel' link.
+      $actions['cancel'] = Link::fromTextAndUrl($this->t('Cancel'), $url)->toRenderable();
+      $actions['cancel']['#weight'] = 200;
+      $actions['cancel']['#attributes']['class'][] = 'button';
     }
 
     return $actions;
