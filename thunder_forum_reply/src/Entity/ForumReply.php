@@ -123,7 +123,11 @@ class ForumReply extends ContentEntityBase implements ForumReplyInterface {
       ->setDescription(t('The user ID of the forum reply author.'))
       ->setTranslatable(TRUE)
       ->setSetting('target_type', 'user')
-      ->setDefaultValueCallback('Drupal\thunder_forum_reply\Entity\ForumReply::getCurrentUserId');
+      ->setDefaultValueCallback('Drupal\thunder_forum_reply\Entity\ForumReply::getCurrentUserId')
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayOptions('view', [
+        'type' => 'hidden',
+      ]);
 
     // Topic ID.
     $fields['nid'] = BaseFieldDefinition::create('entity_reference')
@@ -131,7 +135,11 @@ class ForumReply extends ContentEntityBase implements ForumReplyInterface {
       ->setDescription(t('The node ID of the forum topic the reply belongs to.'))
       ->setSetting('target_type', 'node')
       ->setSetting('target_bundles', ['forum'])
-      ->setRequired(TRUE);
+      ->setRequired(TRUE)
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayOptions('view', [
+        'type' => 'hidden',
+      ]);
 
     // Parent forum reply ID.
     $fields['pfrid'] = BaseFieldDefinition::create('entity_reference')
