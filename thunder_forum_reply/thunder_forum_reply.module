@@ -704,6 +704,26 @@ function thunder_forum_reply_theme_registry_alter(&$theme_registry) {
 }
 
 /**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function thunder_forum_reply_theme_suggestions_thunder_forum_reply(array $variables) {
+  $suggestions = [];
+  /** @var \Drupal\thunder_forum_reply\ForumReplyInterface $reply */
+  $reply = $variables['elements']['#thunder_forum_reply'];
+  $sanitized_view_mode = strtr($variables['elements']['#view_mode'], '.', '_');
+
+  $suggestions[] = 'thunder_forum_reply__' . $sanitized_view_mode;
+  $suggestions[] = 'thunder_forum_reply__' . $reply->id();
+  $suggestions[] = 'thunder_forum_reply__' . $reply->id() . '__' . $sanitized_view_mode;
+  $suggestions[] = 'thunder_forum_reply__' . $reply->getFieldName() . '__' . $sanitized_view_mode;
+  if (($replied_node = $reply->getRepliedNode())) {
+    $suggestions[] = 'thunder_forum_reply__' . $reply->getFieldName() . '__' . $replied_node->bundle() . '__' . $sanitized_view_mode;
+  }
+
+  return $suggestions;
+}
+
+/**
  * Implements hook_ENTITY_TYPE_delete() for forum reply entities.
  */
 function thunder_forum_reply_thunder_forum_reply_delete(ForumReplyInterface $reply) {
