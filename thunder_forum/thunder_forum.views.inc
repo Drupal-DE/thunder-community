@@ -52,4 +52,16 @@ function thunder_forum_views_data_alter(array &$data) {
       ],
     ];
   }
+
+  if (isset($data['users_field_data'])) {
+    // Forum user post count.
+    $data['users_field_data']['thunder_forum_user_post_count'] = [
+      'title' => t('Forum user post count'),
+      'help' => t('The number of forum posts a user has created.'),
+      'field' => [
+        'field' => 'uid',
+        'id' => 'thunder_forum_user_post_count',
+      ],
+    ];
+  }
 }
