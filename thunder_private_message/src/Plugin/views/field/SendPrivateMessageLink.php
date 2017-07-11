@@ -4,6 +4,7 @@ namespace Drupal\thunder_private_message\Plugin\views\field;
 
 use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\thunder_private_message\PrivateMessageHelperInterface;
 use Drupal\views\Plugin\views\field\LinkBase;
@@ -44,6 +45,13 @@ class SendPrivateMessageLink extends LinkBase {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $access_manager);
 
     $this->privateMessageHelper = $private_message_helper;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function allowAdvancedRender() {
+    return FALSE;
   }
 
   /**
@@ -114,7 +122,20 @@ class SendPrivateMessageLink extends LinkBase {
     // Add destination parameter.
     $this->options['alter']['query'] = $this->getDestinationArray();
 
-    return parent::renderLink($row);
+    $text = parent::renderLink($row);
+
+    /** @var \Drupal\Core\Url $url */
+    $url = $this->options['alter']['url'];
+    $url->setOption('query', $this->options['alter']['query']);
+
+    $build = [
+      '#theme' => 'thunder_private_message_link_send__views_view_field__' . $this->view->id() . '__' . $this->view->current_display . '__' . $this->getPluginId(),
+      '#link' => Link::fromTextAndUrl($text, $url)->toRenderable(),
+      '#uid_recipient' => $this->getEntity($row)->id(),
+      '#uid_sender' => $this->currentUser()->id(),
+    ];
+
+    return $this->getRenderer()->render($build);
   }
 
 }

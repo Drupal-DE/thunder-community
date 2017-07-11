@@ -526,6 +526,15 @@ function thunder_private_message_theme($existing, $type, $theme, $path) {
     ],
   ];
 
+  // Send private message link.
+  $items['thunder_private_message_link_send'] = [
+    'variables' => [
+      'link' => NULL,
+      'uid_recipient' => NULL,
+      'uid_sender' => NULL,
+    ],
+  ];
+
   return $items;
 }
 
