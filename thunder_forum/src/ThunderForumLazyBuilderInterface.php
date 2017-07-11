@@ -27,11 +27,14 @@ interface ThunderForumLazyBuilderInterface {
    *
    * @param int $uid
    *   The user ID to render the post count for.
+   * @param string|null $theme_suggestion_suffix
+   *   An optional prefix added to the theme call to allow suggestions based on
+   *   context.
    *
    * @return array
    *   A renderable array containing the user's post count.
    */
-  public function renderUserPostCount($uid);
+  public function renderUserPostCount($uid, $theme_suggestion_suffix = NULL);
 
   /**
    * Lazy builder callback; render user rank.

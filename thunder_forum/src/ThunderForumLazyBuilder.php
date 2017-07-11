@@ -69,16 +69,15 @@ class ThunderForumLazyBuilder implements ThunderForumLazyBuilderInterface {
   /**
    * {@inheritdoc}
    */
-  public function renderUserPostCount($uid) {
+  public function renderUserPostCount($uid, $theme_suggestion_suffix = NULL) {
     $statistics = $this->forumManager->getUserStatistics($uid);
-    $count = 0;
-
-    if (isset($statistics->sum_count)) {
-      $count += $statistics->sum_count;
-    }
 
     $build = [
-      '#markup' => $count,
+      '#theme' => 'thunder_forum_user_post_count' . (isset($theme_suggestion_suffix) ? '__' . str_replace(['-'], '_', $theme_suggestion_suffix) : ''),
+      '#reply_count' => isset($statistics->reply_count) ? $statistics->reply_count : 0,
+      '#topic_count' => isset($statistics->topic_count) ? $statistics->sum_count : 0,
+      '#sum_count' => isset($statistics->sum_count) ? $statistics->sum_count : 0,
+      '#uid' => $uid,
     ];
 
     return $build;

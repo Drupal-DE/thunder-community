@@ -304,6 +304,16 @@ function thunder_forum_theme($existing, $type, $theme, $path) {
     ],
   ];
 
+  // Forum user post count.
+  $items['thunder_forum_user_post_count'] = [
+    'variables' => [
+      'topic_count' => 0,
+      'reply_count' => 0,
+      'sum_count' => 0,
+      'uid' => NULL,
+    ],
+  ];
+
   // Forum user rank.
   $items['thunder_forum_user_rank'] = [
     'variables' => [
