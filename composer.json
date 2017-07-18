@@ -15,9 +15,6 @@
   "enable-patching": true,
   "extra": {
     "patches": {
-      "drupal/core": {
-        "(DRUPAL 8.2.x only) Canonical taxonomy term link for forum vocabulary is broken [#2010132]": "https://www.drupal.org/files/issues/2010132-forum_uri_96-8.2.x.patch"
-      },
       "drupal/message_ui": {
         "buildPermissions single quotes string replacement fails [#2874976]": "https://www.drupal.org/files/issues/message_ui-permissions-2874976-4.patch",
         "Fix error on installation with non-existing config [#2886830]": "https://www.drupal.org/files/issues/message_ui-config_install-2886830-2.patch",
