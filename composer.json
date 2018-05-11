@@ -16,8 +16,6 @@
   "extra": {
     "patches": {
       "drupal/message_ui": {
-        "buildPermissions single quotes string replacement fails [#2874976]": "https://www.drupal.org/files/issues/message_ui-permissions-2874976-4.patch",
-        "Fix error on installation with non-existing config [#2886830]": "https://www.drupal.org/files/issues/message_ui-config_install-2886830-2.patch",
         "Object of class Drupal\\message\\Entity\\MessageTemplate could not be converted to string in Drupal\\syslog\\Logger\\SysLog->log() [#2894234]": "https://www.drupal.org/files/issues/object_of_class-2894234-2.patch"
       }
     }
